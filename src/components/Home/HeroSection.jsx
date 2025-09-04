@@ -209,7 +209,7 @@ const HeroSection = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="relative z-10">View My Showreel</span>
+            <span className="relative z-10">View Our Work</span>
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </motion.button>
 
@@ -237,7 +237,7 @@ const HeroSection = () => {
       >
         <div className="text-center mb-6">
           <p className="text-gray-400 text-sm font-light">
-            Experience my work in motion
+            Experience Our work in motion
           </p>
         </div>
 
