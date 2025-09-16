@@ -1,15 +1,8 @@
-import Home from "./page/Home";
-import "./App.css";
-import DarkAnimatedBackground from "./components/DarkAnimatedBackground";
+import { RouterProvider } from "react-router-dom";
+import router from "./router";
 
 function App() {
-  return (
-    <>
-      <DarkAnimatedBackground>
-        <Home />
-      </DarkAnimatedBackground>
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
