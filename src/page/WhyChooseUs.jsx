@@ -1,60 +1,59 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { getReviews } from "../services/api"; // Adjust the import path as needed
 
 const WhyChooseUs = () => {
   const canvasRef = useRef(null);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Testimonials data
-  const testimonials = [
-    {
-      id: 1,
-      text: "Their editing transformed our content completely. The cinematic quality and attention to detail exceeded our expectations.",
-      author: "John Carter",
-      role: "Creative Director, Vision Studios",
-      initials: "JC",
-    },
-    {
-      id: 2,
-      text: "The turnaround time was incredible without sacrificing quality. They understood our brand vision perfectly from day one.",
-      author: "Sarah Johnson",
-      role: "Marketing Director, TechVision",
-      initials: "SJ",
-    },
-    {
-      id: 3,
-      text: "Working with this team elevated our video content to a professional level. Their color grading expertise is unmatched.",
-      author: "Michael Chen",
-      role: "Content Creator, Digital Waves",
-      initials: "MC",
-    },
-    {
-      id: 4,
-      text: "The motion graphics and visual effects added so much value to our product launch video. Absolutely stunning work!",
-      author: "Emma Rodriguez",
-      role: "Product Manager, InnovateCo",
-      initials: "ER",
-    },
-    {
-      id: 5,
-      text: "Their creative input took our documentary to the next level. The storytelling and pacing were absolutely perfect.",
-      author: "David Wilson",
-      role: "Director, True Stories Films",
-      initials: "DW",
-    },
-    {
-      id: 6,
-      text: "The team's responsiveness and ability to incorporate feedback made the collaboration seamless and enjoyable.",
-      author: "Lisa Thompson",
-      role: "Brand Manager, StyleCo",
-      initials: "LT",
-    },
-  ];
+  // Fetch reviews from API
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        const response = await getReviews();
+
+        if (response.status === "success" && response.data?.reviews) {
+          setReviews(response.data.reviews);
+        } else {
+          setError("Failed to load reviews");
+        }
+      } catch (err) {
+        console.error("Error fetching reviews:", err);
+        setError("Error loading reviews. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  // Process reviews data for display
+  const processedReviews = reviews.map((review, index) => ({
+    id: review._id || index,
+    text: review.content,
+    author: review.userName,
+    role: review.user?.name || "Client",
+    initials: review.userName
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2),
+    screenshot: review.screenshot,
+    rating: review.rating,
+    isBest: review.isBest,
+    createdAt: review.createdAt,
+  }));
 
   // Double the testimonials for seamless looping
-  const doubledTestimonials = [...testimonials, ...testimonials];
+  const doubledTestimonials = [...processedReviews];
 
-  // Background grid animation (same as HeroSection)
+  // Background grid animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -210,6 +209,68 @@ const WhyChooseUs = () => {
     { value: "48h", label: "Avg. Delivery Time" },
   ];
 
+  // Star rating component
+  const StarRating = ({ rating }) => {
+    return (
+      <div className="flex items-center space-x-1 mb-3">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-lg ${
+              star <= rating ? "text-yellow-400" : "text-gray-600"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+        <span className="text-sm text-gray-400 ml-2">({rating}/5)</span>
+      </div>
+    );
+  };
+
+  // No Screenshot Placeholder Component
+  const NoScreenshotPlaceholder = () => {
+    return (
+      <div className="w-full h-32 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg border border-gray-400/30 flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Grid pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"></div>
+          <div className="absolute top-0 left-0 w-full h-px bg-gray-400/30"></div>
+          <div className="absolute top-1/3 left-0 w-full h-px bg-gray-400/30"></div>
+          <div className="absolute top-2/3 left-0 w-full h-px bg-gray-400/30"></div>
+          <div className="absolute top-0 left-0 h-full w-px bg-gray-400/30"></div>
+          <div className="absolute top-0 left-1/3 h-full w-px bg-gray-400/30"></div>
+          <div className="absolute top-0 left-2/3 h-full w-px bg-gray-400/30"></div>
+        </div>
+
+        {/* Camera icon */}
+        <div className="relative z-10 text-gray-600 mb-2">
+          <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 8a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+          </svg>
+        </div>
+
+        {/* Text */}
+        <div className="relative z-10 text-center">
+          <p className="text-gray-600 text-sm font-medium">No Screenshot</p>
+          <p className="text-gray-500 text-xs">Available</p>
+        </div>
+
+        {/* Subtle shine effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 translate-x-[-100%] animate-shine"></div>
+      </div>
+    );
+  };
+
+  // Format date
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black flex flex-col items-center justify-center py-20">
       {/* Animated background canvas */}
@@ -325,7 +386,7 @@ const WhyChooseUs = () => {
             <div className="relative w-full h-96 lg:h-full rounded-xl overflow-hidden border border-white/10 shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10"></div>
 
-              {/* Placeholder for feature visualization - would be replaced with actual graphics */}
+              {/* Placeholder for feature visualization */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-7xl text-cyan-400/30">
                   {features[activeFeature].icon}
@@ -360,53 +421,129 @@ const WhyChooseUs = () => {
             What Our Clients Say
           </h2>
 
-          {/* Marquee Container */}
-          <div className="relative overflow-hidden">
-            {/* Gradient overlays for the edges */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400"></div>
+              <p className="text-gray-400 mt-4">Loading reviews...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-red-400">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-4 px-6 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          ) : processedReviews.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-gray-400">
+                No reviews yet. Be the first to share your experience!
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Marquee Container */}
+              <div className="relative overflow-hidden">
+                {/* Gradient overlays for the edges */}
+                <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
+                <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
 
-            {/* Marquee */}
-            <motion.div
-              className="flex"
-              animate={{
-                x: [0, -1000],
-              }}
-              transition={{
-                x: {
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  duration: 40,
-                  ease: "linear",
-                },
-              }}
-            >
-              {doubledTestimonials.map((testimonial, index) => (
-                <div
-                  key={`${testimonial.id}-${index}`}
-                  className="flex-shrink-0 w-80 mx-3"
+                {/* Marquee */}
+                <motion.div
+                  className="flex"
+                  animate={{
+                    x: [0, -1000],
+                  }}
+                  transition={{
+                    x: {
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      duration: 40,
+                      ease: "linear",
+                    },
+                  }}
                 >
-                  <div className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 h-full">
-                    <div className="text-cyan-400 text-4xl mb-4">"</div>
-                    <p className="text-gray-300 mb-4">{testimonial.text}</p>
-                    <div className="flex items-center mt-4">
-                      <div className="w-10 h-10 rounded-full bg-cyan-900/50 flex items-center justify-center text-cyan-400 font-bold mr-3">
-                        {testimonial.initials}
-                      </div>
-                      <div>
-                        <div className="text-white font-medium">
-                          {testimonial.author}
+                  {doubledTestimonials.map((testimonial, index) => (
+                    <div
+                      key={`${testimonial.id}-${index}`}
+                      className="flex-shrink-0 w-80 mx-3"
+                    >
+                      <div
+                        className={`bg-black/30 backdrop-blur-sm p-6 rounded-xl border transition-all duration-300 h-full ${
+                          testimonial.isBest
+                            ? "border-yellow-500/50 shadow-lg shadow-yellow-500/20"
+                            : "border-white/10 hover:border-cyan-500/30"
+                        }`}
+                      >
+                        {/* Featured Badge */}
+                        {testimonial.isBest && (
+                          <div className="flex items-center mb-3">
+                            <span className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                              ⭐ Featured Review
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Star Rating */}
+                        <StarRating rating={testimonial.rating} />
+
+                        {/* Review Text */}
+                        <div className="text-cyan-400 text-4xl mb-4">"</div>
+                        <p className="text-gray-300 mb-4 line-clamp-4">
+                          {testimonial.text}
+                        </p>
+
+                        {/* Screenshot or Placeholder */}
+                        <div className="mb-4">
+                          {testimonial.screenshot ? (
+                            <img
+                              src={testimonial.screenshot}
+                              alt="Review screenshot"
+                              className="w-full h-32 object-cover rounded-lg border border-white/10"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <NoScreenshotPlaceholder />
+                          )}
                         </div>
-                        <div className="text-cyan-400 text-sm">
-                          {testimonial.role}
+
+                        {/* Author Info */}
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-cyan-900/50 flex items-center justify-center text-cyan-400 font-bold mr-3">
+                              {testimonial.initials}
+                            </div>
+                            <div>
+                              <div className="text-white font-medium">
+                                {testimonial.author}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Date */}
+                          {testimonial.createdAt && (
+                            <div className="text-gray-500 text-xs text-right">
+                              {formatDate(testimonial.createdAt)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+                  ))}
+                </motion.div>
+              </div>
+
+              {/* Reviews Summary */}
+              <div className="mt-8 text-center">
+                <p className="text-gray-400">
+                  Showing {processedReviews.length} verified review
+                  {processedReviews.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+            </>
+          )}
         </motion.div>
 
         {/* CTA Section */}
@@ -491,6 +628,21 @@ const WhyChooseUs = () => {
           •
         </motion.div>
       </motion.div>
+
+      {/* Add custom animation for the shine effect */}
+      <style jsx>{`
+        @keyframes shine {
+          0% {
+            transform: skewX(-12deg) translateX(-100%);
+          }
+          100% {
+            transform: skewX(-12deg) translateX(200%);
+          }
+        }
+        .animate-shine {
+          animation: shine 3s infinite;
+        }
+      `}</style>
     </div>
   );
 };

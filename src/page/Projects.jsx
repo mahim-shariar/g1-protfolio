@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiPlay, FiX, FiGrid, FiBox, FiFilm } from "react-icons/fi";
+import {
+  getVideoReels,
+  getCategories,
+  getVideoReelsByCategory,
+} from "../services/api"; // Adjust the import path as needed
 
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -8,104 +13,138 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [modalVideoPlaying, setModalVideoPlaying] = useState(true);
   const [activeLayout, setActiveLayout] = useState("grid");
+  const [projects, setProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const videoRefs = useRef({});
   const hoverVideoRefs = useRef({});
   const modalVideoRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Project data
-  const projects = [
-    {
-      id: 1,
-      title: "Cinematic Wedding Film",
-      category: "wedding",
-      description:
-        "A beautifully crafted wedding film with cinematic color grading and emotional storytelling",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      technologies: ["Premiere Pro", "After Effects", "Color Grading"],
-      year: "2023",
-      duration: "3:45",
-      color: "#06b6d4", // cyan-500
-    },
-    {
-      id: 2,
-      title: "Corporate Brand Video",
-      category: "commercial",
-      description:
-        "A dynamic brand video showcasing company culture and values with sleek motion graphics",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1639&q=80",
-      technologies: ["Motion Graphics", "DaVinci Resolve", "Sound Design"],
-      year: "2023",
-      duration: "2:15",
-      color: "#3b82f6", // blue-500
-    },
-    {
-      id: 3,
-      title: "Music Video Production",
-      category: "music",
-      description:
-        "A high-energy music video with creative transitions and visual effects",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      technologies: ["Visual Effects", "Color Theory", "Rhythmic Editing"],
-      year: "2022",
-      duration: "4:20",
-      color: "#8b5cf6", // violet-500
-    },
-    {
-      id: 4,
-      title: "Documentary Short",
-      category: "documentary",
-      description:
-        "An impactful documentary short focusing on environmental conservation",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1616469829476-8953c5655574?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      technologies: [
-        "Interview Editing",
-        "B-roll Sequencing",
-        "Documentary Style",
-      ],
-      year: "2022",
-      duration: "12:30",
-      color: "#10b981", // emerald-500
-    },
-    {
-      id: 5,
-      title: "Travel Vlog Series",
-      category: "travel",
-      description:
-        "A vibrant travel vlog series capturing the essence of different cultures",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1464822759849-deb748f1034a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      technologies: ["Fast-paced Editing", "Drone Footage", "Travel Vlogging"],
-      year: "2023",
-      duration: "8:15",
-      color: "#ec4899", // pink-500
-    },
-    {
-      id: 6,
-      title: "Product Launch Video",
-      category: "commercial",
-      description:
-        "A sleek product launch video with 3D integration and dynamic transitions",
-      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
-      thumbnail:
-        "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1455&q=80",
-      technologies: ["3D Integration", "Product Showcase", "Brand Consistency"],
-      year: "2023",
-      duration: "1:45",
-      color: "#f59e0b", // amber-500
-    },
-  ];
+  // Fetch projects and categories on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-  const categories = [
+        // Fetch categories
+        const categoriesResponse = await getCategories();
+        const categoriesData = categoriesResponse.data?.categories || [];
+
+        // Format categories for the UI
+        const formattedCategories = [
+          {
+            id: "all",
+            name: "All Projects",
+            icon: <FiFilm className="inline mr-2" />,
+          },
+          ...categoriesData.map((cat) => ({
+            id: cat.slug || cat.name.toLowerCase(),
+            name: cat.name,
+            icon: <FiFilm className="inline mr-2" />,
+          })),
+        ];
+
+        setCategories(formattedCategories);
+
+        // Fetch all video reels
+        const projectsResponse = await getVideoReels();
+        const projectsData = projectsResponse.data?.videoReels || [];
+
+        // Format projects for the UI
+        const formattedProjects = projectsData.map((project) => ({
+          id: project._id,
+          title: project.title,
+          category: project.category,
+          description: project.description,
+          videoUrl: project.videoUrl,
+          thumbnail: project.thumbnailUrl,
+          technologies: project.tags || [],
+          year: new Date(project.createdAt).getFullYear().toString(),
+          duration: "0:00", // You might want to calculate this or add it to your API
+          color: getColorByCategory(project.category),
+          isBest: project.isBest,
+          createdAt: project.createdAt,
+        }));
+
+        setProjects(formattedProjects);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load projects. Please try again later.");
+
+        // Fallback to sample data if API fails
+        setCategories(getFallbackCategories());
+        setProjects(getFallbackProjects());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Fetch projects by category when activeCategory changes
+  useEffect(() => {
+    const fetchProjectsByCategory = async () => {
+      if (activeCategory === "all") {
+        // We already have all projects from initial fetch
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await getVideoReelsByCategory(activeCategory);
+        const projectsData = response.data?.videoReels || [];
+
+        const formattedProjects = projectsData.map((project) => ({
+          id: project._id,
+          title: project.title,
+          category: project.category,
+          description: project.description,
+          videoUrl: project.videoUrl,
+          thumbnail: project.thumbnailUrl,
+          technologies: project.tags || [],
+          year: new Date(project.createdAt).getFullYear().toString(),
+          duration: "0:00",
+          color: getColorByCategory(project.category),
+          isBest: project.isBest,
+          createdAt: project.createdAt,
+        }));
+
+        setProjects(formattedProjects);
+      } catch (err) {
+        console.error("Error fetching projects by category:", err);
+        // Keep the current projects on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (activeCategory !== "all") {
+      fetchProjectsByCategory();
+    }
+  }, [activeCategory]);
+
+  // Helper function to assign colors based on category
+  const getColorByCategory = (category) => {
+    const colorMap = {
+      wedding: "#06b6d4", // cyan-500
+      commercial: "#3b82f6", // blue-500
+      music: "#8b5cf6", // violet-500
+      documentary: "#10b981", // emerald-500
+      travel: "#ec4899", // pink-500
+      reel: "#f59e0b", // amber-500
+      // Add more categories as needed
+    };
+
+    return colorMap[category] || "#6b7280"; // Default gray color
+  };
+
+  // Fallback data in case API fails
+  const getFallbackCategories = () => [
     {
       id: "all",
       name: "All Projects",
@@ -138,12 +177,30 @@ const Projects = () => {
     },
   ];
 
+  const getFallbackProjects = () => [
+    {
+      id: 1,
+      title: "Cinematic Wedding Film",
+      category: "wedding",
+      description:
+        "A beautifully crafted wedding film with cinematic color grading and emotional storytelling",
+      videoUrl: "https://assets.codepen.io/3364143/sample.mp4",
+      thumbnail:
+        "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+      technologies: ["Premiere Pro", "After Effects", "Color Grading"],
+      year: "2023",
+      duration: "3:45",
+      color: "#06b6d4",
+    },
+    // Add more fallback projects as needed
+  ];
+
   const filteredProjects =
     activeCategory === "all"
       ? projects
       : projects.filter((project) => project.category === activeCategory);
 
-  // Animation variants
+  // Animation variants (keep the same as before)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -214,7 +271,7 @@ const Projects = () => {
     },
   };
 
-  // Handle video hover
+  // Handle video hover (keep the same as before)
   const handleProjectHover = (project) => {
     setHoveredProject(project.id);
     if (hoverVideoRefs.current[project.id]) {
@@ -232,13 +289,12 @@ const Projects = () => {
     }
   };
 
-  // Handle project selection for modal
+  // Handle project selection for modal (keep the same as before)
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
     setModalVideoPlaying(true);
   };
 
-  // Handle modal video play/pause
   const handleModalVideoToggle = () => {
     if (modalVideoRef.current) {
       if (modalVideoRef.current.paused) {
@@ -251,7 +307,6 @@ const Projects = () => {
     }
   };
 
-  // Close modal
   const closeModal = () => {
     if (modalVideoRef.current) {
       modalVideoRef.current.pause();
@@ -260,7 +315,7 @@ const Projects = () => {
     setModalVideoPlaying(false);
   };
 
-  // Grid animation
+  // Grid animation (keep the same as before)
   useEffect(() => {
     const canvas = containerRef.current;
     if (!canvas) return;
@@ -338,7 +393,7 @@ const Projects = () => {
     };
   }, []);
 
-  // Close modal on escape key
+  // Close modal on escape key (keep the same as before)
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.keyCode === 27) closeModal();
@@ -358,8 +413,47 @@ const Projects = () => {
           .join(" ");
   };
 
-  // Render projects based on active layout
+  // Loading state
+  if (loading && projects.length === 0) {
+    return (
+      <section className="relative min-h-screen w-full overflow-hidden bg-black py-20 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading projects...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error && projects.length === 0) {
+    return (
+      <section className="relative min-h-screen w-full overflow-hidden bg-black py-20 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-cyan-500 text-white rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  // Render projects based on active layout (keep the same rendering logic)
   const renderProjects = () => {
+    if (filteredProjects.length === 0) {
+      return (
+        <div className="text-center py-20">
+          <p className="text-gray-400 text-lg">
+            No projects found for this category.
+          </p>
+        </div>
+      );
+    }
+
     if (activeLayout === "stack") {
       return (
         <motion.div
@@ -786,6 +880,13 @@ const Projects = () => {
             </motion.button>
           ))}
         </motion.div>
+
+        {/* Loading indicator for category changes */}
+        {loading && projects.length > 0 && (
+          <div className="text-center mb-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500 mx-auto"></div>
+          </div>
+        )}
 
         {/* Projects Grid */}
         {renderProjects()}

@@ -1,13 +1,44 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getServices } from "../services/api"; // Adjust the import path
 
 const Services = () => {
   const canvasRef = useRef(null);
   const [selectedService, setSelectedService] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Background grid animation
+  // Fetch services from API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await getServices();
+
+        if (
+          response.status === "success" &&
+          response.data &&
+          response.data.services
+        ) {
+          setServices(response.data.services);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (err) {
+        console.error("Error fetching services:", err);
+        setError("Failed to load services. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  // Background grid animation - EXACTLY AS ORIGINAL
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -85,7 +116,7 @@ const Services = () => {
     };
   }, []);
 
-  // Animation variants
+  // Animation variants - EXACTLY AS ORIGINAL
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -109,156 +140,19 @@ const Services = () => {
     },
   };
 
-  // Handle Learn More click
+  // Handle Learn More click - EXACTLY AS ORIGINAL
   const handleLearnMore = (service) => {
     setSelectedService(service);
     setIsModalOpen(true);
   };
 
-  // Close modal
+  // Close modal - EXACTLY AS ORIGINAL
   const closeModal = () => {
     setIsModalOpen(false);
     setTimeout(() => setSelectedService(null), 300);
   };
 
-  // Services data
-  const services = [
-    {
-      id: 1,
-      title: "Cinematic Editing",
-      description:
-        "Transform your footage into cinematic masterpieces with our expert editing techniques, color grading, and seamless transitions.",
-      features: [
-        "4K/8K Editing",
-        "Color Grading",
-        "Seamless Transitions",
-        "Multi-camera Sync",
-      ],
-      icon: "🎬",
-      details:
-        "Our cinematic editing service transforms raw footage into compelling visual stories. Using industry-standard software and techniques, we create seamless narratives with perfect pacing, emotional impact, and visual coherence. Whether you need a short film, documentary, or commercial, we'll make your content stand out.",
-      deliveryTime: "3-7 days",
-      revisions: "3 included",
-      examples: ["Short Films", "Documentaries", "Commercials", "Music Videos"],
-    },
-    {
-      id: 2,
-      title: "Motion Graphics",
-      description:
-        "Elevate your videos with stunning motion graphics, animated titles, and visual effects that captivate your audience.",
-      features: [
-        "Animated Titles",
-        "2D/3D Animation",
-        "Visual Effects",
-        "Logo Animation",
-      ],
-      icon: "✨",
-      details:
-        "Bring your brand to life with our motion graphics services. We create captivating animations, dynamic titles, and engaging visual elements that enhance your message and keep viewers engaged. From explainer videos to animated logos, we'll make your content move.",
-      deliveryTime: "5-10 days",
-      revisions: "2 included",
-      examples: [
-        "Explainer Videos",
-        "Animated Logos",
-        "Title Sequences",
-        "Infographic Animations",
-      ],
-    },
-    {
-      id: 3,
-      title: "Visual Effects",
-      description:
-        "Add wow-factor to your projects with professional VFX that blend seamlessly with your footage for a truly immersive experience.",
-      features: [
-        "Green Screen",
-        "CGI Integration",
-        "Particle Effects",
-        "Compositing",
-      ],
-      icon: "🔥",
-      details:
-        "Our VFX artists can transform ordinary footage into extraordinary visual experiences. From green screen compositing to complex CGI integration, we create believable effects that serve your story and enhance production value without distracting from your message.",
-      deliveryTime: "7-14 days",
-      revisions: "2 included",
-      examples: [
-        "Green Screen Removal",
-        "CGI Elements",
-        "Environmental Effects",
-        "Simulations",
-      ],
-    },
-    {
-      id: 4,
-      title: "Sound Design",
-      description:
-        "Complete your visual experience with immersive audio design, custom soundscapes, and professional mixing.",
-      features: [
-        "Soundscapes",
-        "Audio Mixing",
-        "Foley Art",
-        "Voiceover Integration",
-      ],
-      icon: "🎧",
-      details:
-        "Great video needs great audio. Our sound design service provides professional audio mixing, custom sound effects, foley artistry, and voiceover integration. We'll balance dialogue, music, and effects to create an immersive auditory experience that complements your visuals.",
-      deliveryTime: "2-5 days",
-      revisions: "3 included",
-      examples: [
-        "Audio Mixing",
-        "Sound Effects",
-        "Voiceover Editing",
-        "Ambient Soundscapes",
-      ],
-    },
-    {
-      id: 5,
-      title: "Color Grading",
-      description:
-        "Give your footage a professional look with our advanced color grading services that set the perfect mood and tone.",
-      features: [
-        "Mood Setting",
-        "Style Consistency",
-        "Skin Tone Correction",
-        "Film Emulation",
-      ],
-      icon: "🎨",
-      details:
-        "Color sets the mood and tone of your visual story. Our color grading service enhances your footage with professional color correction, stylistic looks, and consistency across shots. We'll make your visuals pop with carefully crafted color palettes that support your narrative.",
-      deliveryTime: "2-4 days",
-      revisions: "3 included",
-      examples: [
-        "Color Correction",
-        "Stylistic Looks",
-        "Shot Matching",
-        "Film Emulation",
-      ],
-    },
-    {
-      id: 6,
-      title: "Full Production",
-      description:
-        "End-to-end video production services from concept development to final delivery for your most ambitious projects.",
-      features: [
-        "Concept Development",
-        "Script Writing",
-        "Full Production",
-        "Post-Production",
-      ],
-      icon: "🚀",
-      details:
-        "From idea to execution, our full production service handles every aspect of your project. We develop concepts, write scripts, coordinate production, and handle all post-production needs. This comprehensive solution ensures a consistent vision and high-quality result from start to finish.",
-      deliveryTime: "Varies by project",
-      revisions: "Custom",
-      examples: [
-        "Commercial Productions",
-        "Corporate Videos",
-        "Online Content Series",
-        "Event Coverage",
-      ],
-    },
-  ];
-
-  // Workflow steps
+  // Workflow steps - EXACTLY AS ORIGINAL
   const workflowSteps = [
     {
       title: "Concept & Strategy",
@@ -290,18 +184,46 @@ const Services = () => {
     },
   ];
 
+  // Loading state - KEEPING ORIGINAL DESIGN
+  if (loading) {
+    return (
+      <div className="relative min-h-screen w-full overflow-hidden bg-black flex items-center justify-center pt-20 pb-10">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+        <div className="relative z-10 text-white text-xl">
+          Loading services...
+        </div>
+      </div>
+    );
+  }
+
+  // Error state - KEEPING ORIGINAL DESIGN
+  if (error) {
+    return (
+      <div className="relative min-h-screen w-full overflow-hidden bg-black flex items-center justify-center pt-20 pb-10">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+        <div className="relative z-10 text-white text-xl text-center px-4">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black flex flex-col items-center justify-center pt-20 pb-10">
-      {/* Animated background canvas */}
+      {/* Animated background canvas - EXACTLY AS ORIGINAL */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-      {/* Gradient overlays for cinematic effect */}
+      {/* Gradient overlays for cinematic effect - EXACTLY AS ORIGINAL */}
       <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
       <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
 
-      {/* Content */}
+      {/* Content - EXACTLY AS ORIGINAL STRUCTURE */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-12">
-        {/* Header */}
+        {/* Header - EXACTLY AS ORIGINAL */}
         <motion.div
           className="text-center mb-16"
           variants={containerVariants}
@@ -335,7 +257,7 @@ const Services = () => {
           </motion.p>
         </motion.div>
 
-        {/* Services Grid */}
+        {/* Services Grid - ONLY CHANGED: using API data instead of hardcoded */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
           initial="hidden"
@@ -345,7 +267,7 @@ const Services = () => {
         >
           {services.map((service) => (
             <motion.div
-              key={service.id}
+              key={service._id}
               className="bg-gray-900 backdrop-blur-md rounded-xl border border-white/10 p-6 group hover:border-cyan-500/30 transition-all duration-500 overflow-hidden flex flex-col h-full relative"
               variants={itemVariants}
               whileHover={{ y: -8 }}
@@ -404,7 +326,7 @@ const Services = () => {
           ))}
         </motion.div>
 
-        {/* Workflow Process Section */}
+        {/* Workflow Process Section - EXACTLY AS ORIGINAL */}
         <motion.div
           className="mb-20"
           initial="hidden"
@@ -445,7 +367,7 @@ const Services = () => {
           </div>
         </motion.div>
 
-        {/* Client Collaboration Section */}
+        {/* Client Collaboration Section - EXACTLY AS ORIGINAL */}
         <motion.div
           className="mb-20 bg-gray-900/30 backdrop-blur-md rounded-3xl border border-cyan-500/20 p-8 md:p-12 relative overflow-hidden"
           initial="hidden"
@@ -571,7 +493,7 @@ const Services = () => {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
+        {/* CTA Section - EXACTLY AS ORIGINAL */}
         <motion.div
           className="bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-500/20 rounded-2xl p-8 md:p-12 text-center relative overflow-hidden"
           initial="hidden"
@@ -633,7 +555,7 @@ const Services = () => {
         </motion.div>
       </div>
 
-      {/* Service Detail Modal */}
+      {/* Service Detail Modal - EXACTLY AS ORIGINAL */}
       <AnimatePresence>
         {isModalOpen && selectedService && (
           <motion.div
@@ -752,7 +674,7 @@ const Services = () => {
         )}
       </AnimatePresence>
 
-      {/* Animated decorative elements */}
+      {/* Animated decorative elements - EXACTLY AS ORIGINAL */}
       <motion.div
         className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-cyan-400"
         animate={{
@@ -780,7 +702,7 @@ const Services = () => {
         }}
       />
 
-      {/* Scrolling text effect at bottom */}
+      {/* Scrolling text effect at bottom - EXACTLY AS ORIGINAL */}
       <motion.div
         className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-5xl px-4 overflow-hidden"
         initial={{ opacity: 0 }}

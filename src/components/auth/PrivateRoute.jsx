@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
-import LoadingSpinner from "../sections/LoadingSpinner"; // Your cinematic loader component
 import { useEffect, useState } from "react";
+import LoadingSpinner from "../Shared/LoadingSpinner";
 
 const isAuthenticated = () => {
   try {
