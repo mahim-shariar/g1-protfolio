@@ -17,6 +17,9 @@ const VideosPage = lazy(() => import("./page/VideosPage"));
 const ReviewsPage = lazy(() => import("./page/ReviewsPage"));
 const CategoriesPage = lazy(() => import("./page/CategoriesPage"));
 const ServicesPage = lazy(() => import("./page/ServicesPage"));
+const FaqsPage = lazy(() => import("./page/FaqsPage"));
+const Faqs = lazy(() => import("./page/Faqs"));
+const Settings = lazy(() => import("./page/Settings"));
 
 const router = createBrowserRouter([
   {
@@ -71,6 +74,14 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "faqs",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <FaqsPage />
+          </Suspense>
+        ),
+      },
     ],
   },
   {
@@ -116,6 +127,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ServicesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Settings />
+          </Suspense>
+        ),
+      },
+      {
+        path: "faqs",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Faqs />
           </Suspense>
         ),
       },

@@ -255,6 +255,88 @@ export const deleteService = async (id) => {
   return response.data;
 };
 
+// Contact API
+export const getContactInfo = async () => {
+  const response = await api.get("/contact");
+  return response.data;
+};
+
+export const getAllContactEntries = async () => {
+  const response = await api.get("/contact/all");
+  return response.data;
+};
+
+export const createOrUpdateContact = async (contactData) => {
+  const response = await api.post("/contact", contactData);
+  return response.data;
+};
+
+export const updateContact = async (contactData) => {
+  const response = await api.patch("/contact", contactData);
+  return response.data;
+};
+
+export const deleteContact = async () => {
+  const response = await api.delete("/contact");
+  return response.data;
+};
+
+// FAQ API
+export const getFAQs = async (params = {}) => {
+  const response = await api.get("/faqs", { params });
+  return response.data;
+};
+
+export const getFAQ = async (slug) => {
+  const response = await api.get(`/faqs/${slug}`);
+  return response.data;
+};
+
+export const createFAQ = async (faqData) => {
+  const response = await api.post("/faqs", faqData);
+  return response.data;
+};
+
+export const updateFAQ = async (slug, faqData) => {
+  const response = await api.patch(`/faqs/${slug}`, faqData);
+  return response.data;
+};
+
+export const deleteFAQ = async (slug) => {
+  const response = await api.delete(`/faqs/${slug}`);
+  return response.data;
+};
+
+export const getFAQsByCategory = async (category) => {
+  const response = await api.get(`/faqs/category/${category}`);
+  return response.data;
+};
+
+export const getPopularFAQs = async (limit = 10) => {
+  const response = await api.get("/faqs/popular", { params: { limit } });
+  return response.data;
+};
+
+export const markFAQHelpful = async (slug) => {
+  const response = await api.post(`/faqs/${slug}/helpful`);
+  return response.data;
+};
+
+export const markFAQNotHelpful = async (slug) => {
+  const response = await api.post(`/faqs/${slug}/not-helpful`);
+  return response.data;
+};
+
+// Enhanced FAQ API with search and filtering
+export const searchFAQs = async (query) => {
+  const response = await api.get("/faqs", { params: { search: query } });
+  return response.data;
+};
+
+export const getFAQsWithFilters = async (filters = {}) => {
+  const response = await api.get("/faqs", { params: filters });
+  return response.data;
+};
 // File Upload API
 export const uploadFile = async (file) => {
   const formData = new FormData();

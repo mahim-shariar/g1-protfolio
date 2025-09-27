@@ -6,13 +6,16 @@ import {
   useTransform,
   AnimatePresence,
 } from "framer-motion";
+import { getReviews } from "../../services/api";
 
 const TestimonialSection = () => {
   const sectionRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
   const isInView = useInView(sectionRef, { once: false, amount: 0.4 });
 
+  // Initialize scroll effects only after component is mounted
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: isMounted ? sectionRef : null,
     offset: ["start end", "end start"],
   });
 
@@ -23,38 +26,115 @@ const TestimonialSection = () => {
     [0.8, 1, 1, 0.9]
   );
 
-  // Testimonial data
-  const testimonials = [
-    {
-      id: 1,
-      quote: "They turned our raw footage into an ad that tripled conversions.",
-      author: "Brand X",
-      role: "Marketing Director",
-      stats: "3x higher conversions",
-    },
-    {
-      id: 2,
-      quote:
-        "The AI-powered editing cut our production time by 70% while improving quality.",
-      author: "TechCorp",
-      role: "Creative Lead",
-      stats: "70% faster production",
-    },
-    {
-      id: 3,
-      quote:
-        "Our engagement increased by 240% after implementing their edited content.",
-      author: "StartUp Y",
-      role: "CEO",
-      stats: "240% more engagement",
-    },
-  ];
+  // State for testimonials data
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedTestimonials, setExpandedTestimonials] = useState({});
+  const [count, setCount] = useState(0);
+
+  // Set mounted state after initial render
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Toggle read more/less for a specific testimonial
+  const toggleReadMore = (testimonialId) => {
+    setExpandedTestimonials((prev) => ({
+      ...prev,
+      [testimonialId]: !prev[testimonialId],
+    }));
+  };
+
+  // Function to truncate text if it's too long
+  const truncateText = (text, maxLength = 150) => {
+    if (text.length <= maxLength) return text;
+    return text.substr(0, maxLength) + "...";
+  };
+
+  // Fetch testimonials from API
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch only best reviews (isBest: true)
+        const response = await getReviews({ isBest: true });
+
+        if (response.status === "success" && response.data?.reviews) {
+          setCount(response.results);
+          // Transform API data to match component structure
+          const transformedTestimonials = response.data.reviews.map(
+            (review, index) => ({
+              id: review._id || index,
+              quote: review.content,
+              author: review.userName,
+              role: review.user?.name || "Client",
+              stats: `${review.rating}/5 Rating`,
+              rating: review.rating,
+              screenshot: review.screenshot,
+              isBest: review.isBest,
+              createdAt: review.createdAt,
+              // Add a flag to indicate if text needs truncation
+              needsTruncation: review.content.length > 150,
+            })
+          );
+
+          setTestimonials(transformedTestimonials);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (err) {
+        console.error("Error fetching testimonials:", err);
+        setError("Failed to load testimonials");
+
+        // Fallback to default testimonials if API fails
+        setTestimonials([
+          {
+            id: 1,
+            quote:
+              "They turned our raw footage into an ad that tripled conversions. This was an amazing experience working with their team. The quality and professionalism exceeded our expectations.",
+            author: "Brand X",
+            role: "Marketing Director",
+            stats: "3x higher conversions",
+            rating: 5,
+            needsTruncation: true,
+          },
+          {
+            id: 2,
+            quote:
+              "The AI-powered editing cut our production time by 70% while improving quality.",
+            author: "TechCorp",
+            role: "Creative Lead",
+            stats: "70% faster production",
+            rating: 5,
+            needsTruncation: false,
+          },
+          {
+            id: 3,
+            quote:
+              "Our engagement increased by 240% after implementing their edited content. The results were phenomenal and the team was incredibly responsive throughout the entire process.",
+            author: "StartUp Y",
+            role: "CEO",
+            stats: "240% more engagement",
+            rating: 5,
+            needsTruncation: true,
+          },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  // Auto-rotate testimonials
+  // Auto-rotate testimonials only if there are testimonials and component is in view
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || testimonials.length === 0) return;
 
     const interval = setInterval(() => {
       setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -62,6 +142,25 @@ const TestimonialSection = () => {
 
     return () => clearInterval(interval);
   }, [isInView, testimonials.length]);
+
+  // Don't render if loading and no testimonials
+  if (loading && testimonials.length === 0) {
+    return (
+      <section
+        ref={sectionRef}
+        className="relative py-32 overflow-hidden bg-gradient-to-br from-gray-900 via-black to-gray-950"
+      >
+        <div className="container relative z-10 px-4 mx-auto text-center">
+          <div className="text-white">Loading testimonials...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Don't render if no testimonials available
+  if (!loading && testimonials.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -135,30 +234,56 @@ const TestimonialSection = () => {
       </div>
 
       <div className="container relative z-10 px-4 mx-auto">
-        <motion.div className="text-center mb-16" style={{ opacity, scale }}>
-          <motion.span
-            className="inline-block mb-4 text-sm tracking-widest text-cyan-400 uppercase font-mono"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Client Success Stories
-          </motion.span>
+        {/* Use motion.div only when mounted to prevent hydration issues */}
+        {isMounted ? (
+          <motion.div className="text-center mb-16" style={{ opacity, scale }}>
+            <motion.span
+              className="inline-block mb-4 text-sm tracking-widest text-cyan-400 uppercase font-mono"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              Client Success Stories
+            </motion.span>
 
-          <motion.h2
-            className="mb-6 text-4xl font-bold text-white md:text-5xl"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            Proven{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-              Results
+            <motion.h2
+              className="mb-6 text-4xl font-bold text-white md:text-5xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              Proven{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                Results
+              </span>
+            </motion.h2>
+          </motion.div>
+        ) : (
+          // Static fallback while mounting
+          <div className="text-center mb-16">
+            <span className="inline-block mb-4 text-sm tracking-widest text-cyan-400 uppercase font-mono">
+              Client Success Stories
             </span>
-          </motion.h2>
-        </motion.div>
+            <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">
+              Proven{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                Results
+              </span>
+            </h2>
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="max-w-4xl mx-auto mb-8 text-center">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30">
+              <div className="w-2 h-2 bg-red-400 rounded-full mr-2 animate-pulse"></div>
+              <span className="text-red-300 text-sm font-mono">{error}</span>
+            </div>
+          </div>
+        )}
 
         {/* Main testimonial content */}
         <div className="relative max-w-4xl mx-auto">
@@ -195,17 +320,42 @@ const TestimonialSection = () => {
                       ></motion.div>
                     </motion.div>
 
-                    {/* Quote text with typewriter effect */}
-                    <motion.blockquote
-                      className="px-4 text-2xl font-bold text-white md:text-4xl md:leading-tight mb-8"
+                    {/* Quote text with consistent height */}
+                    <motion.div
+                      className="px-4 mb-8 min-h-[120px] flex items-center justify-center"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.7, duration: 0.5 }}
                     >
-                      <span className="quote-mark text-cyan-400">"</span>
-                      {testimonial.quote}
-                      <span className="quote-mark text-cyan-400">"</span>
-                    </motion.blockquote>
+                      <blockquote className="text-2xl font-bold text-white md:text-4xl md:leading-tight">
+                        <span className="quote-mark text-cyan-400">"</span>
+                        {testimonial.needsTruncation &&
+                        !expandedTestimonials[testimonial.id] ? (
+                          <>
+                            {truncateText(testimonial.quote)}
+                            <button
+                              onClick={() => toggleReadMore(testimonial.id)}
+                              className="ml-2 text-cyan-400 hover:text-cyan-300 text-lg font-medium underline"
+                            >
+                              Read more
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            {testimonial.quote}
+                            {testimonial.needsTruncation && (
+                              <button
+                                onClick={() => toggleReadMore(testimonial.id)}
+                                className="ml-2 text-cyan-400 hover:text-cyan-300 text-lg font-medium underline"
+                              >
+                                Read less
+                              </button>
+                            )}
+                          </>
+                        )}
+                        <span className="quote-mark text-cyan-400">"</span>
+                      </blockquote>
+                    </motion.div>
 
                     {/* Author info */}
                     <motion.div
@@ -217,7 +367,6 @@ const TestimonialSection = () => {
                       <div className="text-xl font-semibold text-cyan-400">
                         {testimonial.author}
                       </div>
-                      <div className="text-gray-400">{testimonial.role}</div>
                     </motion.div>
 
                     {/* Animated stat bar */}
@@ -267,30 +416,32 @@ const TestimonialSection = () => {
             )}
           </AnimatePresence>
 
-          {/* Navigation dots */}
-          <div className="flex justify-center mt-16 space-x-3">
-            {testimonials.map((_, index) => (
-              <motion.button
-                key={index}
-                onClick={() => setActiveTestimonial(index)}
-                className={`relative w-3 h-3 rounded-full transition-all ${
-                  activeTestimonial === index
-                    ? "bg-cyan-400"
-                    : "bg-gray-600 hover:bg-gray-400"
-                }`}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                {activeTestimonial === index && (
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-cyan-400/30 -z-10"
-                    animate={{ scale: [1, 2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                )}
-              </motion.button>
-            ))}
-          </div>
+          {/* Navigation dots - Only show if there are multiple testimonials */}
+          {testimonials.length > 1 && (
+            <div className="flex justify-center mt-16 space-x-3">
+              {testimonials.map((_, index) => (
+                <motion.button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`relative w-3 h-3 rounded-full transition-all ${
+                    activeTestimonial === index
+                      ? "bg-cyan-400"
+                      : "bg-gray-600 hover:bg-gray-400"
+                  }`}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  {activeTestimonial === index && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full bg-cyan-400/30 -z-10"
+                      animate={{ scale: [1, 2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                </motion.button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Floating tech elements */}
@@ -304,7 +455,7 @@ const TestimonialSection = () => {
           <div className="flex items-center">
             <div className="w-2 h-2 mr-2 bg-cyan-400 rounded-full animate-pulse"></div>
             <span className="text-sm text-cyan-300 font-mono">
-              98% Satisfaction
+              {count}+ Satisfied Clients
             </span>
           </div>
         </motion.div>
@@ -318,7 +469,11 @@ const TestimonialSection = () => {
         >
           <div className="flex items-center">
             <span className="text-sm text-purple-300 font-mono mr-2">
-              250+ Projects
+              {(
+                testimonials.reduce((acc, curr) => acc + curr.rating, 0) /
+                testimonials.length
+              ).toFixed(1)}
+              /5 Avg Rating
             </span>
             <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
           </div>

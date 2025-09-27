@@ -1,6 +1,14 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { FiVideo, FiStar, FiCamera, FiGrid, FiArrowLeft } from "react-icons/fi";
+import {
+  FiVideo,
+  FiStar,
+  FiCamera,
+  FiGrid,
+  FiArrowLeft,
+  FiSettings,
+  FiHelpCircle,
+} from "react-icons/fi";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +42,20 @@ const Dashboard = () => {
       path: "/dashboard/services",
       color: "bg-gradient-to-br from-green-50 to-green-100",
     },
+    {
+      title: "FAQs",
+      description: "Manage frequently asked questions",
+      icon: <FiHelpCircle className="h-8 w-8 text-indigo-500" />,
+      path: "/dashboard/faqs",
+      color: "bg-gradient-to-br from-indigo-50 to-indigo-100",
+    },
+    {
+      title: "Settings",
+      description: "Configure your preferences",
+      icon: <FiSettings className="h-8 w-8 text-purple-500" />,
+      path: "/dashboard/settings",
+      color: "bg-gradient-to-br from-purple-50 to-purple-100",
+    },
   ];
 
   return (
@@ -58,17 +80,18 @@ const Dashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {cards.map((card, index) => (
             <motion.div
               key={index}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`${card.color} rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg`}
+              className={`${card.color} rounded-xl shadow-md p-6 cursor-pointer transition-all duration-200 hover:shadow-lg flex flex-col h-full`}
               onClick={() => navigate(card.path)}
             >
-              <div className="flex items-center justify-between">
-                <div>
+              {/* Card Content */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {card.title}
                   </h3>
@@ -78,19 +101,23 @@ const Dashboard = () => {
                 </div>
                 {card.icon}
               </div>
-              <div className="mt-4 flex items-center text-sm text-red-600 font-medium">
-                Manage
-                <svg
-                  className="ml-1 h-4 w-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+
+              {/* Manage Button at Bottom */}
+              <div className="mt-auto pt-4 border-t border-gray-200">
+                <div className="flex items-center text-sm text-red-600 font-medium">
+                  Manage
+                  <svg
+                    className="ml-1 h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
               </div>
             </motion.div>
           ))}

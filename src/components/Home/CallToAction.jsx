@@ -246,32 +246,6 @@ const CallToAction = () => {
               </div>
             </div>
           </motion.div>
-
-          {/* Trust indicators with animated logos */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.6 }}
-            className="mt-16 pt-8 border-t border-gray-800/50"
-          >
-            <p className="text-gray-500 text-sm mb-6">
-              Trusted by innovative creators worldwide
-            </p>
-
-            <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
-              {/* Animated client logos */}
-              {[...Array(4)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="w-24 h-12 bg-gray-800/30 backdrop-blur-sm rounded-lg flex items-center justify-center border border-cyan-500/10 hover:border-cyan-500/30 transition-colors duration-300"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full opacity-70"></div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </div>
 

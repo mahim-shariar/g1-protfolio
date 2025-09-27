@@ -1,116 +1,61 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import { getServices } from "../../services/api"; // Adjust the import path as needed
 
 const NextGenServices = () => {
   const [activeService, setActiveService] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const containerRef = useRef(null);
 
-  // Services data with enhanced descriptions
-  const services = [
-    {
-      id: 1,
-      icon: "🎬",
-      title: "YouTube / Social",
-      description: "Edits that maximize retention and engagement",
-      detailedDescription:
-        "Our specialized editing techniques are engineered to boost viewer retention rates by an average of 40%. We analyze audience behavior patterns and implement strategic cuts, hooks, and pacing that align with platform algorithms to maximize your content's reach and impact.",
-      features: [
-        "Algorithm-optimized cuts designed for maximum retention",
-        "Attention retention analysis with heat mapping",
-        "Platform-specific formatting for YouTube, TikTok, Instagram, and more",
-        "A/B testing for thumbnail and content optimization",
-        "Audience engagement pattern analysis",
-      ],
-      stats: "Avg. 40% increase in viewer retention",
-      price: "Starting at $299/video",
-    },
-    {
-      id: 2,
-      icon: "🎥",
-      title: "Ads & Commercials",
-      description: "Cinematic storytelling for brands",
-      detailedDescription:
-        "Transform your brand message into compelling visual narratives that convert. Our commercial editing combines cinematic techniques with psychological triggers that drive action, whether for TV spots, social media ads, or digital campaigns.",
-      features: [
-        "Brand narrative development and storyboarding",
-        "High-impact visual sequences optimized for conversion",
-        "Psychological trigger implementation",
-        "Multi-format delivery for various platforms",
-        "Performance analytics and optimization recommendations",
-      ],
-      stats: "Avg. 32% higher conversion rates",
-      price: "Starting at $799/project",
-    },
-    {
-      id: 3,
-      icon: "🏢",
-      title: "Corporate",
-      description: "Professional videos with clean branding",
-      detailedDescription:
-        "Elevate your corporate communications with professionally edited videos that maintain brand integrity while effectively delivering your message. From executive presentations to training materials, we ensure your content reflects your company's standards.",
-      features: [
-        "Executive messaging with professional pacing",
-        "Brand consistency across all visual elements",
-        "Subtle animation for emphasis without distraction",
-        "Multi-camera editing for events and presentations",
-        "Closed captioning and accessibility features",
-      ],
-      stats: "Used by 50+ Fortune 500 companies",
-      price: "Custom pricing based on needs",
-    },
-    {
-      id: 4,
-      icon: "✨",
-      title: "Motion Graphics",
-      description: "Custom titles and animations",
-      detailedDescription:
-        "Bring data and concepts to life with custom motion graphics that enhance understanding and retention. Our animations are tailored to your brand identity and designed to simplify complex information through visual storytelling.",
-      features: [
-        "Dynamic typography and kinetic text animations",
-        "3D elements and depth-enhanced visuals",
-        "Seamless integration with live-action footage",
-        "Data visualization and infographic animation",
-        "Custom illustration and character animation",
-      ],
-      stats: "60% higher information retention",
-      price: "Starting at $499/project",
-    },
-    {
-      id: 5,
-      icon: "📊",
-      title: "Documentary",
-      description: "Authentic stories with emotional impact",
-      detailedDescription:
-        "Capture the essence of real stories with editing that honors the narrative while maximizing emotional resonance. We specialize in structuring raw footage into compelling documentaries that engage audiences from start to finish.",
-      features: [
-        "Narrative structure development from raw footage",
-        "Emotional pacing and rhythm analysis",
-        "Archival footage integration and restoration",
-        "Interview sequencing for maximum impact",
-        "Sound design tailored to emotional cues",
-      ],
-      stats: "Festival selections increased by 45%",
-      price: "Starting at $1,200/project",
-    },
-    {
-      id: 6,
-      icon: "🎵",
-      title: "Music Videos",
-      description: "Rhythmic editing that complements audio",
-      detailedDescription:
-        "Create visual experiences that amplify your music through rhythmically synchronized editing. We work closely with artists to develop concepts that visually represent their sound and brand identity.",
-      features: [
-        "Precise beat synchronization and visual rhythm",
-        "Color grading tailored to music genre and mood",
-        "Artist representation and brand alignment",
-        "Special effects that complement musical elements",
-        "Multi-platform optimization for music platforms",
-      ],
-      stats: "Avg. 25% more streams on platforms",
-      price: "Starting at $899/video",
-    },
-  ];
+  // Text truncation function
+  const truncateText = (text, maxLength = 100) => {
+    if (!text) return "";
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
+  // Fetch services from API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await getServices();
+
+        if (response.status === "success" && response.data.services) {
+          // Transform API data to match component structure
+          const transformedServices = response.data.services.map((service) => ({
+            id: service._id,
+            icon: service.icon || "🎬",
+            title: service.title,
+            description: service.description, // Short description truncated
+            detailedDescription: service.details || service.description,
+            features: service.features || [],
+            examples: service.examples || [], // Include examples from API
+            deliveryTime: service.deliveryTime || "Not specified",
+            revisions: service.revisions || "Not specified",
+            // Include additional API data if needed
+            apiData: service,
+          }));
+
+          setServices(transformedServices);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (err) {
+        console.error("Error fetching services:", err);
+        setError("Failed to load services. Please try again later.");
+        // Fallback to empty array if API fails
+        setServices([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // 3D tilt effect
   useEffect(() => {
@@ -149,6 +94,41 @@ const NextGenServices = () => {
       container.removeEventListener("mouseleave", handleMouseLeave);
     };
   }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-white text-2xl">Loading services...</div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-red-400 text-xl">{error}</div>
+        </div>
+      </section>
+    );
+  }
+
+  // No services state
+  if (services.length === 0) {
+    return (
+      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-gray-400 text-xl">
+            No services available at the moment.
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
@@ -192,16 +172,14 @@ const NextGenServices = () => {
           <div className="inline-block relative">
             <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 relative">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-                HOLO SERVICES
+                OUR SERVICES
               </span>
               <div className="absolute -inset-6 bg-cyan-500/10 blur-2xl -z-10 rounded-full"></div>
             </h2>
             <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full"></div>
           </div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mt-6">
-            Next-generation video solutions with holographic interface
-            technology, powered by AI-assisted editing algorithms and real-time
-            collaboration features
+            Professional video editing services tailored to your needs
           </p>
         </motion.div>
 
@@ -242,16 +220,22 @@ const NextGenServices = () => {
                     >
                       <div className="flex items-center">
                         <span className="text-2xl mr-3">{service.icon}</span>
-                        <div className="flex-1">
-                          <span className="font-medium text-white block">
+                        <div className="flex-1 min-w-0">
+                          {" "}
+                          {/* Added min-w-0 for truncation */}
+                          <span className="font-medium text-white block truncate">
+                            {" "}
+                            {/* Added truncate */}
                             {service.title}
                           </span>
-                          <span className="text-sm text-cyan-300 block mt-1">
+                          <span className="text-sm text-cyan-300 block mt-1 truncate">
+                            {" "}
+                            {/* Added truncate */}
                             {service.description}
                           </span>
                         </div>
                         {activeService === index && (
-                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse flex-shrink-0 ml-2" />
                         )}
                       </div>
                     </motion.button>
@@ -269,44 +253,19 @@ const NextGenServices = () => {
                   className="bg-gray-900/40 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 h-full"
                 >
                   <div className="flex items-start mb-6">
-                    <div className="text-4xl mr-4 bg-gradient-to-br from-cyan-400 to-purple-500 p-3 rounded-xl">
+                    <div className="text-4xl mr-4 bg-gradient-to-br from-cyan-400 to-purple-500 p-3 rounded-xl flex-shrink-0">
                       {services[activeService].icon}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h3 className="text-2xl font-bold text-white">
+                        {" "}
+                        {/* Added truncate */}
                         {services[activeService].title}
                       </h3>
                       <p className="text-cyan-300">
+                        {" "}
                         {services[activeService].description}
                       </p>
-
-                      {/* Stats and pricing */}
-                      <div className="flex flex-wrap gap-4 mt-4">
-                        <div className="flex items-center text-sm bg-cyan-900/30 px-3 py-1 rounded-full">
-                          <svg
-                            className="w-4 h-4 mr-1 text-cyan-400"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          {services[activeService].stats}
-                        </div>
-                        <div className="flex items-center text-sm bg-purple-900/30 px-3 py-1 rounded-full text-purple-300">
-                          <svg
-                            className="w-4 h-4 mr-1"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
-                          </svg>
-                          {services[activeService].price}
-                        </div>
-                      </div>
                     </div>
                   </div>
 
@@ -317,70 +276,117 @@ const NextGenServices = () => {
                     </h4>
                     <p className="text-gray-300 mb-6 leading-relaxed">
                       {services[activeService].detailedDescription}
+                      {/* Truncated detailed description */}
                     </p>
 
-                    <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                      Key Features
-                      <span className="ml-2 text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-full">
-                        {services[activeService].features.length} features
-                      </span>
-                    </h4>
-                    <ul className="space-y-3">
-                      {services[activeService].features.map(
-                        (feature, index) => (
-                          <motion.li
-                            key={index}
-                            className="flex items-start text-gray-300"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: index * 0.1 }}
+                    {/* Service Info Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="bg-gray-800/30 rounded-lg p-3">
+                        <div className="flex items-center text-sm text-cyan-300 mb-1">
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
                           >
-                            <svg
-                              className="w-5 h-5 text-cyan-400 mr-3 mt-0.5 flex-shrink-0"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                            <span>{feature}</span>
-                          </motion.li>
-                        )
-                      )}
-                    </ul>
-                  </div>
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Delivery Time
+                        </div>
+                        <div className="text-white font-medium">
+                          {services[activeService].deliveryTime} days
+                        </div>
+                      </div>
+                      <div className="bg-gray-800/30 rounded-lg p-3">
+                        <div className="flex items-center text-sm text-cyan-300 mb-1">
+                          <svg
+                            className="w-4 h-4 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Revisions
+                        </div>
+                        <div className="text-white font-medium">
+                          {services[activeService].revisions}
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="flex space-x-4 pt-4 border-t border-gray-700/50">
-                    <button className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white rounded-lg transition-all duration-300 flex items-center shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      View Demo
-                    </button>
-                    <button className="px-5 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-lg transition-all duration-300 flex items-center">
-                      Contact
-                    </button>
+                    {services[activeService].features.length > 0 && (
+                      <>
+                        <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                          Key Features
+                          <span className="ml-2 text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-full">
+                            {services[activeService].features.length} features
+                          </span>
+                        </h4>
+                        <ul className="space-y-3 mb-6">
+                          {services[activeService].features.map(
+                            (feature, index) => (
+                              <motion.li
+                                key={index}
+                                className="flex items-start text-gray-300"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                <svg
+                                  className="w-5 h-5 text-cyan-400 mr-3 mt-0.5 flex-shrink-0"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                                <span className="truncate">{feature}</span>{" "}
+                                {/* Added truncate */}
+                              </motion.li>
+                            )
+                          )}
+                        </ul>
+                      </>
+                    )}
+
+                    {services[activeService].examples.length > 0 && (
+                      <>
+                        <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                          Project Examples
+                          <span className="ml-2 text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full">
+                            {services[activeService].examples.length} examples
+                          </span>
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {services[activeService].examples.map(
+                            (example, index) => (
+                              <motion.span
+                                key={index}
+                                className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.1 }}
+                              >
+                                {truncateText(example, 20)}{" "}
+                                {/* Truncated examples */}
+                              </motion.span>
+                            )
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </motion.div>
               </div>
@@ -392,50 +398,18 @@ const NextGenServices = () => {
           <div className="absolute -inset-6 rounded-3xl border border-purple-500/10 pointer-events-none"></div>
         </motion.div>
 
-        {/* Tech specs footer */}
+        {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12"
-        >
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30 text-center hover:border-cyan-500/30 transition-colors duration-300">
-            <div className="text-cyan-400 text-2xl font-bold">8K</div>
-            <div className="text-gray-300 text-sm">Resolution Support</div>
-            <div className="text-xs text-cyan-300 mt-2">Ultra HD quality</div>
-          </div>
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30 text-center hover:border-cyan-500/30 transition-colors duration-300">
-            <div className="text-cyan-400 text-2xl font-bold">120fps</div>
-            <div className="text-gray-300 text-sm">High Frame Rate</div>
-            <div className="text-xs text-cyan-300 mt-2">Smooth motion</div>
-          </div>
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30 text-center hover:border-cyan-500/30 transition-colors duration-300">
-            <div className="text-cyan-400 text-2xl font-bold">HDR</div>
-            <div className="text-gray-300 text-sm">Dynamic Range</div>
-            <div className="text-xs text-cyan-300 mt-2">Enhanced contrast</div>
-          </div>
-          <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-700/30 text-center hover:border-cyan-500/30 transition-colors duration-300">
-            <div className="text-cyan-400 text-2xl font-bold">
-              Color Grading
-            </div>
-            <div className="text-gray-300 text-sm">Color Correction</div>
-            <div className="text-xs text-cyan-300 mt-2">Realistic colors</div>
-          </div>
-        </motion.div>
-
-        {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          viewport={{ once: true }}
           className="text-center mt-16"
         >
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Ready to elevate your content with our next-generation editing
-            services? Schedule a free consultation to discuss your project needs
-            and receive a customized quote.
+            Ready to elevate your content with our professional editing
+            services? Schedule a free consultation to discuss your project
+            needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full font-semibold text-lg hover:from-cyan-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/25">

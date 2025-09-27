@@ -29,6 +29,7 @@ const NextGenNavbar = () => {
     { name: "Services", path: "/services" },
     { name: "About", path: "/whyChooseUs" },
     { name: "Contact", path: "/contact" },
+    { name: "Faqs", path: "/faqs" },
   ];
 
   const containerVariants = {
