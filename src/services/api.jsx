@@ -88,11 +88,6 @@ export const resetPassword = async (token, password) => {
   return response.data;
 };
 
-export const forceLogoutAllDevices = async () => {
-  const response = await api.post("/auth/forceLogoutAllDevices");
-  return response.data;
-};
-
 export const verifyToken = async (token = null) => {
   try {
     // If no token provided, try to get from localStorage
@@ -123,6 +118,29 @@ export const verifyToken = async (token = null) => {
       error: error.message,
     };
   }
+};
+
+// Add these to your existing API functions
+
+// Security Question API
+export const setSecurityQuestion = async (data) => {
+  const response = await api.post("/auth/set-security-question", data);
+  return response.data;
+};
+
+export const verifySecurityQuestion = async (data) => {
+  const response = await api.post("/auth/verify-security-answer", data);
+  return response.data;
+};
+
+export const resetPasswordWithSecurity = async (data) => {
+  const response = await api.post("/auth/reset-password-with-security", data);
+  return response.data;
+};
+
+export const getSecurityQuestionByEmail = async (email) => {
+  const response = await api.post("/auth/get-security-question", { email });
+  return response.data;
 };
 
 // Video Reels API
@@ -335,6 +353,55 @@ export const searchFAQs = async (query) => {
 
 export const getFAQsWithFilters = async (filters = {}) => {
   const response = await api.get("/faqs", { params: filters });
+  return response.data;
+};
+
+// Statistics API
+export const getStatistics = async (params = {}) => {
+  const response = await api.get("/statistics", { params });
+  return response.data;
+};
+
+export const getActiveStatistics = async () => {
+  const response = await api.get("/statistics/active");
+  return response.data;
+};
+
+export const getStatistic = async (slug) => {
+  const response = await api.get(`/statistics/${slug}`);
+  return response.data;
+};
+
+export const createStatistic = async (statisticData) => {
+  const response = await api.post("/statistics", statisticData);
+  return response.data;
+};
+
+export const updateStatistic = async (slug, statisticData) => {
+  const response = await api.patch(`/statistics/${slug}`, statisticData);
+  return response.data;
+};
+
+export const deleteStatistic = async (slug) => {
+  const response = await api.delete(`/statistics/${slug}`);
+  return response.data;
+};
+
+export const toggleStatistic = async (slug) => {
+  const response = await api.patch(`/statistics/${slug}/toggle`);
+  return response.data;
+};
+
+// Enhanced Statistics API with filtering
+export const getStatisticsByType = async (type) => {
+  const response = await api.get("/statistics", { params: { type } });
+  return response.data;
+};
+
+export const searchStatistics = async (query) => {
+  const response = await api.get("/statistics", {
+    params: { search: query },
+  });
   return response.data;
 };
 // File Upload API

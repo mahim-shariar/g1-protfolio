@@ -14,7 +14,7 @@ const Home = () => {
       <MotionCredibilityStrip />
       <FeaturedPortfolio />
       <NextGenServices />
-      <WhyWorkWithUs />
+      {/* <WhyWorkWithUs /> */}
       <TestimonialSection />
       <CallToAction />
     </div>

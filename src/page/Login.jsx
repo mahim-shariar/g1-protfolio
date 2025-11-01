@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
-import {
-  login,
-  forgotPassword,
-  verifyToken,
-  getCurrentUser,
-} from "../services/api";
+import { login, verifyToken, getCurrentUser } from "../services/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");

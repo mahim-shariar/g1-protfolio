@@ -1,20 +1,31 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { getContactInfo } from "../services/api";
+import emailjs from "@emailjs/browser";
 
 const ContactPage = () => {
   const canvasRef = useRef(null);
+  const formRef = useRef(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     projectType: "",
     message: "",
+    phone: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedSocial, setExpandedSocial] = useState(false);
+
+  // EmailJS configuration - REPLACE WITH YOUR ACTUAL CREDENTIALS
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: import.meta.env.VITE_SERVICE_ID,
+    TEMPLATE_ID: import.meta.env.VITE_TEMPLATE_ID,
+    PUBLIC_KEY: import.meta.env.VITE_PUBLIC_KEY,
+  };
 
   // Fetch contact data from API
   useEffect(() => {
@@ -50,6 +61,11 @@ const ContactPage = () => {
     };
 
     fetchContactData();
+  }, []);
+
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
   }, []);
 
   // Background grid animation
@@ -177,20 +193,49 @@ const ContactPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    setIsSubmitted(true);
+    setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({
-        name: "",
-        email: "",
-        projectType: "",
-        message: "",
-      });
-    }, 3000);
+    try {
+      // Send email using EmailJS
+      const templateParams = {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        subject: `New Project Inquiry: ${formData.projectType}`,
+        time: new Date().toLocaleString(),
+        phone: formData.phone,
+      };
+
+      await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.TEMPLATE_ID,
+        templateParams,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
+      console.log("Email sent successfully:", formData);
+      setIsSubmitted(true);
+
+      // Reset form after successful submission
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          projectType: "",
+          message: "",
+        });
+      }, 5000);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      alert(
+        "Sorry, there was an error sending your message. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Social media platform configurations
@@ -567,7 +612,11 @@ const ContactPage = () => {
                   <h3 className="text-2xl font-bold text-white mb-6">
                     Start Your Project
                   </h3>
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form
+                    ref={formRef}
+                    onSubmit={handleSubmit}
+                    className="space-y-6"
+                  >
                     <div>
                       <label
                         htmlFor="name"
@@ -603,6 +652,24 @@ const ContactPage = () => {
                         required
                         className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
                         placeholder="your.email@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="phone"
+                        className="block text-sm font-medium text-gray-300 mb-2"
+                      >
+                        Phone Number
+                      </label>
+                      <input
+                        type="number"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
+                        placeholder="Your phone number"
                       />
                     </div>
 
@@ -651,13 +718,23 @@ const ContactPage = () => {
 
                     <motion.button
                       type="submit"
-                      className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium rounded-lg relative overflow-hidden group"
+                      disabled={isSubmitting}
+                      className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium rounded-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
                       variants={glowVariants}
                       animate="pulse"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                      whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                     >
-                      <span className="relative z-10">Send Message</span>
+                      <span className="relative z-10">
+                        {isSubmitting ? (
+                          <div className="flex items-center justify-center">
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            Sending...
+                          </div>
+                        ) : (
+                          "Send Message"
+                        )}
+                      </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </motion.button>
                   </form>

@@ -20,6 +20,7 @@ const ServicesPage = lazy(() => import("./page/ServicesPage"));
 const FaqsPage = lazy(() => import("./page/FaqsPage"));
 const Faqs = lazy(() => import("./page/Faqs"));
 const Settings = lazy(() => import("./page/Settings"));
+const StatisticsManagement = lazy(() => import("./page/StatisticsManagement"));
 
 const router = createBrowserRouter([
   {
@@ -143,6 +144,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <Faqs />
+          </Suspense>
+        ),
+      },
+      {
+        path: "statistics",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <StatisticsManagement />
           </Suspense>
         ),
       },

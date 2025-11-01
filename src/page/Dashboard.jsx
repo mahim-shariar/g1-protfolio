@@ -8,6 +8,7 @@ import {
   FiArrowLeft,
   FiSettings,
   FiHelpCircle,
+  FiBarChart2,
 } from "react-icons/fi";
 
 const Dashboard = () => {
@@ -41,6 +42,13 @@ const Dashboard = () => {
       icon: <FiGrid className="h-8 w-8 text-green-500" />,
       path: "/dashboard/services",
       color: "bg-gradient-to-br from-green-50 to-green-100",
+    },
+    {
+      title: "Statistics",
+      description: "Manage project numbers & metrics",
+      icon: <FiBarChart2 className="h-8 w-8 text-teal-500" />, // New icon for statistics
+      path: "/dashboard/statistics",
+      color: "bg-gradient-to-br from-teal-50 to-teal-100", // New color
     },
     {
       title: "FAQs",

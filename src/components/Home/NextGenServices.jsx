@@ -98,9 +98,9 @@ const NextGenServices = () => {
   // Loading state
   if (loading) {
     return (
-      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
         <div className="container mx-auto px-4 text-center">
-          <div className="text-white text-2xl">Loading services...</div>
+          <div className="text-gray-600 text-2xl">Loading services...</div>
         </div>
       </section>
     );
@@ -109,9 +109,9 @@ const NextGenServices = () => {
   // Error state
   if (error) {
     return (
-      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
         <div className="container mx-auto px-4 text-center">
-          <div className="text-red-400 text-xl">{error}</div>
+          <div className="text-red-500 text-xl">{error}</div>
         </div>
       </section>
     );
@@ -120,9 +120,9 @@ const NextGenServices = () => {
   // No services state
   if (services.length === 0) {
     return (
-      <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
         <div className="container mx-auto px-4 text-center">
-          <div className="text-gray-400 text-xl">
+          <div className="text-gray-500 text-xl">
             No services available at the moment.
           </div>
         </div>
@@ -131,18 +131,18 @@ const NextGenServices = () => {
   }
 
   return (
-    <section className="relative py-20 bg-gradient-to-b from-gray-950 to-black overflow-hidden">
+    <section className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       {/* Animated grid background */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <div className="holographic-grid"></div>
+      <div className="absolute inset-0 z-0 opacity-10">
+        <div className="modern-grid"></div>
       </div>
 
-      {/* Holographic particles */}
+      {/* Modern particles */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute rounded-full holographic-particle"
+            className="absolute rounded-full modern-particle"
             style={{
               width: `${3 + Math.random() * 5}px`,
               height: `${3 + Math.random() * 5}px`,
@@ -150,8 +150,8 @@ const NextGenServices = () => {
               top: `${Math.random() * 100}%`,
               background: `radial-gradient(circle, ${
                 Math.random() > 0.5
-                  ? "rgba(0, 245, 255, 0.7)"
-                  : "rgba(147, 51, 234, 0.7)"
+                  ? "rgba(20, 184, 166, 0.4)"
+                  : "rgba(16, 185, 129, 0.4)"
               }, transparent)`,
               animationDelay: `${Math.random() * 5}s`,
               animationDuration: `${10 + Math.random() * 10}s`,
@@ -170,20 +170,20 @@ const NextGenServices = () => {
           className="text-center mb-16"
         >
           <div className="inline-block relative">
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-4 relative">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-4 relative">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
                 OUR SERVICES
               </span>
-              <div className="absolute -inset-6 bg-cyan-500/10 blur-2xl -z-10 rounded-full"></div>
+              <div className="absolute -inset-6 bg-teal-500/5 blur-2xl -z-10 rounded-full"></div>
             </h2>
-            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full"></div>
+            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"></div>
           </div>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mt-6">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">
             Professional video editing services tailored to your needs
           </p>
         </motion.div>
 
-        {/* Holographic Services Interface */}
+        {/* Modern Services Interface */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -191,17 +191,17 @@ const NextGenServices = () => {
           viewport={{ once: true }}
           className="relative"
         >
-          {/* Main holographic display */}
+          {/* Main modern display */}
           <div
             ref={containerRef}
-            className="bg-gray-900/20 backdrop-blur-xl rounded-3xl border border-cyan-500/30 p-8 holographic-display transition-all duration-300"
+            className="bg-white/80 backdrop-blur-xl rounded-3xl border border-teal-200 p-8 modern-display transition-all duration-300 shadow-xl"
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Service selector panel */}
               <div className="lg:col-span-1">
-                <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                   Service Modules
-                  <span className="ml-2 text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-full">
+                  <span className="ml-2 text-xs px-2 py-1 bg-teal-100 text-teal-700 rounded-full">
                     {services.length} available
                   </span>
                 </h3>
@@ -211,8 +211,8 @@ const NextGenServices = () => {
                       key={service.id}
                       className={`w-full text-left p-4 rounded-xl transition-all duration-300 ${
                         activeService === index
-                          ? "bg-cyan-500/20 border border-cyan-500/50 shadow-lg shadow-cyan-500/20"
-                          : "bg-gray-800/30 border border-gray-700/30 hover:bg-cyan-500/10"
+                          ? "bg-teal-50 border border-teal-300 shadow-lg shadow-teal-500/10"
+                          : "bg-gray-50 border border-gray-200 hover:bg-teal-50"
                       }`}
                       onClick={() => setActiveService(index)}
                       whileHover={{ x: 5 }}
@@ -223,19 +223,19 @@ const NextGenServices = () => {
                         <div className="flex-1 min-w-0">
                           {" "}
                           {/* Added min-w-0 for truncation */}
-                          <span className="font-medium text-white block truncate">
+                          <span className="font-medium text-gray-800 block truncate">
                             {" "}
                             {/* Added truncate */}
                             {service.title}
                           </span>
-                          <span className="text-sm text-cyan-300 block mt-1 truncate">
+                          <span className="text-sm text-teal-600 block mt-1 truncate">
                             {" "}
                             {/* Added truncate */}
                             {service.description}
                           </span>
                         </div>
                         {activeService === index && (
-                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse flex-shrink-0 ml-2" />
+                          <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse flex-shrink-0 ml-2" />
                         )}
                       </div>
                     </motion.button>
@@ -250,19 +250,19 @@ const NextGenServices = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="bg-gray-900/40 backdrop-blur-md rounded-2xl p-6 border border-purple-500/30 h-full"
+                  className="bg-white backdrop-blur-md rounded-2xl p-6 border border-emerald-200 h-full shadow-lg"
                 >
                   <div className="flex items-start mb-6">
-                    <div className="text-4xl mr-4 bg-gradient-to-br from-cyan-400 to-purple-500 p-3 rounded-xl flex-shrink-0">
+                    <div className="text-4xl mr-4 bg-gradient-to-br from-teal-500 to-emerald-500 p-3 rounded-xl flex-shrink-0 text-white">
                       {services[activeService].icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-2xl font-bold text-white">
+                      <h3 className="text-2xl font-bold text-gray-800">
                         {" "}
                         {/* Added truncate */}
                         {services[activeService].title}
                       </h3>
-                      <p className="text-cyan-300">
+                      <p className="text-teal-600">
                         {" "}
                         {services[activeService].description}
                       </p>
@@ -270,19 +270,19 @@ const NextGenServices = () => {
                   </div>
 
                   <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                       Detailed Overview
-                      <div className="ml-2 w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                      <div className="ml-2 w-2 h-2 rounded-full bg-teal-500 animate-pulse"></div>
                     </h4>
-                    <p className="text-gray-300 mb-6 leading-relaxed">
+                    <p className="text-gray-600 mb-6 leading-relaxed">
                       {services[activeService].detailedDescription}
                       {/* Truncated detailed description */}
                     </p>
 
                     {/* Service Info Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                      <div className="bg-gray-800/30 rounded-lg p-3">
-                        <div className="flex items-center text-sm text-cyan-300 mb-1">
+                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                        <div className="flex items-center text-sm text-teal-600 mb-1">
                           <svg
                             className="w-4 h-4 mr-2"
                             fill="currentColor"
@@ -296,12 +296,12 @@ const NextGenServices = () => {
                           </svg>
                           Delivery Time
                         </div>
-                        <div className="text-white font-medium">
+                        <div className="text-gray-800 font-medium">
                           {services[activeService].deliveryTime} days
                         </div>
                       </div>
-                      <div className="bg-gray-800/30 rounded-lg p-3">
-                        <div className="flex items-center text-sm text-cyan-300 mb-1">
+                      <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                        <div className="flex items-center text-sm text-teal-600 mb-1">
                           <svg
                             className="w-4 h-4 mr-2"
                             fill="currentColor"
@@ -315,7 +315,7 @@ const NextGenServices = () => {
                           </svg>
                           Revisions
                         </div>
-                        <div className="text-white font-medium">
+                        <div className="text-gray-800 font-medium">
                           {services[activeService].revisions}
                         </div>
                       </div>
@@ -323,9 +323,9 @@ const NextGenServices = () => {
 
                     {services[activeService].features.length > 0 && (
                       <>
-                        <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                           Key Features
-                          <span className="ml-2 text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded-full">
+                          <span className="ml-2 text-xs px-2 py-1 bg-teal-100 text-teal-700 rounded-full">
                             {services[activeService].features.length} features
                           </span>
                         </h4>
@@ -334,13 +334,13 @@ const NextGenServices = () => {
                             (feature, index) => (
                               <motion.li
                                 key={index}
-                                className="flex items-start text-gray-300"
+                                className="flex items-start text-gray-600"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: index * 0.1 }}
                               >
                                 <svg
-                                  className="w-5 h-5 text-cyan-400 mr-3 mt-0.5 flex-shrink-0"
+                                  className="w-5 h-5 text-teal-500 mr-3 mt-0.5 flex-shrink-0"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -363,9 +363,9 @@ const NextGenServices = () => {
 
                     {services[activeService].examples.length > 0 && (
                       <>
-                        <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                           Project Examples
-                          <span className="ml-2 text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded-full">
+                          <span className="ml-2 text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full">
                             {services[activeService].examples.length} examples
                           </span>
                         </h4>
@@ -374,7 +374,7 @@ const NextGenServices = () => {
                             (example, index) => (
                               <motion.span
                                 key={index}
-                                className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30"
+                                className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm border border-emerald-200"
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: index * 0.1 }}
@@ -393,9 +393,9 @@ const NextGenServices = () => {
             </div>
           </div>
 
-          {/* Holographic effect lines */}
-          <div className="absolute -inset-4 rounded-3xl border border-cyan-500/20 pointer-events-none"></div>
-          <div className="absolute -inset-6 rounded-3xl border border-purple-500/10 pointer-events-none"></div>
+          {/* Modern effect lines */}
+          <div className="absolute -inset-4 rounded-3xl border border-teal-100 pointer-events-none"></div>
+          <div className="absolute -inset-6 rounded-3xl border border-emerald-100 pointer-events-none"></div>
         </motion.div>
 
         {/* CTA Section */}
@@ -406,16 +406,16 @@ const NextGenServices = () => {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
             Ready to elevate your content with our professional editing
             services? Schedule a free consultation to discuss your project
             needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-full font-semibold text-lg hover:from-cyan-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/25">
+            <button className="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full font-semibold text-lg hover:from-teal-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-teal-500/25">
               Book Call
             </button>
-            <button className="px-8 py-4 bg-transparent border border-cyan-500/50 text-cyan-300 rounded-full font-semibold text-lg hover:bg-cyan-500/10 transition-all duration-300">
+            <button className="px-8 py-4 bg-transparent border border-teal-500 text-teal-600 rounded-full font-semibold text-lg hover:bg-teal-50 transition-all duration-300">
               View Portfolio
             </button>
           </div>
@@ -424,41 +424,45 @@ const NextGenServices = () => {
 
       {/* Custom animations */}
       <style jsx>{`
-        .holographic-grid {
+        .modern-grid {
           background-image: linear-gradient(
-              rgba(0, 245, 255, 0.1) 1px,
+              rgba(20, 184, 166, 0.05) 1px,
               transparent 1px
             ),
-            linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
+            linear-gradient(
+              90deg,
+              rgba(20, 184, 166, 0.05) 1px,
+              transparent 1px
+            );
           background-size: 50px 50px;
           background-position: center center;
           width: 100%;
           height: 100%;
           animation: grid-move 20s linear infinite;
         }
-        .holographic-particle {
-          animation: holographic-float 15s ease-in-out infinite;
+        .modern-particle {
+          animation: modern-float 15s ease-in-out infinite;
         }
-        .holographic-display {
-          box-shadow: 0 0 80px rgba(0, 245, 255, 0.15),
-            inset 0 0 20px rgba(0, 245, 255, 0.1);
+        .modern-display {
+          box-shadow: 0 0 80px rgba(20, 184, 166, 0.08),
+            inset 0 0 20px rgba(20, 184, 166, 0.05);
           transition: transform 0.1s ease-out;
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0, 245, 255, 0.05);
+          background: rgba(20, 184, 166, 0.05);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(0, 245, 255, 0.2);
+          background: rgba(20, 184, 166, 0.2);
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(0, 245, 255, 0.3);
+          background: rgba(20, 184, 166, 0.3);
         }
-        @keyframes holographic-float {
+        @keyframes modern-float {
           0%,
           100% {
             transform: translateY(0) rotate(0deg);

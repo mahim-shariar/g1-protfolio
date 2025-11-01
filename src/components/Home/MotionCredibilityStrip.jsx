@@ -1,11 +1,40 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation } from "framer-motion";
+import { getStatistics, getActiveStatistics } from "../../services/api";
 
 const MotionCredibilityStrip = () => {
   const controls = useAnimation();
   const ref = useRef(null);
   const canvasRef = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
+
+  const [statistics, setStatistics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch statistics data
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        setLoading(true);
+        const response = await getActiveStatistics();
+        setStatistics(response.data?.statistics || []);
+      } catch (err) {
+        console.error("Error fetching statistics:", err);
+        setError("Failed to load statistics");
+        // Fallback to default statistics if API fails
+        setStatistics([
+          { value: "500+", title: "Videos Delivered" },
+          { value: "40+", title: "Trusted Brands" },
+          { value: "3+", title: "Years Experience" },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
 
   useEffect(() => {
     if (isInView) {
@@ -39,7 +68,7 @@ const MotionCredibilityStrip = () => {
         y: Math.random() * canvas.height,
         radius: Math.random() * 1.5 + 0.5,
         speed: Math.random() * 0.5 + 0.2,
-        opacity: Math.random() * 0.5 + 0.1,
+        opacity: Math.random() * 0.3 + 0.1, // Lower opacity for light background
         direction: Math.random() * Math.PI * 2,
       });
     }
@@ -47,8 +76,8 @@ const MotionCredibilityStrip = () => {
     const drawParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw connecting lines
-      ctx.strokeStyle = "rgba(34, 211, 238, 0.05)";
+      // Draw connecting lines - very subtle for light background
+      ctx.strokeStyle = "rgba(20, 184, 166, 0.03)";
       ctx.lineWidth = 0.5;
 
       for (let i = 0; i < particles.length; i++) {
@@ -70,7 +99,7 @@ const MotionCredibilityStrip = () => {
       particles.forEach((particle) => {
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(34, 211, 238, ${particle.opacity})`;
+        ctx.fillStyle = `rgba(20, 184, 166, ${particle.opacity})`;
         ctx.fill();
 
         // Move particles
@@ -95,10 +124,55 @@ const MotionCredibilityStrip = () => {
     };
   }, []);
 
+  // Find specific statistics by title
+  const getStatisticByTitle = (title) => {
+    return statistics.find((stat) =>
+      stat.title.toLowerCase().includes(title.toLowerCase())
+    );
+  };
+
+  // Get values for specific statistics
+  const getVideosValue = () => {
+    const projectStat = getStatisticByTitle("project");
+    return projectStat ? `${projectStat.value}+` : "500+";
+  };
+
+  const getBrandsValue = () => {
+    const brandStat = getStatisticByTitle("brand");
+    return brandStat ? `${brandStat.value}+` : "40+";
+  };
+
+  const getYearsValue = () => {
+    const yearStat = getStatisticByTitle("year");
+    return yearStat ? `${yearStat.value}+` : "3+";
+  };
+
+  // Prepare scrolling items - use default titles with API values
+  const scrollingItems = [
+    {
+      id: 1,
+      value: getVideosValue(),
+      title: "Videos Delivered",
+      type: "number",
+    },
+    {
+      id: 2,
+      value: getBrandsValue(),
+      title: "Trusted Brands",
+      type: "number",
+    },
+    {
+      id: 3,
+      value: getYearsValue(),
+      title: "Years Experience",
+      type: "number",
+    },
+  ];
+
   return (
     <motion.section
       ref={ref}
-      className="relative py-16 md:py-24 overflow-hidden bg-gray-950"
+      className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-br from-white to-gray-50"
       initial="hidden"
       animate={controls}
       variants={{
@@ -115,22 +189,22 @@ const MotionCredibilityStrip = () => {
       {/* Animated particle background */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full opacity-70"
+        className="absolute inset-0 w-full h-full opacity-50"
       />
 
-      {/* Glowing orbs with more depth */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow"></div>
+      {/* Glowing orbs with light colors */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-100 rounded-full blur-3xl animate-pulse-slow"></div>
       <div
-        className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl animate-pulse-slow"
+        className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-emerald-100 rounded-full blur-3xl animate-pulse-slow"
         style={{ animationDelay: "2s" }}
       ></div>
       <div
-        className="absolute top-2/3 left-1/3 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-pulse-slow"
+        className="absolute top-2/3 left-1/3 w-64 h-64 bg-green-100 rounded-full blur-3xl animate-pulse-slow"
         style={{ animationDelay: "4s" }}
       ></div>
 
       {/* Subtle vignette effect */}
-      <div className="absolute inset-0 shadow-[inset_0_0_100px_20px_rgba(0,0,0,0.9)]"></div>
+      <div className="absolute inset-0 shadow-[inset_0_0_100px_20px_rgba(255,255,255,0.5)]"></div>
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4">
@@ -148,23 +222,42 @@ const MotionCredibilityStrip = () => {
             },
           }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-cyan-50 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
             Trusted by Creators Worldwide
           </h2>
-          <p className="text-cyan-200/80 max-w-2xl mx-auto font-light">
+          <p className="text-gray-600 max-w-2xl mx-auto font-light">
             Delivering exceptional video editing results that transform content
             and drive engagement
           </p>
         </motion.div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full"
+            />
+            <span className="ml-3 text-gray-600">Loading statistics...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="text-center py-8">
+            <p className="text-amber-600">{error}</p>
+          </div>
+        )}
+
         {/* Scrolling Credibility Strip */}
-        <div className="relative overflow-hidden py-8 border-y border-cyan-500/20 bg-gradient-to-r from-cyan-900/10 to-cyan-800/10 backdrop-blur-sm">
+        <div className="relative overflow-hidden py-8 border-y border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 backdrop-blur-sm">
           {/* Glowing edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-gray-950 to-transparent z-10"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-gray-950 to-transparent z-10"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-white to-transparent z-10"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-white to-transparent z-10"></div>
 
           {/* Subtle pulse effect on the strip */}
-          <div className="absolute inset-0 bg-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-1000"></div>
+          <div className="absolute inset-0 bg-teal-200/30 opacity-0 hover:opacity-100 transition-opacity duration-1000"></div>
 
           <motion.div
             className="flex whitespace-nowrap"
@@ -182,56 +275,54 @@ const MotionCredibilityStrip = () => {
           >
             {/* First set */}
             <div className="flex items-center">
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-500 mr-4 shadow-lg shadow-cyan-500/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  <span className="text-cyan-400 font-bold">500+</span> videos
-                  delivered
-                </span>
-              </div>
-
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-400 mr-4 shadow-lg shadow-cyan-400/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  Trusted by{" "}
-                  <span className="text-cyan-400 font-bold">40+</span> brands
-                </span>
-              </div>
-
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-300 mr-4 shadow-lg shadow-cyan-300/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  <span className="text-cyan-400 font-bold">3+</span> years
-                  experience
-                </span>
-              </div>
+              {scrollingItems.map((item, index) => (
+                <div
+                  key={`first-${item.id}`}
+                  className="mx-10 flex items-center"
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      index === 0
+                        ? "bg-teal-500 shadow-lg shadow-teal-500/30"
+                        : index === 1
+                        ? "bg-emerald-500 shadow-lg shadow-emerald-500/30"
+                        : "bg-green-500 shadow-lg shadow-green-500/30"
+                    } mr-4`}
+                  ></div>
+                  <span className="text-gray-700 text-lg md:text-xl font-medium tracking-wide">
+                    <span className="text-teal-600 font-bold">
+                      {item.value}
+                    </span>{" "}
+                    {item.title}
+                  </span>
+                </div>
+              ))}
             </div>
 
             {/* Duplicate set for seamless looping */}
             <div className="flex items-center">
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-500 mr-4 shadow-lg shadow-cyan-500/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  <span className="text-cyan-400 font-bold">500+</span> videos
-                  delivered
-                </span>
-              </div>
-
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-400 mr-4 shadow-lg shadow-cyan-400/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  Trusted by{" "}
-                  <span className="text-cyan-400 font-bold">40+</span> brands
-                </span>
-              </div>
-
-              <div className="mx-10 flex items-center">
-                <div className="w-3 h-3 rounded-full bg-cyan-300 mr-4 shadow-lg shadow-cyan-300/30"></div>
-                <span className="text-cyan-100 text-lg md:text-xl font-medium tracking-wide">
-                  <span className="text-cyan-400 font-bold">3+</span> years
-                  experience
-                </span>
-              </div>
+              {scrollingItems.map((item, index) => (
+                <div
+                  key={`second-${item.id}`}
+                  className="mx-10 flex items-center"
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      index === 0
+                        ? "bg-teal-500 shadow-lg shadow-teal-500/30"
+                        : index === 1
+                        ? "bg-emerald-500 shadow-lg shadow-emerald-500/30"
+                        : "bg-green-500 shadow-lg shadow-green-500/30"
+                    } mr-4`}
+                  ></div>
+                  <span className="text-gray-700 text-lg md:text-xl font-medium tracking-wide">
+                    <span className="text-teal-600 font-bold">
+                      {item.value}
+                    </span>{" "}
+                    {item.title}
+                  </span>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -250,9 +341,9 @@ const MotionCredibilityStrip = () => {
             },
           }}
         >
-          {/* Stat 1 */}
+          {/* Stat 1 - Videos Delivered */}
           <motion.div
-            className="text-center p-8 bg-gradient-to-b from-cyan-900/10 to-cyan-900/5 rounded-2xl border border-cyan-500/10 backdrop-blur-md relative overflow-hidden"
+            className="text-center p-8 bg-white rounded-2xl border border-teal-100 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: {
@@ -266,24 +357,24 @@ const MotionCredibilityStrip = () => {
             }}
             whileHover={{
               y: -5,
-              borderColor: "rgba(34, 211, 238, 0.3)",
+              borderColor: "rgba(20, 184, 166, 0.3)",
               transition: { duration: 0.3 },
             }}
           >
-            <div className="absolute inset-0 bg-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10">
-              <div className="text-5xl font-bold text-cyan-400 mb-2 drop-shadow-lg">
-                500+
+              <div className="text-5xl font-bold text-teal-600 mb-2">
+                {getVideosValue()}
               </div>
-              <div className="text-cyan-200/90 font-light tracking-wide">
+              <div className="text-gray-600 font-light tracking-wide">
                 Videos Delivered
               </div>
             </div>
           </motion.div>
 
-          {/* Stat 2 */}
+          {/* Stat 2 - Trusted Brands */}
           <motion.div
-            className="text-center p-8 bg-gradient-to-b from-cyan-900/10 to-cyan-900/5 rounded-2xl border border-cyan-500/10 backdrop-blur-md relative overflow-hidden"
+            className="text-center p-8 bg-white rounded-2xl border border-emerald-100 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: {
@@ -298,24 +389,24 @@ const MotionCredibilityStrip = () => {
             }}
             whileHover={{
               y: -5,
-              borderColor: "rgba(34, 211, 238, 0.3)",
+              borderColor: "rgba(16, 185, 129, 0.3)",
               transition: { duration: 0.3 },
             }}
           >
-            <div className="absolute inset-0 bg-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10">
-              <div className="text-5xl font-bold text-cyan-400 mb-2 drop-shadow-lg">
-                40+
+              <div className="text-5xl font-bold text-emerald-600 mb-2">
+                {getBrandsValue()}
               </div>
-              <div className="text-cyan-200/90 font-light tracking-wide">
+              <div className="text-gray-600 font-light tracking-wide">
                 Trusted Brands
               </div>
             </div>
           </motion.div>
 
-          {/* Stat 3 */}
+          {/* Stat 3 - Years Experience */}
           <motion.div
-            className="text-center p-8 bg-gradient-to-b from-cyan-900/10 to-cyan-900/5 rounded-2xl border border-cyan-500/10 backdrop-blur-md relative overflow-hidden"
+            className="text-center p-8 bg-white rounded-2xl border border-green-100 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: {
@@ -330,16 +421,16 @@ const MotionCredibilityStrip = () => {
             }}
             whileHover={{
               y: -5,
-              borderColor: "rgba(34, 211, 238, 0.3)",
+              borderColor: "rgba(34, 197, 94, 0.3)",
               transition: { duration: 0.3 },
             }}
           >
-            <div className="absolute inset-0 bg-cyan-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
             <div className="relative z-10">
-              <div className="text-5xl font-bold text-cyan-400 mb-2 drop-shadow-lg">
-                3+
+              <div className="text-5xl font-bold text-green-600 mb-2">
+                {getYearsValue()}
               </div>
-              <div className="text-cyan-200/90 font-light tracking-wide">
+              <div className="text-gray-600 font-light tracking-wide">
                 Years Experience
               </div>
             </div>
@@ -352,10 +443,10 @@ const MotionCredibilityStrip = () => {
         @keyframes pulse-slow {
           0%,
           100% {
-            opacity: 0.5;
+            opacity: 0.3;
           }
           50% {
-            opacity: 0.8;
+            opacity: 0.6;
           }
         }
         .animate-pulse-slow {

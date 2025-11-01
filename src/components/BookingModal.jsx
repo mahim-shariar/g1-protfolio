@@ -1,0 +1,432 @@
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const BookingModal = ({ isOpen, onClose }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [bookingCompleted, setBookingCompleted] = useState(false);
+
+  // Listen for booking completion
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data.event === "calendly.event_scheduled") {
+        setBookingCompleted(true);
+        console.log("Booking completed!", event.data);
+
+        // Auto-close modal after successful booking (optional)
+        setTimeout(() => {
+          onClose();
+        }, 3000);
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener("message", handleMessage);
+    }
+
+    return () => window.removeEventListener("message", handleMessage);
+  }, [isOpen, onClose]);
+
+  // Reset states when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      setBookingCompleted(false);
+    }
+  }, [isOpen]);
+
+  // Close modal on escape key
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.keyCode === 27) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  const modalVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.8,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      transition: {
+        duration: 0.2,
+        ease: "easeIn",
+      },
+    },
+  };
+
+  const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const glowVariants = {
+    pulse: {
+      boxShadow: [
+        "0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3), 0 0 15px rgba(34, 211, 238, 0.2)",
+        "0 0 10px rgba(34, 211, 238, 0.8), 0 0 20px rgba(34, 211, 238, 0.5), 0 0 30px rgba(34, 211, 238, 0.3)",
+        "0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3), 0 0 15px rgba(34, 211, 238, 0.2)",
+      ],
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          {/* Animated Background Overlay */}
+          <motion.div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            variants={overlayVariants}
+            onClick={onClose}
+          />
+
+          {/* Gradient overlays for cinematic effect */}
+          <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-black/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+
+          {/* Modal Content */}
+          <motion.div
+            className="relative bg-gray-900 border border-cyan-500/30 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+            variants={modalVariants}
+          >
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 border border-cyan-400/30 flex items-center justify-center transition-all duration-200 group"
+              aria-label="Close modal"
+            >
+              <svg
+                className="w-4 h-4 text-cyan-300 group-hover:text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="max-h-[90vh] overflow-y-auto">
+              <div className="bg-gradient-to-br from-gray-900 via-purple-900/10 to-cyan-900/10 py-8 px-6 sm:px-8 border-b border-cyan-500/20">
+                <div className="max-w-6xl mx-auto">
+                  {/* Header Section */}
+                  <div className="text-center mb-8">
+                    <motion.h2
+                      className="text-cyan-400 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      Book Your Creative Session
+                    </motion.h2>
+
+                    <motion.h1
+                      className="text-3xl md:text-4xl font-bold text-white mb-4"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      Schedule Your{" "}
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                        1-Hour Consultation
+                      </span>
+                    </motion.h1>
+
+                    <motion.p
+                      className="text-lg text-gray-300 max-w-3xl mx-auto"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      Let's discuss your project and create something
+                      extraordinary together.
+                    </motion.p>
+
+                    {/* Success Message */}
+                    {bookingCompleted && (
+                      <motion.div
+                        className="mt-6 bg-green-900/30 border border-green-400/50 rounded-lg p-4 max-w-md mx-auto backdrop-blur-sm"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                      >
+                        <div className="flex items-center justify-center">
+                          <svg
+                            className="w-5 h-5 text-green-400 mr-2"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span className="text-green-300 font-medium">
+                            Booking confirmed! Check your email for details.
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {/* Main Content Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Sidebar - Info & Features */}
+                    <div className="lg:col-span-1 space-y-4">
+                      {/* Quick Info Card */}
+                      <motion.div
+                        className="bg-gray-800/50 rounded-xl border border-cyan-500/20 p-4 backdrop-blur-sm"
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        <h3 className="font-semibold text-cyan-300 mb-3 font-mono">
+                          SESSION DETAILS
+                        </h3>
+                        <div className="space-y-3">
+                          <div className="flex items-center text-sm">
+                            <svg
+                              className="w-4 h-4 text-cyan-400 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <span className="text-gray-300">60 minutes</span>
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <svg
+                              className="w-4 h-4 text-cyan-400 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                              />
+                            </svg>
+                            <span className="text-gray-300">
+                              1-on-1 creative session
+                            </span>
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <svg
+                              className="w-4 h-4 text-cyan-400 mr-2"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                              />
+                            </svg>
+                            <span className="text-gray-300">Video call</span>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Features Card */}
+                      <motion.div
+                        className="bg-gray-800/50 rounded-xl border border-purple-500/20 p-4 backdrop-blur-sm"
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                      >
+                        <h3 className="font-semibold text-purple-300 mb-3 font-mono">
+                          WHAT WE'LL COVER
+                        </h3>
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-center">
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
+                            <span className="text-gray-300">
+                              Project analysis & strategy
+                            </span>
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
+                            <span className="text-gray-300">
+                              Creative direction & vision
+                            </span>
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
+                            <span className="text-gray-300">
+                              Technical requirements
+                            </span>
+                          </li>
+                          <li className="flex items-center">
+                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
+                            <span className="text-gray-300">
+                              Timeline & deliverables
+                            </span>
+                          </li>
+                        </ul>
+                      </motion.div>
+
+                      {/* Support Card */}
+                      <motion.div
+                        className="bg-cyan-900/20 rounded-xl border border-cyan-400/30 p-4 backdrop-blur-sm"
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.7 }}
+                      >
+                        <h3 className="font-semibold text-cyan-300 mb-2 font-mono">
+                          NEED HELP?
+                        </h3>
+                        <p className="text-cyan-200 text-xs mb-3">
+                          Technical issues or questions? We're here to assist!
+                        </p>
+                        <a
+                          href="mailto:support@yourdomain.com"
+                          className="text-cyan-400 hover:text-cyan-300 text-xs font-medium inline-flex items-center group"
+                        >
+                          Contact support
+                          <svg
+                            className="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            />
+                          </svg>
+                        </a>
+                      </motion.div>
+                    </div>
+
+                    {/* Calendar Section */}
+                    <div className="lg:col-span-3">
+                      <motion.div
+                        className="bg-gray-800/30 rounded-xl border border-white/10 overflow-hidden backdrop-blur-sm"
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                      >
+                        {/* Loading State */}
+                        {isLoading && (
+                          <div className="flex items-center justify-center py-16">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-500"></div>
+                            <span className="ml-3 text-cyan-300 font-mono">
+                              Loading calendar...
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Calendly Iframe */}
+                        <iframe
+                          src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=000000&text_color=ffffff&primary_color=009eff"
+                          width="100%"
+                          height="600"
+                          frameBorder="0"
+                          title="Schedule Your Creative Session"
+                          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                          className={`w-full ${isLoading ? "hidden" : "block"}`}
+                          onLoad={() => setIsLoading(false)}
+                        />
+                      </motion.div>
+
+                      {/* Booking Steps */}
+                      <motion.div
+                        className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-center"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                      >
+                        <div className="bg-gray-800/50 rounded-lg p-3 border border-cyan-500/20 backdrop-blur-sm">
+                          <div className="text-xl font-bold text-cyan-400 mb-1 font-mono">
+                            01
+                          </div>
+                          <p className="text-xs text-gray-300">
+                            Select your time
+                          </p>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-3 border border-purple-500/20 backdrop-blur-sm">
+                          <div className="text-xl font-bold text-purple-400 mb-1 font-mono">
+                            02
+                          </div>
+                          <p className="text-xs text-gray-300">Enter details</p>
+                        </div>
+                        <div className="bg-gray-800/50 rounded-lg p-3 border border-cyan-500/20 backdrop-blur-sm">
+                          <div className="text-xl font-bold text-cyan-400 mb-1 font-mono">
+                            03
+                          </div>
+                          <p className="text-xs text-gray-300">
+                            Get confirmation
+                          </p>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Decorative elements */}
+            <div className="absolute top-4 left-4 flex gap-2 z-10">
+              <span className="w-2 h-2 rounded-full bg-cyan-500 shadow-lg shadow-cyan-900/50"></span>
+              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-lg shadow-cyan-800/50"></span>
+              <span className="w-2 h-2 rounded-full bg-cyan-300 shadow-lg shadow-cyan-700/50"></span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default BookingModal;

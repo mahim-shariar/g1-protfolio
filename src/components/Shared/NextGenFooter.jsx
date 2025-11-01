@@ -53,19 +53,19 @@ const NextGenFooter = () => {
   };
 
   return (
-    <footer className="relative bg-black border-t border-gray-800/50 overflow-hidden">
+    <footer className="relative bg-white border-t border-gray-200/50 overflow-hidden">
       {/* Subtle background elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-100/30 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-48 h-48 bg-emerald-100/30 rounded-full blur-3xl"></div>
 
         {/* Grid overlay */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-5"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px)
+              linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px)
             `,
             backgroundSize: "40px 40px",
           }}
@@ -84,15 +84,15 @@ const NextGenFooter = () => {
           >
             {/* Animated logo */}
             <div className="relative mr-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
                 V
               </div>
-              <div className="absolute -inset-2 bg-cyan-500/10 rounded-lg blur-sm"></div>
+              <div className="absolute -inset-2 bg-teal-500/10 rounded-lg blur-sm"></div>
             </div>
 
             <div>
-              <p className="text-white font-medium">VIDEO EDITING</p>
-              <p className="text-gray-400 text-sm">{footerData.logo.tagline}</p>
+              <p className="text-gray-800 font-medium">VIDEO EDITING</p>
+              <p className="text-gray-600 text-sm">{footerData.logo.tagline}</p>
             </div>
           </motion.div>
 
@@ -110,7 +110,7 @@ const NextGenFooter = () => {
                 <motion.a
                   key={index}
                   href={link.href}
-                  className="relative text-gray-400 hover:text-white transition-colors duration-300 text-sm group/link"
+                  className="relative text-gray-600 hover:text-gray-900 transition-colors duration-300 text-sm group/link"
                   onHoverStart={() => setHoveredItem(`link-${index}`)}
                   onHoverEnd={() => setHoveredItem(null)}
                   whileHover={{ y: -2 }}
@@ -118,7 +118,7 @@ const NextGenFooter = () => {
                   {link.name}
                   {/* Animated underline */}
                   <motion.div
-                    className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full"
+                    className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
                     initial={{ scaleX: 0 }}
                     animate={{
                       scaleX: hoveredItem === `link-${index}` ? 1 : 0,
@@ -127,7 +127,7 @@ const NextGenFooter = () => {
                   />
                   {/* Arrow indicator on hover */}
                   <FaArrowRight
-                    className="inline-block ml-1 text-cyan-400 opacity-0 group-hover/link:opacity-100 transition-opacity duration-300 transform group-hover/link:translate-x-1"
+                    className="inline-block ml-1 text-teal-500 opacity-0 group-hover/link:opacity-100 transition-opacity duration-300 transform group-hover/link:translate-x-1"
                     size={10}
                   />
                 </motion.a>
@@ -148,7 +148,7 @@ const NextGenFooter = () => {
                   <motion.a
                     key={index}
                     href={social.href}
-                    className={`relative p-2 text-gray-400 transition-colors duration-300 group ${social.color}`}
+                    className={`relative p-2 text-gray-500 transition-colors duration-300 group ${social.color}`}
                     onHoverStart={() => setHoveredItem(`social-${index}`)}
                     onHoverEnd={() => setHoveredItem(null)}
                     whileHover={{ y: -3, scale: 1.1 }}
@@ -156,7 +156,7 @@ const NextGenFooter = () => {
                   >
                     {/* Hover effect background */}
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-lg"
+                      className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-emerald-500/10 rounded-lg"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{
                         opacity: hoveredItem === `social-${index}` ? 1 : 0,
@@ -176,17 +176,17 @@ const NextGenFooter = () => {
                       className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{
                         boxShadow:
-                          "0 0 15px rgba(0, 245, 255, 0.3), 0 0 30px rgba(147, 51, 234, 0.2)",
+                          "0 0 15px rgba(20, 184, 166, 0.2), 0 0 30px rgba(16, 185, 129, 0.1)",
                       }}
                       animate={{
                         boxShadow:
                           hoveredItem === `social-${index}`
                             ? [
-                                "0 0 15px rgba(0, 245, 255, 0.3), 0 0 30px rgba(147, 51, 234, 0.2)",
-                                "0 0 20px rgba(0, 245, 255, 0.4), 0 0 40px rgba(147, 51, 234, 0.3)",
-                                "0 0 15px rgba(0, 245, 255, 0.3), 0 0 30px rgba(147, 51, 234, 0.2)",
+                                "0 0 15px rgba(20, 184, 166, 0.2), 0 0 30px rgba(16, 185, 129, 0.1)",
+                                "0 0 20px rgba(20, 184, 166, 0.3), 0 0 40px rgba(16, 185, 129, 0.2)",
+                                "0 0 15px rgba(20, 184, 166, 0.2), 0 0 30px rgba(16, 185, 129, 0.1)",
                               ]
-                            : "0 0 0px rgba(0, 245, 255, 0), 0 0 0px rgba(147, 51, 234, 0)",
+                            : "0 0 0px rgba(20, 184, 166, 0), 0 0 0px rgba(16, 185, 129, 0)",
                       }}
                       transition={{
                         duration: 0.5,
@@ -198,10 +198,10 @@ const NextGenFooter = () => {
 
                     {/* Tooltip on hover */}
                     <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      <div className="bg-gray-900 text-white text-xs py-1 px-2 rounded-md whitespace-nowrap">
+                      <div className="bg-gray-800 text-white text-xs py-1 px-2 rounded-md whitespace-nowrap">
                         {social.name}
                       </div>
-                      <div className="w-2 h-2 bg-gray-900 rotate-45 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
+                      <div className="w-2 h-2 bg-gray-800 rotate-45 absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"></div>
                     </div>
                   </motion.a>
                 );
@@ -212,7 +212,7 @@ const NextGenFooter = () => {
 
         {/* Bottom copyright */}
         <motion.div
-          className="mt-12 pt-6 border-t border-gray-800/30 text-center"
+          className="mt-12 pt-6 border-t border-gray-200/50 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -223,11 +223,11 @@ const NextGenFooter = () => {
           </p>
 
           {/* Additional info */}
-          <div className="flex justify-center items-center mt-2 space-x-4 text-xs text-gray-600">
+          <div className="flex justify-center items-center mt-2 space-x-4 text-xs text-gray-500">
             <span>Powered by AI Technology</span>
-            <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
             <span>4K & 8K Support</span>
-            <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+            <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
             <span>Global Delivery</span>
           </div>
         </motion.div>
@@ -246,8 +246,8 @@ const NextGenFooter = () => {
               top: `${Math.random() * 100}%`,
               background: `radial-gradient(circle, ${
                 Math.random() > 0.5
-                  ? "rgba(0, 245, 255, 0.5)"
-                  : "rgba(147, 51, 234, 0.5)"
+                  ? "rgba(20, 184, 166, 0.3)"
+                  : "rgba(16, 185, 129, 0.3)"
               }, transparent)`,
               animation: `float ${
                 10 + Math.random() * 10
@@ -264,19 +264,19 @@ const NextGenFooter = () => {
           0%,
           100% {
             transform: translateY(0) translateX(0);
-            opacity: 0.5;
+            opacity: 0.3;
           }
           25% {
             transform: translateY(-10px) translateX(5px);
-            opacity: 0.7;
+            opacity: 0.5;
           }
           50% {
             transform: translateY(-5px) translateX(10px);
-            opacity: 1;
+            opacity: 0.7;
           }
           75% {
             transform: translateY(-15px) translateX(5px);
-            opacity: 0.7;
+            opacity: 0.5;
           }
         }
       `}</style>

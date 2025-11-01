@@ -52,8 +52,8 @@ const LoadingSpinner = () => {
 
         ctx.beginPath();
         ctx.arc(x, y, size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(6, 182, 212, ${
-          0.3 + Math.sin(time * 0.005 + i) * 0.2
+        ctx.fillStyle = `rgba(20, 184, 166, ${
+          0.2 + Math.sin(time * 0.005 + i) * 0.15
         })`;
         ctx.fill();
       }
@@ -70,13 +70,13 @@ const LoadingSpinner = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-black flex items-center justify-center z-50 overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-white flex items-center justify-center z-50 overflow-hidden">
       {/* Animated background canvas */}
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-      {/* Gradient overlays for cinematic effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+      {/* Gradient overlays for soft effect */}
+      <div className="absolute inset-0 bg-gradient-to-b from-teal-50/20 to-white/80"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-100/10 to-emerald-100/10"></div>
 
       {/* Main centered content */}
       <div className="relative z-10 flex flex-col items-center justify-center">
@@ -89,10 +89,10 @@ const LoadingSpinner = () => {
         >
           {/* Glow effect behind the spinner */}
           <motion.div
-            className="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl"
+            className="absolute inset-0 rounded-full bg-teal-200/30 blur-xl"
             animate={{
               scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{ duration: 3, repeat: Infinity }}
           />
@@ -102,7 +102,7 @@ const LoadingSpinner = () => {
             className="absolute w-full h-full rounded-full border-4 border-transparent"
             style={{
               backgroundImage:
-                "linear-gradient(black, black), linear-gradient(to right, #06b6d4, #8b5cf6, #06b6d4)",
+                "linear-gradient(white, white), linear-gradient(to right, #0d9488, #10b981, #0d9488)",
               backgroundOrigin: "border-box",
               backgroundClip: "content-box, border-box",
             }}
@@ -115,7 +115,7 @@ const LoadingSpinner = () => {
             className="absolute w-64 h-64 rounded-full border-4 border-transparent"
             style={{
               backgroundImage:
-                "linear-gradient(black, black), linear-gradient(to left, #06b6d4, #8b5cf6, #06b6d4)",
+                "linear-gradient(white, white), linear-gradient(to left, #0d9488, #10b981, #0d9488)",
               backgroundOrigin: "border-box",
               backgroundClip: "content-box, border-box",
             }}
@@ -125,13 +125,13 @@ const LoadingSpinner = () => {
 
           {/* Video play icon in center */}
           <motion.div
-            className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-600/20 backdrop-blur-md flex items-center justify-center shadow-lg"
+            className="absolute w-32 h-32 rounded-full bg-gradient-to-br from-teal-100/40 to-emerald-100/40 backdrop-blur-md flex items-center justify-center shadow-lg border border-white/50"
             animate={{
               scale: [1, 1.05, 1],
               boxShadow: [
-                "0 0 0px rgba(59, 130, 246, 0.3)",
-                "0 0 30px rgba(59, 130, 246, 0.6)",
-                "0 0 0px rgba(59, 130, 246, 0.3)",
+                "0 0 0px rgba(13, 148, 136, 0.2)",
+                "0 0 30px rgba(13, 148, 136, 0.4)",
+                "0 0 0px rgba(13, 148, 136, 0.2)",
               ],
             }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -144,7 +144,7 @@ const LoadingSpinner = () => {
               transition={{ duration: 1.5, repeat: Infinity }}
             >
               <svg
-                className="w-16 h-16 text-cyan-400 drop-shadow-lg"
+                className="w-16 h-16 text-teal-600 drop-shadow-sm"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -162,7 +162,7 @@ const LoadingSpinner = () => {
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <motion.p
-            className="text-cyan-300 font-mono text-sm mb-4 tracking-wider uppercase"
+            className="text-teal-700 font-mono text-sm mb-4 tracking-wider uppercase"
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -170,9 +170,9 @@ const LoadingSpinner = () => {
           </motion.p>
 
           {/* Progress bar with gradient */}
-          <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden mb-2">
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-2">
             <motion.div
-              className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full"
+              className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
@@ -182,7 +182,7 @@ const LoadingSpinner = () => {
           {/* Progress percentage and timecode */}
           <div className="flex justify-between items-center">
             <motion.span
-              className="text-cyan-400 font-mono text-xs"
+              className="text-teal-600 font-mono text-xs"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 1, repeat: Infinity }}
             >
@@ -190,7 +190,7 @@ const LoadingSpinner = () => {
             </motion.span>
 
             <motion.span
-              className="text-cyan-400 font-mono text-xs"
+              className="text-teal-600 font-mono text-xs"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
             >
@@ -200,7 +200,7 @@ const LoadingSpinner = () => {
         </motion.div>
 
         {/* Video editing terms floating in background */}
-        <div className="absolute -z-10 inset-0 overflow-hidden opacity-30">
+        <div className="absolute -z-10 inset-0 overflow-hidden opacity-20">
           {[
             "COLOR GRADING",
             "MOTION GRAPHICS",
@@ -211,14 +211,14 @@ const LoadingSpinner = () => {
           ].map((term, i) => (
             <motion.div
               key={i}
-              className="absolute text-cyan-400/30 font-mono text-xs uppercase tracking-widest"
+              className="absolute text-teal-600/20 font-mono text-xs uppercase tracking-widest"
               style={{
                 left: `${10 + i * 15}%`,
                 top: `${20 + i * 10}%`,
               }}
               animate={{
                 y: [0, -20, 0],
-                opacity: [0, 0.5, 0],
+                opacity: [0, 0.3, 0],
               }}
               transition={{
                 duration: 5,
@@ -237,7 +237,7 @@ const LoadingSpinner = () => {
         {[...Array(25)].map((_, i) => (
           <motion.div
             key={i}
-            className="w-1 h-4 mx-0.5 bg-gradient-to-t from-cyan-400 to-purple-500 rounded-t-sm"
+            className="w-1 h-4 mx-0.5 bg-gradient-to-t from-teal-400 to-emerald-400 rounded-t-sm"
             animate={{
               height: [8, 24, 8],
             }}

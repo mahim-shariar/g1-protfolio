@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const CallToAction = () => {
   const ctaRef = useRef(null);
@@ -23,8 +24,8 @@ const CallToAction = () => {
       particle.style.height = particle.style.width;
       particle.style.background = `radial-gradient(circle, ${
         Math.random() > 0.5
-          ? "rgba(0, 245, 255, 0.8)"
-          : "rgba(147, 51, 234, 0.8)"
+          ? "rgba(255, 255, 255, 0.8)"
+          : "rgba(20, 184, 166, 0.8)"
       }, transparent)`;
       particle.style.left = `${Math.random() * 100}%`;
       particle.style.top = `${Math.random() * 100}%`;
@@ -47,7 +48,7 @@ const CallToAction = () => {
       setIsHovered(false);
       particles.forEach((particle) => {
         particle.style.transform = "translate(0, 0)";
-        particle.style.opacity = "0.5";
+        particle.style.opacity = "0.3";
       });
     };
 
@@ -64,16 +65,16 @@ const CallToAction = () => {
   return (
     <section
       ref={ctaRef}
-      className="relative py-32 bg-gradient-to-b from-gray-950 to-black overflow-hidden"
+      className="relative py-32 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
     >
       {/* Animated circuit board background */}
-      <div className="absolute inset-0 z-0 opacity-30">
+      <div className="absolute inset-0 z-0 opacity-10">
         <div className="circuit-board"></div>
       </div>
 
       {/* Glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-teal-100 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-emerald-100 rounded-full blur-3xl animate-pulse"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -83,19 +84,19 @@ const CallToAction = () => {
             transition={{ duration: 0.7 }}
             className="mb-12"
           >
-            <h2 className="text-5xl md:text-7xl font-bold text-white mb-8">
+            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-8">
               Your footage deserves an{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
                 unforgettable edit
               </span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Transform your raw footage into captivating visual stories that
               engage your audience and elevate your brand.
             </p>
           </motion.div>
 
-          {/* Holographic CTA Button */}
+          {/* Teal CTA Button */}
           <motion.div
             ref={containerRef}
             initial={{ opacity: 0, scale: 0.9 }}
@@ -106,23 +107,26 @@ const CallToAction = () => {
             {/* Outer glow */}
             <div
               className={`absolute -inset-4 rounded-2xl blur-xl transition-all duration-500 ${
-                isHovered ? "bg-cyan-500/30" : "bg-cyan-500/10"
+                isHovered ? "bg-teal-500/30" : "bg-teal-500/20"
               }`}
             ></div>
 
-            {/* Holographic button */}
-            <button className="relative px-12 py-6 bg-gray-900/50 backdrop-blur-md text-white rounded-2xl font-bold text-2xl border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-500 transform group-hover:scale-105 shadow-2xl shadow-cyan-500/10 group-hover:shadow-cyan-500/30 flex items-center justify-center overflow-hidden">
+            {/* Teal button */}
+            <Link
+              to="/contact"
+              className="relative px-12 py-6 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-2xl font-bold text-2xl border border-teal-500 hover:from-teal-600 hover:to-teal-700 transition-all duration-500 transform group-hover:scale-105 shadow-2xl shadow-teal-500/20 group-hover:shadow-teal-500/40 flex items-center justify-center overflow-hidden"
+            >
               {/* Animated background */}
-              <div className="absolute inset-0 opacity-30">
-                <div className="holographic-pattern"></div>
+              <div className="absolute inset-0 opacity-20">
+                <div className="modern-pattern"></div>
               </div>
 
               {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-shine"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shine"></div>
 
               <span>Start a Project</span>
               <motion.svg
-                className="w-6 h-6 ml-3"
+                className="w-6 h-6 ml-3 text-white"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -136,14 +140,14 @@ const CallToAction = () => {
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </motion.svg>
-            </button>
+            </Link>
 
             {/* Binary code rain effect */}
-            <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-20">
+            <div className="absolute inset-0 overflow-hidden rounded-2xl opacity-10">
               {[...Array(15)].map((_, i) => (
                 <div
                   key={i}
-                  className="absolute text-cyan-400 font-mono text-xs opacity-70 binary-rain"
+                  className="absolute text-white font-mono text-xs opacity-70 binary-rain"
                   style={{
                     left: `${5 + Math.random() * 90}%`,
                     animationDelay: `${Math.random() * 5}s`,
@@ -163,10 +167,10 @@ const CallToAction = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
           >
-            <div className="bg-gray-900/20 backdrop-blur-sm rounded-xl p-4 border border-cyan-500/10 hover:border-cyan-500/30 transition-colors duration-300">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-teal-100 hover:border-teal-200 transition-colors duration-300 shadow-sm">
               <div className="flex items-center justify-center mb-2">
                 <svg
-                  className="w-8 h-8 text-cyan-400"
+                  className="w-8 h-8 text-teal-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -179,12 +183,12 @@ const CallToAction = () => {
                   />
                 </svg>
               </div>
-              <p className="text-gray-300 font-medium">
+              <p className="text-gray-700 font-medium">
                 Replies within 24 hours
               </p>
-              <div className="h-1 mt-2 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1 mt-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-cyan-500 rounded-full"
+                  className="h-full bg-teal-500 rounded-full"
                   initial={{ width: "0%" }}
                   animate={isInView ? { width: "95%" } : {}}
                   transition={{ duration: 1, delay: 0.6 }}
@@ -192,10 +196,10 @@ const CallToAction = () => {
               </div>
             </div>
 
-            <div className="bg-gray-900/20 backdrop-blur-sm rounded-xl p-4 border border-purple-500/10 hover:border-purple-500/30 transition-colors duration-300">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-emerald-100 hover:border-emerald-200 transition-colors duration-300 shadow-sm">
               <div className="flex items-center justify-center mb-2">
                 <svg
-                  className="w-8 h-8 text-purple-400"
+                  className="w-8 h-8 text-emerald-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -208,10 +212,10 @@ const CallToAction = () => {
                   />
                 </svg>
               </div>
-              <p className="text-gray-300 font-medium">Simple pricing</p>
-              <div className="h-1 mt-2 bg-gray-800 rounded-full overflow-hidden">
+              <p className="text-gray-700 font-medium">Simple pricing</p>
+              <div className="h-1 mt-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-purple-500 rounded-full"
+                  className="h-full bg-emerald-500 rounded-full"
                   initial={{ width: "0%" }}
                   animate={isInView ? { width: "100%" } : {}}
                   transition={{ duration: 1, delay: 0.8 }}
@@ -219,10 +223,10 @@ const CallToAction = () => {
               </div>
             </div>
 
-            <div className="bg-gray-900/20 backdrop-blur-sm rounded-xl p-4 border border-cyan-500/10 hover:border-cyan-500/30 transition-colors duration-300">
+            <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-teal-100 hover:border-teal-200 transition-colors duration-300 shadow-sm">
               <div className="flex items-center justify-center mb-2">
                 <svg
-                  className="w-8 h-8 text-cyan-400"
+                  className="w-8 h-8 text-teal-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -235,10 +239,10 @@ const CallToAction = () => {
                   />
                 </svg>
               </div>
-              <p className="text-gray-300 font-medium">Fast delivery</p>
-              <div className="h-1 mt-2 bg-gray-800 rounded-full overflow-hidden">
+              <p className="text-gray-700 font-medium">Fast delivery</p>
+              <div className="h-1 mt-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-cyan-500 rounded-full"
+                  className="h-full bg-teal-500 rounded-full"
                   initial={{ width: "0%" }}
                   animate={isInView ? { width: "90%" } : {}}
                   transition={{ duration: 1, delay: 1 }}
@@ -254,41 +258,41 @@ const CallToAction = () => {
         .circuit-board {
           background-image: radial-gradient(
               circle at 1px 1px,
-              rgba(0, 245, 255, 0.2) 1px,
+              rgba(20, 184, 166, 0.1) 1px,
               transparent 0
             ),
             radial-gradient(
               circle at 1px 1px,
-              rgba(147, 51, 234, 0.2) 1px,
+              rgba(16, 185, 129, 0.1) 1px,
               transparent 0
             );
           background-size: 30px 30px;
           background-position: 0 0, 15px 15px;
         }
 
-        .holographic-pattern {
+        .modern-pattern {
           background-image: linear-gradient(
               45deg,
-              rgba(0, 245, 255, 0.1) 25%,
+              rgba(255, 255, 255, 0.1) 25%,
               transparent 25%,
               transparent 75%,
-              rgba(0, 245, 255, 0.1) 75%,
-              rgba(0, 245, 255, 0.1)
+              rgba(255, 255, 255, 0.1) 75%,
+              rgba(255, 255, 255, 0.1)
             ),
             linear-gradient(
               45deg,
-              rgba(0, 245, 255, 0.1) 25%,
+              rgba(255, 255, 255, 0.1) 25%,
               transparent 25%,
               transparent 75%,
-              rgba(0, 245, 255, 0.1) 75%,
-              rgba(0, 245, 255, 0.1)
+              rgba(255, 255, 255, 0.1) 75%,
+              rgba(255, 255, 255, 0.1)
             );
           background-size: 60px 60px;
           background-position: 0 0, 30px 30px;
         }
 
         .cta-particle {
-          opacity: 0.5;
+          opacity: 0.3;
           transition: all 0.5s ease-out;
         }
 
@@ -302,10 +306,10 @@ const CallToAction = () => {
             opacity: 0;
           }
           10% {
-            opacity: 1;
+            opacity: 0.7;
           }
           90% {
-            opacity: 1;
+            opacity: 0.7;
           }
           100% {
             transform: translateY(1000%);
