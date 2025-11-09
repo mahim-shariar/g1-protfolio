@@ -2,15 +2,288 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { getVideoReelsByCategory } from "../../services/api";
 import BookingModal from "../BookingModal";
-import * as THREE from "three";
+import davinchi from "../../assets/davenchi.png";
+import premier from "../../assets/premier.png";
+import cap_cut from "../../assets/cap-cut.png";
+import after_effect from "../../assets/after-effect.png";
+import blender from "../../assets/blender.png";
+import final_cut from "../../assets/final-cut.png";
+import bg from "/ICON.png";
+
+// Background Logo Only Animation
+const BackgroundLogoAnimation = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Main Background Logo */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{
+          scale: [1, 1.03, 1],
+          opacity: [0.08, 0.12, 0.08],
+          rotate: [0, 1, 0, -1, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo"
+          className="w-[85%] max-w-[1100px] h-auto"
+          style={{
+            filter: `
+              brightness(1.2)
+              contrast(1.1)
+              drop-shadow(0 0 150px rgba(13, 148, 136, 0.15))
+            `,
+          }}
+        />
+      </motion.div>
+
+      {/* Secondary Larger Logo for Depth */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1.05, 1.12, 1.05],
+          opacity: [0.05, 0.08, 0.05],
+          rotate: [0, -2, 0, 2, 0],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+          delay: 2,
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo Glow"
+          className="w-[90%] max-w-[1300px] h-auto opacity-60"
+          style={{
+            filter: "blur(40px) brightness(1.3)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+      </motion.div>
+
+      {/* Subtle Floating Particles */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-1.5 h-1.5 bg-gradient-to-r from-teal-400/50 to-teal-300/30 rounded-full z-5"
+          style={{
+            left: `${8 + i * 8}%`,
+            top: `${12 + i * 8}%`,
+          }}
+          animate={{
+            y: [0, -20, 0, -12, 0],
+            x: [0, 6, -4, 5, 0],
+            scale: [1, 1.3, 0.8, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2, 0.35, 0.2],
+          }}
+          transition={{
+            duration: 8 + i * 1.5,
+            repeat: Infinity,
+            delay: i * 0.4,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Glow Effect Behind Background Logo */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.08, 0.15, 0.08],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <div className="w-[800px] h-[800px] bg-teal-400/12 rounded-full blur-3xl" />
+      </motion.div>
+    </div>
+  );
+};
+
+// Floating App Logos Component
+const FloatingAppLogos = ({ videoTools }) => {
+  // Generate random positions for floating logos
+  const getRandomPosition = (index) => {
+    const positions = [
+      { top: "15%", left: "8%", scale: 0.7 },
+      { top: "22%", right: "12%", scale: 0.9 },
+      { top: "65%", left: "6%", scale: 0.8 },
+      { bottom: "20%", right: "8%", scale: 1.1 },
+      { top: "42%", right: "5%", scale: 0.6 },
+      { bottom: "32%", left: "20%", scale: 1.0 },
+      { top: "12%", right: "25%", scale: 1.2 },
+      { bottom: "16%", right: "32%", scale: 0.5 },
+    ];
+    return positions[index % positions.length];
+  };
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-25">
+      {/* Floating App Logos in Random Positions */}
+      {videoTools.map((tool, index) => {
+        const position = getRandomPosition(index);
+
+        return (
+          <motion.div
+            key={`floating-${tool.name}`}
+            className="absolute z-30"
+            style={position}
+            initial={{ opacity: 0, scale: 0, y: 20 }}
+            animate={{
+              opacity: [0.4, 0.9, 0.4],
+              scale: [
+                position.scale * 0.8,
+                position.scale * 1.3,
+                position.scale * 0.8,
+              ],
+              y: [0, -40, 0, -25, 0],
+              x: [0, 10, -15, 8, 0],
+              rotate: [0, 5, -3, 2, 0],
+            }}
+            transition={{
+              duration: 14 + Math.random() * 8,
+              repeat: Infinity,
+              delay: index * 1.2,
+              ease: [0.25, 0.1, 0.25, 1],
+            }}
+          >
+            <motion.div
+              className="relative bg-gradient-to-br from-white/30 to-white/12 backdrop-blur-2xl rounded-2xl p-4 border border-white/40 shadow-2xl"
+              whileHover={{
+                scale: 1.5,
+                rotateY: 180,
+                transition: {
+                  duration: 0.8,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                },
+              }}
+            >
+              <motion.img
+                src={tool.logo}
+                alt={tool.name}
+                className="w-18 h-18 object-contain"
+                animate={{
+                  filter: [
+                    "brightness(1.1) drop-shadow(0 0 15px rgba(13, 148, 136, 0.5))",
+                    "brightness(1.4) drop-shadow(0 0 25px rgba(20, 184, 166, 0.8))",
+                    "brightness(1.1) drop-shadow(0 0 15px rgba(13, 148, 136, 0.5))",
+                  ],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  delay: index * 0.8,
+                  ease: "easeInOut",
+                }}
+              />
+
+              {/* Tool Name Tooltip */}
+              <motion.div
+                className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-teal-800/95 text-white text-sm px-4 py-2 rounded-lg whitespace-nowrap opacity-0 border border-teal-600/30 backdrop-blur-sm shadow-lg"
+                whileHover={{
+                  opacity: 1,
+                  y: -3,
+                  transition: { duration: 0.4, ease: "easeOut" },
+                }}
+              >
+                {tool.name}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-2 h-2 bg-teal-800/95 rotate-45" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        );
+      })}
+
+      {/* Subtle Floating Particles */}
+      {Array.from({ length: 8 }).map((_, i) => {
+        const positions = [
+          { top: "30%", left: "16%" },
+          { top: "45%", right: "22%" },
+          { top: "70%", left: "11%" },
+          { bottom: "32%", right: "16%" },
+          { top: "55%", right: "9%" },
+          { bottom: "42%", left: "26%" },
+          { top: "25%", right: "18%" },
+          { bottom: "28%", left: "14%" },
+        ];
+
+        const position = positions[i];
+
+        return (
+          <motion.div
+            key={`floating-particle-${i}`}
+            className="absolute w-1.5 h-1.5 bg-gradient-to-r from-teal-400/50 to-teal-300/30 rounded-full opacity-60 z-20"
+            style={position}
+            animate={{
+              y: [0, -25, 0, -15, 0],
+              x: [0, 8, -10, 6, 0],
+              scale: [1, 1.4, 0.9, 1.3, 1],
+              opacity: [0.3, 0.6, 0.3, 0.5, 0.3],
+              rotate: [0, 45, 90, 135, 180],
+            }}
+            transition={{
+              duration: 10 + Math.random() * 6,
+              delay: Math.random() * 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        );
+      })}
+
+      {/* Subtle Glow Spots */}
+      {Array.from({ length: 4 }).map((_, i) => {
+        const positions = [
+          { top: "35%", left: "30%" },
+          { top: "50%", right: "35%" },
+          { bottom: "40%", left: "25%" },
+          { top: "60%", left: "45%" },
+        ];
+
+        const position = positions[i];
+
+        return (
+          <motion.div
+            key={`floating-glow-${i}`}
+            className="absolute w-48 h-48 rounded-full z-15"
+            style={position}
+            animate={{
+              scale: [1, 2, 1],
+              opacity: [0, 0.08, 0],
+            }}
+            transition={{
+              duration: 18,
+              repeat: Infinity,
+              delay: i * 4,
+              ease: [0.4, 0, 0.2, 1],
+            }}
+          >
+            <div className="w-full h-full bg-teal-400/20 rounded-full blur-3xl" />
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
 const HeroSection = () => {
-  const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const progressBarRef = useRef(null);
   const volumeBarRef = useRef(null);
-  const mountRef = useRef(null);
-  const heroRef = useRef(null);
 
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [loadingVideo, setLoadingVideo] = useState(false);
@@ -29,11 +302,32 @@ const HeroSection = () => {
   const [videoEnded, setVideoEnded] = useState(false);
   const [controlsTimeout, setControlsTimeout] = useState(null);
 
-  // Three.js animation state
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-
   // Booking modal state
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Video editing tools data
+  const videoTools = [
+    { name: "DaVinci Resolve", logo: davinchi },
+    { name: "Premier Pro", logo: premier },
+    { name: "Final Cut Pro", logo: final_cut },
+    { name: "CapCut", logo: cap_cut },
+    { name: "After Effects", logo: after_effect },
+    { name: "Blender", logo: blender },
+  ];
+
+  // Marquee content
+  const marqueeItems = [
+    "4K RESOLUTION",
+    "COLOR GRADING",
+    "MOTION GRAPHICS",
+    "VISUAL EFFECTS",
+    "SOUND DESIGN",
+    "AI ENHANCEMENT",
+    "DRONE FOOTAGE",
+    "CINEMATIC EDITING",
+    "3D ANIMATION",
+    "VR CONTENT",
+  ];
 
   // Fetch introduction video
   useEffect(() => {
@@ -61,330 +355,6 @@ const HeroSection = () => {
     fetchIntroductionVideo();
   }, []);
 
-  // Three.js Holographic Tunnel Background
-  useEffect(() => {
-    if (!mountRef.current) return;
-
-    // Three.js Scene Setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-    });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    if (mountRef.current) {
-      mountRef.current.appendChild(renderer.domElement);
-    }
-
-    camera.position.z = 15;
-
-    // Create holographic tunnel with proper wave layers
-    const tunnelGroup = new THREE.Group();
-    scene.add(tunnelGroup);
-
-    // Create wave-like tunnel layers
-    const layers = [];
-    const layerCount = 40;
-    const layerSpacing = 1.5;
-
-    for (let i = 0; i < layerCount; i++) {
-      // Create wave-shaped geometry
-      const points = [];
-      const segments = 64;
-      const baseRadius = 8;
-      const waveAmplitude = 2;
-
-      for (let j = 0; j <= segments; j++) {
-        const angle = (j / segments) * Math.PI * 2;
-        const wave1 = Math.sin(angle * 4) * waveAmplitude;
-        const wave2 = Math.cos(angle * 3 + i * 0.3) * waveAmplitude * 0.5;
-        const wave3 = Math.sin(angle * 6 + i * 0.5) * waveAmplitude * 0.3;
-
-        const radius = baseRadius + wave1 + wave2 + wave3;
-        points.push(
-          new THREE.Vector3(
-            Math.cos(angle) * radius,
-            Math.sin(angle) * radius,
-            0
-          )
-        );
-      }
-
-      const layerGeometry = new THREE.BufferGeometry().setFromPoints(points);
-      const layerMaterial = new THREE.LineBasicMaterial({
-        color: new THREE.Color(0x008081),
-        transparent: true,
-        opacity: 0.15 - (i / layerCount) * 0.12,
-        linewidth: 1,
-      });
-
-      const layer = new THREE.LineLoop(layerGeometry, layerMaterial);
-      layer.position.z = -i * layerSpacing;
-      layer.rotation.x = Math.PI / 2;
-      tunnelGroup.add(layer);
-      layers.push({
-        mesh: layer,
-        baseZ: -i * layerSpacing,
-        phase: i * 0.2,
-        speed: 0.1 + (i / layerCount) * 0.2,
-      });
-    }
-
-    // Create data stream particles that follow wave pattern
-    const streamCount = 12;
-    const streams = [];
-
-    for (let i = 0; i < streamCount; i++) {
-      const streamParticles = new THREE.BufferGeometry();
-      const particleCount = 80;
-      const positions = new Float32Array(particleCount * 3);
-      const colors = new Float32Array(particleCount * 3);
-
-      const baseAngle = (i / streamCount) * Math.PI * 2;
-      const baseRadius = 7;
-
-      for (let j = 0; j < particleCount; j++) {
-        const j3 = j * 3;
-        const progress = j / particleCount;
-
-        const angle = baseAngle + progress * Math.PI * 3;
-        const waveOffset = Math.sin(angle * 4 + progress * Math.PI * 2) * 1.5;
-        const radius = baseRadius + waveOffset;
-
-        positions[j3] = Math.cos(angle) * radius;
-        positions[j3 + 1] = Math.sin(angle) * radius;
-        positions[j3 + 2] = -progress * 60;
-
-        const intensity = 0.5 + Math.random() * 0.4;
-        colors[j3] = 0.1;
-        colors[j3 + 1] = intensity;
-        colors[j3 + 2] = intensity * 0.9;
-      }
-
-      streamParticles.setAttribute(
-        "position",
-        new THREE.BufferAttribute(positions, 3)
-      );
-      streamParticles.setAttribute(
-        "color",
-        new THREE.BufferAttribute(colors, 3)
-      );
-
-      const streamMaterial = new THREE.PointsMaterial({
-        size: 1.2,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.7,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: true,
-      });
-
-      const stream = new THREE.Points(streamParticles, streamMaterial);
-      scene.add(stream);
-      streams.push({
-        mesh: stream,
-        speed: 0.15 + Math.random() * 0.2,
-        offset: Math.random() * 100,
-        baseAngle: baseAngle,
-      });
-    }
-
-    // Create floating hexagons with wave-like motion
-    const hexagons = [];
-    const hexagonCount = 20;
-
-    for (let i = 0; i < hexagonCount; i++) {
-      const hexGeometry = new THREE.CircleGeometry(
-        0.3 + Math.random() * 0.4,
-        6
-      );
-      const hexMaterial = new THREE.MeshBasicMaterial({
-        color: 0x008081,
-        transparent: true,
-        opacity: 0.2 + Math.random() * 0.2,
-        side: THREE.DoubleSide,
-      });
-
-      const hexagon = new THREE.Mesh(hexGeometry, hexMaterial);
-
-      const angle = (i / hexagonCount) * Math.PI * 2;
-      const radius = 5 + Math.random() * 3;
-
-      hexagon.position.set(
-        Math.cos(angle) * radius,
-        Math.sin(angle) * radius,
-        (Math.random() - 0.5) * 15
-      );
-
-      hexagon.rotation.x = Math.random() * Math.PI;
-      hexagon.rotation.y = Math.random() * Math.PI;
-
-      scene.add(hexagon);
-      hexagons.push({
-        mesh: hexagon,
-        basePosition: hexagon.position.clone(),
-        baseAngle: angle,
-        radius: radius,
-        floatSpeed: 0.2 + Math.random() * 0.3,
-        rotationSpeed: (Math.random() - 0.5) * 0.008,
-        wavePhase: Math.random() * Math.PI * 2,
-      });
-    }
-
-    // Mouse interaction
-    const mouse = new THREE.Vector2();
-    const handleMouseMove = (event) => {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    // Animation
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
-
-      // Animate wave layers
-      layers.forEach((layer, index) => {
-        const layerTime = elapsedTime * layer.speed + layer.phase;
-
-        const positions = layer.mesh.geometry.attributes.position.array;
-        const baseRadius = 8;
-        const waveAmplitude = 1.5;
-
-        for (let j = 0; j < positions.length / 3; j++) {
-          const j3 = j * 3;
-          const angle = (j / (positions.length / 3)) * Math.PI * 2;
-
-          const wave1 = Math.sin(angle * 4 + layerTime * 2) * waveAmplitude;
-          const wave2 =
-            Math.cos(angle * 3 + layerTime * 1.5) * waveAmplitude * 0.6;
-          const wave3 = Math.sin(angle * 6 + layerTime) * waveAmplitude * 0.3;
-
-          const radius = baseRadius + wave1 + wave2 + wave3;
-
-          positions[j3] = Math.cos(angle) * radius;
-          positions[j3 + 1] = Math.sin(angle) * radius;
-        }
-
-        layer.mesh.geometry.attributes.position.needsUpdate = true;
-        layer.mesh.rotation.z += 0.001;
-        layer.mesh.position.z = layer.baseZ + elapsedTime * 0.3;
-        if (layer.mesh.position.z > 10) {
-          layer.mesh.position.z = -60;
-        }
-      });
-
-      // Animate data streams
-      streams.forEach((stream, index) => {
-        const positions = stream.mesh.geometry.attributes.position.array;
-        const streamTime = elapsedTime * stream.speed + stream.offset;
-
-        for (let i = 0; i < positions.length; i += 3) {
-          const progress = i / 3 / (positions.length / 3);
-          const angle = stream.baseAngle + progress * Math.PI * 2;
-
-          const waveOffset = Math.sin(angle * 4 + streamTime * 3) * 2;
-          const radius = 7 + waveOffset;
-
-          positions[i] = Math.cos(angle) * radius;
-          positions[i + 1] = Math.sin(angle) * radius;
-          positions[i + 2] += 0.15;
-
-          if (positions[i + 2] > 10) {
-            positions[i + 2] = -60;
-          }
-        }
-
-        stream.mesh.geometry.attributes.position.needsUpdate = true;
-      });
-
-      // Animate floating hexagons
-      hexagons.forEach((hex, index) => {
-        const hexTime = elapsedTime * hex.floatSpeed + hex.wavePhase;
-
-        const orbitAngle = hex.baseAngle + hexTime * 0.5;
-        const waveRadius = hex.radius + Math.sin(hexTime * 2) * 0.8;
-
-        hex.mesh.position.x = Math.cos(orbitAngle) * waveRadius;
-        hex.mesh.position.y = Math.sin(orbitAngle) * waveRadius;
-        hex.mesh.position.z = hex.basePosition.z + Math.sin(hexTime * 1.7) * 2;
-
-        hex.mesh.rotation.x += hex.rotationSpeed + Math.sin(hexTime) * 0.002;
-        hex.mesh.rotation.y +=
-          hex.rotationSpeed * 0.7 + Math.cos(hexTime) * 0.001;
-
-        const dx = hex.mesh.position.x - mouse.x * 8;
-        const dy = hex.mesh.position.y - mouse.y * 8;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 4) {
-          const force = (4 - distance) * 0.008;
-          const waveForce = Math.sin(elapsedTime * 5) * force * 0.3;
-          hex.mesh.position.x += (dx / distance) * force + waveForce;
-          hex.mesh.position.y += (dy / distance) * force + waveForce;
-        }
-      });
-
-      tunnelGroup.rotation.y = elapsedTime * 0.03;
-      tunnelGroup.rotation.x = Math.sin(elapsedTime * 0.08) * 0.1;
-      tunnelGroup.rotation.z = Math.sin(elapsedTime * 0.05) * 0.05;
-
-      camera.position.x = Math.sin(elapsedTime * 0.08) * 0.8;
-      camera.position.y = Math.cos(elapsedTime * 0.06) * 0.6;
-      camera.position.z = 15 + Math.sin(elapsedTime * 0.1) * 0.3;
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
-      }
-      renderer.dispose();
-    };
-  }, []);
-
-  // Text animation
-  useEffect(() => {
-    setTimeout(() => {
-      const animatedElements = document.querySelectorAll(".animate-on-scroll");
-      animatedElements.forEach((el, index) => {
-        setTimeout(() => {
-          el.classList.add("opacity-100", "translate-y-0");
-          el.classList.remove("opacity-0", "translate-y-8");
-        }, index * 300);
-      });
-    }, 500);
-  }, []);
-
   // Video event handlers and controls
   useEffect(() => {
     const video = videoRef.current;
@@ -399,19 +369,16 @@ const HeroSection = () => {
       setVideoPlaying(false);
       setVideoEnded(true);
       setShowCentralButton(true);
-      setIsVideoPlaying(false);
     };
 
     const handlePlay = () => {
       setVideoPlaying(true);
       setVideoEnded(false);
       setShowCentralButton(false);
-      setIsVideoPlaying(true);
     };
 
     const handlePause = () => {
       setVideoPlaying(false);
-      setIsVideoPlaying(false);
       if (!videoEnded) {
         setShowCentralButton(true);
       }
@@ -426,7 +393,6 @@ const HeroSection = () => {
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
 
-    // Set initial volume and start paused
     video.volume = volume;
     video.muted = isMuted;
     video.pause();
@@ -450,7 +416,6 @@ const HeroSection = () => {
         setShowControls(false);
       }, 3000);
       setControlsTimeout(timeout);
-
       return () => clearTimeout(timeout);
     }
   }, [showControls, videoPlaying]);
@@ -461,11 +426,9 @@ const HeroSection = () => {
         videoRef.current.play();
         setShowCentralButton(false);
         setVideoEnded(false);
-        setIsVideoPlaying(true);
       } else {
         videoRef.current.pause();
         setShowCentralButton(true);
-        setIsVideoPlaying(false);
       }
     }
   };
@@ -476,30 +439,25 @@ const HeroSection = () => {
       videoRef.current.play();
       setShowCentralButton(false);
       setVideoEnded(false);
-      setIsVideoPlaying(true);
     }
   };
 
   const handleSeek = (e) => {
     if (!videoRef.current) return;
-
     const progressBar = progressBarRef.current;
     const rect = progressBar.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
-
     videoRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   };
 
   const handleVolumeChange = (e) => {
     if (!videoRef.current) return;
-
     const volumeBar = volumeBarRef.current;
     const rect = volumeBar.getBoundingClientRect();
     let newVolume = (e.clientX - rect.left) / rect.width;
     newVolume = Math.max(0, Math.min(1, newVolume));
-
     setVolume(newVolume);
     videoRef.current.volume = newVolume;
     if (newVolume === 0) {
@@ -521,7 +479,6 @@ const HeroSection = () => {
     const currentIndex = rates.indexOf(playbackRate);
     const nextIndex = (currentIndex + 1) % rates.length;
     const newRate = rates[nextIndex];
-
     setPlaybackRate(newRate);
     if (videoRef.current) {
       videoRef.current.playbackRate = newRate;
@@ -531,22 +488,17 @@ const HeroSection = () => {
   const toggleFullscreen = () => {
     const videoContainer = videoRef.current?.parentElement;
     if (!videoContainer) return;
-
     if (!isFullscreen) {
       if (videoContainer.requestFullscreen) {
         videoContainer.requestFullscreen();
       } else if (videoContainer.webkitRequestFullscreen) {
         videoContainer.webkitRequestFullscreen();
-      } else if (videoContainer.msRequestFullscreen) {
-        videoContainer.msRequestFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
       }
     }
     setIsFullscreen(!isFullscreen);
@@ -566,24 +518,9 @@ const HeroSection = () => {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleVideoHover = (isHovering) => {
-    if (videoRef.current && isHovering && videoPlaying) {
-      videoRef.current.playbackRate = 1.2;
-    } else if (videoRef.current) {
-      videoRef.current.playbackRate = 1.0;
-    }
-  };
-
   // Modal handlers
-  const openBookingModal = () => {
-    setIsBookingModalOpen(true);
-  };
-
-  const closeBookingModal = () => {
-    setIsBookingModalOpen(false);
-  };
-
-  // Projects navigation handler
+  const openBookingModal = () => setIsBookingModalOpen(true);
+  const closeBookingModal = () => setIsBookingModalOpen(false);
   const navigateToProjects = () => {
     window.location.href = "/projects";
   };
@@ -594,20 +531,21 @@ const HeroSection = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
+        staggerChildren: 0.15,
+        delayChildren: 0.4,
+        ease: [0.25, 0.1, 0.25, 1],
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 25, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.8,
-        ease: "easeOut",
+        duration: 0.9,
+        ease: [0.25, 0.1, 0.25, 1],
       },
     },
   };
@@ -624,74 +562,98 @@ const HeroSection = () => {
     : "INTRODUCTION_2025.MP4";
 
   return (
-    <div
-      ref={heroRef}
-      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-gray-50 to-teal-50 flex flex-col items-center justify-center pt-20 pb-10"
+    <motion.div
+      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 flex flex-col items-center justify-start pt-10 pb-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
     >
-      {/* Three.js Holographic Tunnel Background */}
-      <div
-        ref={mountRef}
-        className="absolute top-0 left-0 w-full h-full pointer-events-none"
-      />
+      {/* Background Logo Only Animation */}
+      <BackgroundLogoAnimation />
 
-      {/* Gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-gray-50 to-teal-50 opacity-90"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent opacity-70"></div>
+      {/* Floating App Logos in Random Positions */}
+      <FloatingAppLogos videoTools={videoTools} />
 
-      {/* Content */}
+      {/* Content Section - Reduced text size */}
       <motion.div
-        className="relative z-10 text-center px-4 md:px-8 max-w-6xl mx-auto mb-8"
+        className="relative z-30 text-center px-4 md:px-8 max-w-4xl mx-auto mb-4 mt-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* Animated badge */}
         <motion.div
-          className="inline-flex items-center space-x-2 mb-8 px-4 py-2 rounded-full bg-teal-50 text-teal-700 text-sm font-medium border border-teal-100 shadow-sm animate-on-scroll opacity-0 translate-y-8"
+          className="inline-flex items-center space-x-2 mb-4 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md text-teal-700 text-sm font-medium border border-teal-200 shadow-lg"
           variants={itemVariants}
         >
-          <span
-            className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"
-            style={{ animationDuration: "2s" }}
-          ></span>
-          <span>Next Generation Video Editing</span>
+          <motion.span
+            className="w-2 h-2 bg-teal-500 rounded-full"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.8, 1, 0.8],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <span className="text-teal-800">Next Generation Video Editing</span>
         </motion.div>
 
         <motion.h1
-          className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 max-w-4xl mx-auto leading-tight animate-on-scroll opacity-0 translate-y-8"
+          className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 max-w-4xl mx-auto leading-tight"
           variants={itemVariants}
+          style={{
+            textShadow: "0 4px 20px rgba(0, 0, 0, 0.12)",
+            background:
+              "linear-gradient(135deg, #1f2937 0%, #374151 50%, #0d9488 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
         >
-          <span className="text-gray-800">Visual Stories</span>
-          <br />
-          <span className="text-teal-600">Reimagined</span>
+          <span className="block">Visual Stories</span>
+          <span className="block text-transparent bg-gradient-to-r from-teal-600 via-teal-500 to-teal-400 bg-clip-text">
+            Reimagined
+          </span>
         </motion.h1>
 
         <motion.p
-          className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-8 leading-relaxed animate-on-scroll opacity-0 translate-y-8"
+          className="text-lg md:text-xl text-gray-800 max-w-2xl mx-auto mb-5 leading-relaxed font-medium"
           variants={itemVariants}
+          style={{
+            textShadow: "0 2px 12px rgba(255, 255, 255, 0.9)",
+          }}
         >
           Transform your vision into captivating visual experiences with our
-          AI-powered editing platform. Where creativity meets cutting-edge
-          technology.
+          AI-powered editing platform.
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-on-scroll opacity-0 translate-y-8"
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6"
           variants={itemVariants}
         >
           <motion.button
-            className="bg-teal-600 text-white px-8 py-4 rounded-full hover:bg-teal-700 transition-all duration-500 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center group"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="bg-teal-600 text-white px-8 py-4 rounded-xl hover:bg-teal-700 transition-all duration-500 font-semibold text-base shadow-xl hover:shadow-2xl flex items-center justify-center group relative overflow-hidden"
+            whileHover={{
+              scale: 1.03,
+              y: -2,
+              transition: { duration: 0.3, ease: "easeOut" },
+            }}
+            whileTap={{ scale: 0.98 }}
             onClick={navigateToProjects}
           >
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-teal-500 group-hover:from-teal-700 group-hover:to-teal-600 transition-all duration-500" />
             <span className="relative z-10 flex items-center gap-2">
               Explore Portfolio
-              <svg
+              <motion.svg
                 className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
               >
                 <path
                   strokeLinecap="round"
@@ -699,23 +661,30 @@ const HeroSection = () => {
                   strokeWidth={2}
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
-              </svg>
+              </motion.svg>
             </span>
           </motion.button>
 
           <motion.button
-            className="border border-teal-200 text-teal-700 px-8 py-4 rounded-full hover:border-teal-400 hover:bg-teal-50 transition-all duration-500 font-medium transform hover:-translate-y-1 flex items-center justify-center group"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="border-2 border-teal-400 text-teal-800 px-8 py-4 rounded-xl hover:border-teal-500 hover:bg-white/80 transition-all duration-500 font-semibold text-base flex items-center justify-center group relative overflow-hidden backdrop-blur-md shadow-lg"
+            whileHover={{
+              scale: 1.03,
+              y: -2,
+              transition: { duration: 0.3, ease: "easeOut" },
+            }}
+            whileTap={{ scale: 0.98 }}
             onClick={openBookingModal}
           >
-            <span className="relative z-10 flex items-center gap-2">
+            <div className="absolute inset-0 bg-gradient-to-r from-white/50 to-white/30 group-hover:from-white/70 group-hover:to-white/50 transition-all duration-500" />
+            <span className="relative z-10 flex items-center gap-2 font-semibold">
               Start Your Project
-              <svg
+              <motion.svg
                 className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
               >
                 <path
                   strokeLinecap="round"
@@ -723,56 +692,60 @@ const HeroSection = () => {
                   strokeWidth={2}
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
-              </svg>
+              </motion.svg>
             </span>
           </motion.button>
         </motion.div>
       </motion.div>
 
-      {/* Modern Video Player Section */}
+      {/* Video Player Section - Adjusted spacing */}
       <motion.div
-        className="relative z-10 w-full max-w-6xl px-4 mb-8"
-        initial={{ opacity: 0, y: 40 }}
+        className="relative z-30 w-full max-w-5xl px-4 mb-6"
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8, duration: 0.7 }}
+        transition={{ delay: 1.0, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border border-gray-100">
+        <motion.div
+          className="text-center mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+        >
+          <div className="inline-flex items-center gap-3 bg-white/95 backdrop-blur-md rounded-xl px-6 py-3 shadow-lg border border-gray-200">
             <div className="flex gap-1">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-red-500 rounded-full shadow-md"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full shadow-md"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full shadow-md"></div>
             </div>
-            <p className="text-gray-600 font-medium">
+            <p className="text-gray-800 font-semibold text-base">
               Experience Our Creative Process
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <div
-          className="w-full h-[500px] lg:h-[600px] relative overflow-hidden rounded-3xl border-2 border-white shadow-2xl hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-500 group bg-white"
-          onMouseEnter={() => {
-            handleVideoHover(true);
-            setShowControls(true);
-          }}
-          onMouseLeave={() => handleVideoHover(false)}
+        <motion.div
+          className="w-full h-[450px] lg:h-[550px] relative overflow-hidden rounded-2xl border-4 border-white/95 shadow-2xl bg-white"
           onMouseMove={handleMouseMove}
+          whileHover={{
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.3)",
+            transition: { duration: 0.3 },
+          }}
         >
+          {/* ... video player content remains the same but with reduced sizes ... */}
           {loadingIntroduction ? (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-blue-50 rounded-3xl flex items-center justify-center z-30">
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl flex items-center justify-center z-30">
               <div className="flex flex-col items-center">
                 <div className="relative">
                   <div className="w-16 h-16 border-4 border-blue-200 rounded-full"></div>
                   <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
                 </div>
-                <p className="text-blue-600 font-medium mt-4">
+                <p className="text-blue-600 font-medium text-sm mt-3">
                   Loading creative showcase...
                 </p>
               </div>
             </div>
           ) : (
             <>
-              {/* Video element */}
               <video
                 ref={videoRef}
                 muted={isMuted}
@@ -786,25 +759,19 @@ const HeroSection = () => {
                 Your browser does not support the video tag.
               </video>
 
-              {/* Modern gradient overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent pointer-events-none z-10"></div>
-              <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white/40 to-transparent pointer-events-none z-10"></div>
-
-              {/* Video title with modern design */}
-              <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-2xl text-sm font-semibold z-20 shadow-lg border border-gray-100">
+              <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md px-3 py-2 rounded-xl text-sm font-semibold z-20 shadow-lg border border-gray-200">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-md"></div>
                   <span className="text-gray-800">▶ {videoTitle}</span>
                 </div>
               </div>
 
-              {/* Loading indicator */}
               {loadingVideo && (
-                <div className="absolute inset-0 flex items-center justify-center z-15 bg-white/20 backdrop-blur-sm">
-                  <div className="bg-white/90 rounded-2xl px-6 py-4 shadow-2xl border border-gray-100">
+                <div className="absolute inset-0 flex items-center justify-center z-15 bg-white/40 backdrop-blur-sm">
+                  <div className="bg-white/95 rounded-xl px-6 py-4 shadow-lg border border-gray-200">
                     <div className="flex items-center gap-3">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium text-sm">
                         Buffering...
                       </span>
                     </div>
@@ -812,100 +779,82 @@ const HeroSection = () => {
                 </div>
               )}
 
-              {/* Modern Central Play/Replay Button */}
               {(showCentralButton || !videoPlaying) && (
                 <motion.div
                   className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.8, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   <motion.div
-                    className="relative"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                    className="relative w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-2xl backdrop-blur-md border-2 border-gray-300 hover:border-blue-500"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={videoEnded ? handleReplay : handlePlayPause}
                   >
-                    {/* Main button */}
-                    <div
-                      className="relative w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-2xl backdrop-blur-sm border border-gray-200 hover:border-blue-300 transition-colors"
-                      onClick={videoEnded ? handleReplay : handlePlayPause}
-                    >
-                      {/* Icon */}
-                      {videoEnded ? (
-                        <motion.svg
-                          className="w-8 h-8 text-gray-700"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          initial={{ rotate: -180 }}
-                          animate={{ rotate: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                            clipRule="evenodd"
-                          />
-                        </motion.svg>
-                      ) : (
-                        <motion.svg
-                          className="w-8 h-8 text-gray-700"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          initial={{ scale: 0.8 }}
-                          animate={{ scale: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                            clipRule="evenodd"
-                          />
-                        </motion.svg>
-                      )}
-                    </div>
+                    {videoEnded ? (
+                      <svg
+                        className="w-8 h-8 text-gray-800"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-8 h-8 text-gray-800"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
                   </motion.div>
                 </motion.div>
               )}
 
-              {/* Modern Video Controls */}
               <motion.div
-                className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white/95 via-white/80 to-transparent p-6 z-20 transition-opacity duration-300 ${
+                className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white/95 via-white/85 to-transparent p-5 z-20 ${
                   showControls ? "opacity-100" : "opacity-0"
                 }`}
-                onMouseEnter={() => setShowControls(true)}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
-                {/* Progress Bar */}
                 <div
                   ref={progressBarRef}
-                  className="w-full h-2 bg-gray-200 rounded-full mb-4 cursor-pointer relative group/progress"
+                  className="w-full h-2 bg-gray-300 rounded-full mb-4 cursor-pointer group"
                   onClick={handleSeek}
                 >
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full relative"
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-200 group-hover:h-3 shadow-md"
                     style={{
                       width: `${
                         duration ? (currentTime / duration) * 100 : 0
                       }%`,
                     }}
-                  >
-                    <div className="absolute right-0 top-1/2 w-4 h-4 bg-white rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover/progress:opacity-100 shadow-lg border border-gray-300"></div>
-                  </div>
+                    layout
+                  />
                 </div>
 
-                {/* Control Buttons */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {/* Play/Pause */}
+                  <div className="flex items-center space-x-3">
                     <motion.button
                       onClick={handlePlayPause}
-                      className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                      className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg border border-gray-300 hover:border-blue-500"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
                     >
                       {videoPlaying ? (
                         <svg
-                          className="w-5 h-5 text-gray-700"
+                          className="w-5 h-5 text-gray-800"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -917,7 +866,7 @@ const HeroSection = () => {
                         </svg>
                       ) : (
                         <svg
-                          className="w-5 h-5 text-gray-700"
+                          className="w-5 h-5 text-gray-800"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -930,17 +879,16 @@ const HeroSection = () => {
                       )}
                     </motion.button>
 
-                    {/* Volume Control */}
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2">
                       <motion.button
                         onClick={toggleMute}
-                        className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
+                        className="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-blue-600"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
                       >
                         {isMuted || volume === 0 ? (
                           <svg
-                            className="w-5 h-5"
+                            className="w-4 h-4"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -950,21 +898,9 @@ const HeroSection = () => {
                               clipRule="evenodd"
                             />
                           </svg>
-                        ) : volume > 0.5 ? (
-                          <svg
-                            className="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
                         ) : (
                           <svg
-                            className="w-5 h-5"
+                            className="w-4 h-4"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -979,45 +915,41 @@ const HeroSection = () => {
 
                       <div
                         ref={volumeBarRef}
-                        className="w-20 h-1 bg-gray-300 rounded-full cursor-pointer relative group/volume"
+                        className="w-16 h-1 bg-gray-400 rounded-full cursor-pointer group"
                         onClick={handleVolumeChange}
                       >
-                        <div
-                          className="h-full bg-blue-500 rounded-full"
+                        <motion.div
+                          className="h-full bg-blue-500 rounded-full transition-all duration-200 group-hover:h-2 shadow-md"
                           style={{ width: `${isMuted ? 0 : volume * 100}%` }}
-                        >
-                          <div className="absolute right-0 top-1/2 w-3 h-3 bg-white rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover/volume:opacity-100 shadow border border-gray-300"></div>
-                        </div>
+                          layout
+                        />
                       </div>
                     </div>
 
-                    {/* Time Display */}
-                    <div className="text-gray-600 text-sm font-medium">
+                    <div className="text-gray-700 text-xs font-medium bg-white/90 px-2 py-1 rounded-lg backdrop-blur-sm border border-gray-300">
                       {formatTime(currentTime)} / {formatTime(duration)}
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
-                    {/* Playback Speed */}
+                  <div className="flex items-center space-x-2">
                     <motion.button
                       onClick={changePlaybackRate}
-                      className="px-3 py-1 text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium bg-white rounded-lg border border-gray-200 hover:border-blue-300"
+                      className="px-3 py-1 text-gray-700 hover:text-blue-600 text-xs font-medium bg-white rounded-lg border border-gray-300 hover:border-blue-500"
                       whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
                     >
                       {playbackRate}x
                     </motion.button>
 
-                    {/* Fullscreen */}
                     <motion.button
                       onClick={toggleFullscreen}
-                      className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      className="w-8 h-8 flex items-center justify-center text-gray-700 hover:text-blue-600"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
                     >
                       {isFullscreen ? (
                         <svg
-                          className="w-5 h-5"
+                          className="w-4 h-4"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -1029,7 +961,7 @@ const HeroSection = () => {
                         </svg>
                       ) : (
                         <svg
-                          className="w-5 h-5"
+                          className="w-4 h-4"
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -1046,49 +978,52 @@ const HeroSection = () => {
               </motion.div>
             </>
           )}
-        </div>
+        </motion.div>
       </motion.div>
 
-      {/* Stats section */}
-      <div className="flex justify-center mt-8 mb-16"></div>
-
-      {/* Modern scrolling tech stack */}
+      {/* Scrolling Marquee - Reduced size */}
       <motion.div
-        className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-6xl px-4 overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
+        className="relative w-full max-w-5xl px-4 mb-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       >
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-gray-100">
+        <div className="bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-lg border border-gray-200 overflow-hidden">
           <motion.div
-            className="flex gap-12 items-center"
-            animate={{ x: [0, -800] }}
+            className="flex gap-10 items-center"
+            animate={{ x: [0, -1000] }}
             transition={{
               x: {
                 repeat: Infinity,
                 repeatType: "loop",
-                duration: 25,
+                duration: 35,
                 ease: "linear",
               },
             }}
           >
-            {[
-              "4K RESOLUTION",
-              "COLOR GRADING",
-              "MOTION GRAPHICS",
-              "VISUAL EFFECTS",
-              "SOUND DESIGN",
-              "AI ENHANCEMENT",
-              "DRONE FOOTAGE",
-              "CINEMATIC EDITING",
-              "3D ANIMATION",
-              "VR CONTENT",
-            ].map((tech, index) => (
-              <div key={index} className="flex items-center gap-12">
-                <span className="text-gray-600 font-semibold text-sm whitespace-nowrap">
+            {[...marqueeItems, ...marqueeItems].map((tech, index) => (
+              <div key={index} className="flex items-center gap-10 shrink-0">
+                <motion.span
+                  className="text-gray-800 font-bold text-sm whitespace-nowrap"
+                  whileHover={{
+                    color: "#0d9488",
+                    scale: 1.03,
+                    textShadow: "0 0 15px rgba(13, 148, 136, 0.3)",
+                  }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
                   {tech}
-                </span>
-                <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+                </motion.span>
+                <motion.div
+                  className="w-1 h-1 bg-teal-500 rounded-full shadow-md"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.7, 1, 0.7] }}
+                  transition={{
+                    duration: 2.5,
+                    repeat: Infinity,
+                    delay: index * 0.2,
+                    ease: "easeInOut",
+                  }}
+                />
               </div>
             ))}
           </motion.div>
@@ -1097,18 +1032,7 @@ const HeroSection = () => {
 
       {/* Booking Modal */}
       <BookingModal isOpen={isBookingModalOpen} onClose={closeBookingModal} />
-
-      {/* Animation styles */}
-      <style jsx>{`
-        .animate-on-scroll {
-          transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .animate-on-scroll.opacity-100.translate-y-0 {
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-        }
-      `}</style>
-    </div>
+    </motion.div>
   );
 };
 
