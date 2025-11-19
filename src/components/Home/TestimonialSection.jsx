@@ -598,16 +598,16 @@ const TestimonialSection = () => {
         </motion.p>
       </div>
 
-      {/* Smoother Dual Marquee Container */}
+      {/* Three Column Marquee Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 ">
-          {/* Left Marquee - Smoother Top to Bottom */}
-          <div className="relative h-[800px] overflow-hidden rounded-3xl  backdrop-blur-sm ">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Top to Bottom */}
+          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
             <motion.div
               className="flex flex-col gap-6 p-6"
               animate={hasAnimated ? { y: [0, -2000] } : { y: 0 }}
               transition={{
-                duration: 50, // Slower for smoother motion
+                duration: 50,
                 repeat: Infinity,
                 ease: "linear",
               }}
@@ -621,18 +621,43 @@ const TestimonialSection = () => {
               ))}
             </motion.div>
 
-            {/* Smoother gradient fades */}
+            {/* Gradient fades */}
             <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           </div>
 
-          {/* Right Marquee - Smoother Bottom to Top */}
-          <div className="relative h-[800px] overflow-hidden rounded-3xl  backdrop-blur-sm ">
+          {/* Middle Column - Bottom to Top */}
+          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
             <motion.div
               className="flex flex-col gap-6 p-6"
               animate={hasAnimated ? { y: [-2000, 0] } : { y: 0 }}
               transition={{
-                duration: 50, // Slower for smoother motion
+                duration: 50,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              {[...testimonials, ...testimonials].map((testimonial, index) => (
+                <MarqueeTestimonial
+                  key={`middle-${index}`}
+                  testimonial={testimonial}
+                  index={index}
+                />
+              ))}
+            </motion.div>
+
+            {/* Gradient fades */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
+
+          {/* Right Column - Top to Bottom */}
+          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
+            <motion.div
+              className="flex flex-col gap-6 p-6"
+              animate={hasAnimated ? { y: [0, -2000] } : { y: 0 }}
+              transition={{
+                duration: 50,
                 repeat: Infinity,
                 ease: "linear",
               }}
@@ -646,7 +671,7 @@ const TestimonialSection = () => {
               ))}
             </motion.div>
 
-            {/* Smoother gradient fades */}
+            {/* Gradient fades */}
             <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           </div>
