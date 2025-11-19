@@ -85,9 +85,9 @@ const BookingModal = ({ isOpen, onClose }) => {
   const glowVariants = {
     pulse: {
       boxShadow: [
-        "0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3), 0 0 15px rgba(34, 211, 238, 0.2)",
-        "0 0 10px rgba(34, 211, 238, 0.8), 0 0 20px rgba(34, 211, 238, 0.5), 0 0 30px rgba(34, 211, 238, 0.3)",
-        "0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3), 0 0 15px rgba(34, 211, 238, 0.2)",
+        "0 0 5px rgba(148, 163, 184, 0.3), 0 0 10px rgba(148, 163, 184, 0.2), 0 0 15px rgba(148, 163, 184, 0.1)",
+        "0 0 10px rgba(148, 163, 184, 0.4), 0 0 20px rgba(148, 163, 184, 0.2), 0 0 30px rgba(148, 163, 184, 0.1)",
+        "0 0 5px rgba(148, 163, 184, 0.3), 0 0 10px rgba(148, 163, 184, 0.2), 0 0 15px rgba(148, 163, 184, 0.1)",
       ],
       transition: {
         duration: 3,
@@ -108,30 +108,30 @@ const BookingModal = ({ isOpen, onClose }) => {
           animate="visible"
           exit="exit"
         >
-          {/* Animated Background Overlay */}
+          {/* Light Background Overlay */}
           <motion.div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-white/80 backdrop-blur-sm"
             variants={overlayVariants}
             onClick={onClose}
           />
 
-          {/* Gradient overlays for cinematic effect */}
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-900/10 to-black/80"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+          {/* Gradient overlays for soft effect */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-50/60 to-white/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-100/40 to-blue-50/40"></div>
 
           {/* Modal Content */}
           <motion.div
-            className="relative bg-gray-900 border border-cyan-500/30 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+            className="relative bg-white border border-gray-200 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
             variants={modalVariants}
           >
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 border border-cyan-400/30 flex items-center justify-center transition-all duration-200 group"
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white hover:bg-gray-50 border border-gray-300 flex items-center justify-center transition-all duration-200 group shadow-sm"
               aria-label="Close modal"
             >
               <svg
-                className="w-4 h-4 text-cyan-300 group-hover:text-white"
+                className="w-4 h-4 text-gray-600 group-hover:text-gray-800"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -146,12 +146,12 @@ const BookingModal = ({ isOpen, onClose }) => {
             </button>
 
             <div className="max-h-[90vh] overflow-y-auto">
-              <div className="bg-gradient-to-br from-gray-900 via-purple-900/10 to-cyan-900/10 py-8 px-6 sm:px-8 border-b border-cyan-500/20">
+              <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50/30 py-8 px-6 sm:px-8 border-b border-gray-200">
                 <div className="max-w-6xl mx-auto">
                   {/* Header Section */}
                   <div className="text-center mb-8">
                     <motion.h2
-                      className="text-cyan-400 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
+                      className="text-gray-600 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.2 }}
@@ -160,19 +160,19 @@ const BookingModal = ({ isOpen, onClose }) => {
                     </motion.h2>
 
                     <motion.h1
-                      className="text-3xl md:text-4xl font-bold text-white mb-4"
+                      className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.3 }}
                     >
                       Schedule Your{" "}
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-700 to-gray-900">
                         1-Hour Consultation
                       </span>
                     </motion.h1>
 
                     <motion.p
-                      className="text-lg text-gray-300 max-w-3xl mx-auto"
+                      className="text-lg text-gray-600 max-w-3xl mx-auto"
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.4 }}
@@ -184,13 +184,13 @@ const BookingModal = ({ isOpen, onClose }) => {
                     {/* Success Message */}
                     {bookingCompleted && (
                       <motion.div
-                        className="mt-6 bg-green-900/30 border border-green-400/50 rounded-lg p-4 max-w-md mx-auto backdrop-blur-sm"
+                        className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto backdrop-blur-sm"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                       >
                         <div className="flex items-center justify-center">
                           <svg
-                            className="w-5 h-5 text-green-400 mr-2"
+                            className="w-5 h-5 text-green-600 mr-2"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -200,7 +200,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                               clipRule="evenodd"
                             />
                           </svg>
-                          <span className="text-green-300 font-medium">
+                          <span className="text-green-700 font-medium">
                             Booking confirmed! Check your email for details.
                           </span>
                         </div>
@@ -214,18 +214,18 @@ const BookingModal = ({ isOpen, onClose }) => {
                     <div className="lg:col-span-1 space-y-4">
                       {/* Quick Info Card */}
                       <motion.div
-                        className="bg-gray-800/50 rounded-xl border border-cyan-500/20 p-4 backdrop-blur-sm"
+                        className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
                       >
-                        <h3 className="font-semibold text-cyan-300 mb-3 font-mono">
+                        <h3 className="font-semibold text-gray-700 mb-3 font-mono">
                           SESSION DETAILS
                         </h3>
                         <div className="space-y-3">
                           <div className="flex items-center text-sm">
                             <svg
-                              className="w-4 h-4 text-cyan-400 mr-2"
+                              className="w-4 h-4 text-gray-600 mr-2"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -237,11 +237,11 @@ const BookingModal = ({ isOpen, onClose }) => {
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
-                            <span className="text-gray-300">60 minutes</span>
+                            <span className="text-gray-600">60 minutes</span>
                           </div>
                           <div className="flex items-center text-sm">
                             <svg
-                              className="w-4 h-4 text-cyan-400 mr-2"
+                              className="w-4 h-4 text-gray-600 mr-2"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -253,13 +253,13 @@ const BookingModal = ({ isOpen, onClose }) => {
                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                               />
                             </svg>
-                            <span className="text-gray-300">
+                            <span className="text-gray-600">
                               1-on-1 creative session
                             </span>
                           </div>
                           <div className="flex items-center text-sm">
                             <svg
-                              className="w-4 h-4 text-cyan-400 mr-2"
+                              className="w-4 h-4 text-gray-600 mr-2"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -271,43 +271,43 @@ const BookingModal = ({ isOpen, onClose }) => {
                                 d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                               />
                             </svg>
-                            <span className="text-gray-300">Video call</span>
+                            <span className="text-gray-600">Video call</span>
                           </div>
                         </div>
                       </motion.div>
 
                       {/* Features Card */}
                       <motion.div
-                        className="bg-gray-800/50 rounded-xl border border-purple-500/20 p-4 backdrop-blur-sm"
+                        className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm"
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.6 }}
                       >
-                        <h3 className="font-semibold text-purple-300 mb-3 font-mono">
+                        <h3 className="font-semibold text-gray-700 mb-3 font-mono">
                           WHAT WE'LL COVER
                         </h3>
                         <ul className="space-y-2 text-sm">
                           <li className="flex items-center">
-                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
-                            <span className="text-gray-300">
+                            <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                            <span className="text-gray-600">
                               Project analysis & strategy
                             </span>
                           </li>
                           <li className="flex items-center">
-                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
-                            <span className="text-gray-300">
+                            <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                            <span className="text-gray-600">
                               Creative direction & vision
                             </span>
                           </li>
                           <li className="flex items-center">
-                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
-                            <span className="text-gray-300">
+                            <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                            <span className="text-gray-600">
                               Technical requirements
                             </span>
                           </li>
                           <li className="flex items-center">
-                            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-3"></div>
-                            <span className="text-gray-300">
+                            <div className="w-2 h-2 bg-gray-600 rounded-full mr-3"></div>
+                            <span className="text-gray-600">
                               Timeline & deliverables
                             </span>
                           </li>
@@ -316,20 +316,20 @@ const BookingModal = ({ isOpen, onClose }) => {
 
                       {/* Support Card */}
                       <motion.div
-                        className="bg-cyan-900/20 rounded-xl border border-cyan-400/30 p-4 backdrop-blur-sm"
+                        className="bg-gray-50 rounded-xl border border-gray-200 p-4 shadow-sm"
                         initial={{ x: -20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.7 }}
                       >
-                        <h3 className="font-semibold text-cyan-300 mb-2 font-mono">
+                        <h3 className="font-semibold text-gray-700 mb-2 font-mono">
                           NEED HELP?
                         </h3>
-                        <p className="text-cyan-200 text-xs mb-3">
+                        <p className="text-gray-600 text-xs mb-3">
                           Technical issues or questions? We're here to assist!
                         </p>
                         <a
                           href="mailto:support@yourdomain.com"
-                          className="text-cyan-400 hover:text-cyan-300 text-xs font-medium inline-flex items-center group"
+                          className="text-gray-700 hover:text-gray-900 text-xs font-medium inline-flex items-center group"
                         >
                           Contact support
                           <svg
@@ -352,7 +352,7 @@ const BookingModal = ({ isOpen, onClose }) => {
                     {/* Calendar Section */}
                     <div className="lg:col-span-3">
                       <motion.div
-                        className="bg-gray-800/30 rounded-xl border border-white/10 overflow-hidden backdrop-blur-sm"
+                        className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm"
                         initial={{ x: 20, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.5 }}
@@ -360,8 +360,8 @@ const BookingModal = ({ isOpen, onClose }) => {
                         {/* Loading State */}
                         {isLoading && (
                           <div className="flex items-center justify-center py-16">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-cyan-500"></div>
-                            <span className="ml-3 text-cyan-300 font-mono">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-600"></div>
+                            <span className="ml-3 text-gray-600 font-mono">
                               Loading calendar...
                             </span>
                           </div>
@@ -369,7 +369,7 @@ const BookingModal = ({ isOpen, onClose }) => {
 
                         {/* Calendly Iframe */}
                         <iframe
-                          src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=000000&text_color=ffffff&primary_color=009eff"
+                          src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=374151&primary_color=6b7280"
                           width="100%"
                           height="600"
                           frameBorder="0"
@@ -387,25 +387,25 @@ const BookingModal = ({ isOpen, onClose }) => {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.8 }}
                       >
-                        <div className="bg-gray-800/50 rounded-lg p-3 border border-cyan-500/20 backdrop-blur-sm">
-                          <div className="text-xl font-bold text-cyan-400 mb-1 font-mono">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                          <div className="text-xl font-bold text-gray-700 mb-1 font-mono">
                             01
                           </div>
-                          <p className="text-xs text-gray-300">
+                          <p className="text-xs text-gray-600">
                             Select your time
                           </p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-3 border border-purple-500/20 backdrop-blur-sm">
-                          <div className="text-xl font-bold text-purple-400 mb-1 font-mono">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                          <div className="text-xl font-bold text-gray-700 mb-1 font-mono">
                             02
                           </div>
-                          <p className="text-xs text-gray-300">Enter details</p>
+                          <p className="text-xs text-gray-600">Enter details</p>
                         </div>
-                        <div className="bg-gray-800/50 rounded-lg p-3 border border-cyan-500/20 backdrop-blur-sm">
-                          <div className="text-xl font-bold text-cyan-400 mb-1 font-mono">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                          <div className="text-xl font-bold text-gray-700 mb-1 font-mono">
                             03
                           </div>
-                          <p className="text-xs text-gray-300">
+                          <p className="text-xs text-gray-600">
                             Get confirmation
                           </p>
                         </div>
@@ -418,9 +418,9 @@ const BookingModal = ({ isOpen, onClose }) => {
 
             {/* Decorative elements */}
             <div className="absolute top-4 left-4 flex gap-2 z-10">
-              <span className="w-2 h-2 rounded-full bg-cyan-500 shadow-lg shadow-cyan-900/50"></span>
-              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-lg shadow-cyan-800/50"></span>
-              <span className="w-2 h-2 rounded-full bg-cyan-300 shadow-lg shadow-cyan-700/50"></span>
+              <span className="w-2 h-2 rounded-full bg-gray-400 shadow-sm"></span>
+              <span className="w-2 h-2 rounded-full bg-gray-500 shadow-sm"></span>
+              <span className="w-2 h-2 rounded-full bg-gray-600 shadow-sm"></span>
             </div>
           </motion.div>
         </motion.div>

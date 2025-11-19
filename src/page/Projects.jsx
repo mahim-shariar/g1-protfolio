@@ -18,12 +18,115 @@ import {
   getVisibleCategories,
   getVideoReelsByCategory,
 } from "../services/api";
+import bg from "/ICON.png";
+
+// Background Logo Only Animation
+const BackgroundLogoAnimation = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Main Background Logo */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{
+          scale: [1, 1.03, 1],
+          opacity: [0.08, 0.12, 0.08],
+          rotate: [0, 1, 0, -1, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo"
+          className="w-[85%] max-w-[1100px] h-auto"
+          style={{
+            filter: `
+              brightness(1.2)
+              contrast(1.1)
+              drop-shadow(0 0 150px rgba(13, 148, 136, 0.15))
+            `,
+          }}
+        />
+      </motion.div>
+
+      {/* Secondary Larger Logo for Depth */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1.05, 1.12, 1.05],
+          opacity: [0.05, 0.08, 0.05],
+          rotate: [0, -2, 0, 2, 0],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+          delay: 2,
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo Glow"
+          className="w-[90%] max-w-[1300px] h-auto opacity-60"
+          style={{
+            filter: "blur(40px) brightness(1.3)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+      </motion.div>
+
+      {/* Subtle Floating Particles */}
+      {Array.from({ length: 12 }).map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-1.5 h-1.5 bg-gradient-to-r from-teal-400/50 to-teal-300/30 rounded-full z-5"
+          style={{
+            left: `${8 + i * 8}%`,
+            top: `${12 + i * 8}%`,
+          }}
+          animate={{
+            y: [0, -20, 0, -12, 0],
+            x: [0, 6, -4, 5, 0],
+            scale: [1, 1.3, 0.8, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2, 0.35, 0.2],
+          }}
+          transition={{
+            duration: 8 + i * 1.5,
+            repeat: Infinity,
+            delay: i * 0.4,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Glow Effect Behind Background Logo */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.08, 0.15, 0.08],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <div className="w-[800px] h-[800px] bg-teal-400/12 rounded-full blur-3xl" />
+      </motion.div>
+    </div>
+  );
+};
 
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [hoveredProject, setHoveredProject] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [modalVideoPlaying, setModalVideoPlaying] = useState(false); // Changed to false initially
+  const [modalVideoPlaying, setModalVideoPlaying] = useState(false);
   const [activeLayout, setActiveLayout] = useState("grid");
   const [projects, setProjects] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -126,13 +229,11 @@ const Projects = () => {
   useEffect(() => {
     const fetchProjectsByCategory = async () => {
       if (activeCategory === "all") {
-        // When switching back to "all", fetch all videos again (excluding introduction)
         try {
           setLoading(true);
           const response = await getVideoReels();
           let projectsData = response.data?.videoReels || [];
 
-          // Filter out introduction category videos
           projectsData = projectsData.filter(
             (project) =>
               project.category !== "introduction" &&
@@ -168,7 +269,6 @@ const Projects = () => {
         const response = await getVideoReelsByCategory(activeCategory);
         let projectsData = response.data?.videoReels || [];
 
-        // Filter out introduction category videos (in case API returns them)
         projectsData = projectsData.filter(
           (project) =>
             project.category !== "introduction" &&
@@ -193,7 +293,6 @@ const Projects = () => {
         setProjects(formattedProjects);
       } catch (err) {
         console.error("Error fetching projects by category:", err);
-        // If category fetch fails, fall back to filtering from existing projects
         const filteredFromExisting = projects.filter(
           (project) => project.category === activeCategory
         );
@@ -244,7 +343,6 @@ const Projects = () => {
     video.addEventListener("play", handlePlay);
     video.addEventListener("pause", handlePause);
 
-    // Set initial volume and start paused
     video.volume = volume;
     video.muted = isMuted;
     video.pause();
@@ -419,14 +517,14 @@ const Projects = () => {
   // Helper functions
   const getColorByCategory = (category) => {
     const colorMap = {
-      wedding: "#06b6d4",
-      commercial: "#3b82f6",
-      music: "#8b5cf6",
-      documentary: "#10b981",
-      travel: "#ec4899",
-      reel: "#f59e0b",
+      wedding: "#0d9488",
+      commercial: "#0d9488",
+      music: "#0d9488",
+      documentary: "#0d9488",
+      travel: "#0d9488",
+      reel: "#0d9488",
     };
-    return colorMap[category] || "#6b7280";
+    return colorMap[category] || "#0d9488";
   };
 
   const getFallbackCategories = () => [
@@ -480,7 +578,7 @@ const Projects = () => {
       technologies: ["Premiere Pro", "After Effects", "Color Grading"],
       year: "2023",
       duration: "3:45",
-      color: "#06b6d4",
+      color: "#0d9488",
     },
     {
       id: 2,
@@ -493,7 +591,7 @@ const Projects = () => {
       technologies: ["After Effects", "Cinema 4D", "Color Grading"],
       year: "2023",
       duration: "2:30",
-      color: "#3b82f6",
+      color: "#0d9488",
     },
   ];
 
@@ -581,10 +679,9 @@ const Projects = () => {
 
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
-    setModalVideoPlaying(false); // Set to false initially
+    setModalVideoPlaying(false);
     setShowCentralButton(true);
     setVideoEnded(false);
-    // Reset video player states
     setCurrentTime(0);
     setVolume(1);
     setIsMuted(false);
@@ -595,7 +692,6 @@ const Projects = () => {
     if (modalVideoRef.current) {
       modalVideoRef.current.pause();
     }
-    // Exit fullscreen if active
     if (isFullscreen) {
       if (document.exitFullscreen) {
         document.exitFullscreen();
@@ -610,7 +706,7 @@ const Projects = () => {
     setShowControls(true);
   };
 
-  // Background grid animation
+  // Background grid animation with new color palette
   useEffect(() => {
     const canvas = containerRef.current;
     if (!canvas) return;
@@ -629,7 +725,7 @@ const Projects = () => {
     const drawGrid = (time) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.strokeStyle = "rgba(66, 153, 225, 0.1)";
+      ctx.strokeStyle = "rgba(13, 148, 136, 0.1)";
       ctx.lineWidth = 1;
 
       const cellSize = 50;
@@ -662,11 +758,11 @@ const Projects = () => {
       const pulseIntensity = (Math.sin(time * 0.002) + 1) * 0.2;
       gradient.addColorStop(
         0,
-        `rgba(100, 50, 255, ${0.03 + pulseIntensity * 0.03})`
+        `rgba(13, 148, 136, ${0.03 + pulseIntensity * 0.03})`
       );
       gradient.addColorStop(
         0.5,
-        `rgba(0, 0, 80, ${0.05 + pulseIntensity * 0.03})`
+        `rgba(13, 148, 136, ${0.05 + pulseIntensity * 0.03})`
       );
       gradient.addColorStop(1, "rgba(0, 0, 0, 0.6)");
 
@@ -706,10 +802,10 @@ const Projects = () => {
   // Loading state
   if (loading && projects.length === 0) {
     return (
-      <section className="relative min-h-screen w-full overflow-hidden bg-black py-20 px-4 flex items-center justify-center">
+      <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 py-20 px-4 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading projects...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
+          <p className="text-gray-700">Loading projects...</p>
         </div>
       </section>
     );
@@ -718,12 +814,12 @@ const Projects = () => {
   // Error state
   if (error && projects.length === 0) {
     return (
-      <section className="relative min-h-screen w-full overflow-hidden bg-black py-20 px-4 flex items-center justify-center">
+      <section className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 py-20 px-4 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-cyan-500 text-white rounded-lg"
+            className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
           >
             Try Again
           </button>
@@ -737,7 +833,7 @@ const Projects = () => {
     if (filteredProjects.length === 0) {
       return (
         <div className="text-center py-20">
-          <p className="text-gray-400 text-lg">
+          <p className="text-gray-600 text-lg">
             No projects found for this category.
           </p>
         </div>
@@ -766,7 +862,7 @@ const Projects = () => {
               onHoverEnd={() => handleProjectLeave(project)}
               onClick={() => handleProjectSelect(project)}
             >
-              <div className="flex h-48 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl overflow-hidden border border-white/5 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex h-48 bg-gradient-to-r from-white to-gray-50 rounded-xl overflow-hidden border border-gray-200 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="thumbnail-container relative w-1/3 overflow-hidden">
                   <div
                     className="thumbnail w-full h-full bg-cover bg-center absolute inset-0"
@@ -792,7 +888,7 @@ const Projects = () => {
                   </video>
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                     <motion.div
-                      className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg"
+                      className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center shadow-lg"
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
@@ -802,20 +898,19 @@ const Projects = () => {
                 </div>
                 <div className="project-info p-5 flex-1 flex flex-col justify-center">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-gray-800">
                       {project.title}
                     </h3>
                     <span
-                      className="text-xs uppercase tracking-wider font-medium px-2 py-1 rounded-full bg-black/30 border border-white/10"
+                      className="text-xs uppercase tracking-wider font-medium px-2 py-1 rounded-full bg-teal-100 border border-teal-200"
                       style={{
-                        color: project.color,
-                        backgroundColor: `${project.color}20`,
+                        color: "#0d9488",
                       }}
                     >
                       {formatCategoryName(project.category)}
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                     {project.description}
                   </p>
                   <div className="flex justify-between items-center">
@@ -826,14 +921,14 @@ const Projects = () => {
                       {project.technologies.slice(0, 2).map((tech, index) => (
                         <span
                           key={index}
-                          className="text-[9px] px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm border border-white/5"
-                          style={{ color: project.color }}
+                          className="text-[9px] px-2 py-0.5 rounded-full bg-white backdrop-blur-sm border border-gray-200"
+                          style={{ color: "#0d9488" }}
                         >
                           {tech}
                         </span>
                       ))}
                       {project.technologies.length > 2 && (
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-black/70 text-gray-400">
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white text-gray-500 border border-gray-200">
                           +{project.technologies.length - 2}
                         </span>
                       )}
@@ -870,12 +965,12 @@ const Projects = () => {
             onClick={() => handleProjectSelect(project)}
           >
             <motion.div
-              className="relative h-full w-full rounded-xl overflow-hidden border border-white/5 bg-gray-900/30 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
+              className="relative h-full w-full rounded-xl overflow-hidden border border-gray-200 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
               initial={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}
               whileHover={{
-                boxShadow: `0 20px 40px ${project.color}20, 0 8px 32px rgba(0, 0, 0, 0.3)`,
-                backgroundColor: "rgba(30, 30, 30, 0.5)",
-                borderColor: `${project.color}30`,
+                boxShadow: `0 20px 40px rgba(13, 148, 136, 0.1), 0 8px 32px rgba(0, 0, 0, 0.1)`,
+                backgroundColor: "rgba(255, 255, 255, 0.8)",
+                borderColor: `#0d9488`,
                 transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
               }}
             >
@@ -904,23 +999,22 @@ const Projects = () => {
                 </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-80 transition-opacity duration-300" />
                 <motion.div
-                  className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-medium border border-white/10 z-10"
+                  className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 z-10"
                   style={{
-                    color: project.color,
-                    backgroundColor: `${project.color}20`,
+                    color: "#0d9488",
                   }}
                   whileHover={{ scale: 1.05 }}
                 >
                   {formatCategoryName(project.category)}
                 </motion.div>
                 <div
-                  className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-mono border border-white/5"
-                  style={{ color: project.color }}
+                  className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-mono border border-gray-200"
+                  style={{ color: "#0d9488" }}
                 >
                   {project.year}
                 </div>
                 <motion.div
-                  className="absolute inset-0 m-auto bg-cyan-500 w-14 h-14 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  className="absolute inset-0 m-auto bg-teal-500 w-14 h-14 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   whileHover={{ scale: 1.1 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -928,24 +1022,24 @@ const Projects = () => {
                 </motion.div>
               </div>
               <motion.div
-                className="project-info p-5 bg-gradient-to-b from-gray-900/70 to-gray-900/50"
+                className="project-info p-5 bg-gradient-to-b from-white/70 to-white/50"
                 initial={{ y: 0 }}
                 whileHover={{ y: -3 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="flex justify-start items-start mb-2">
-                  <h3 className="text-lg font-medium text-white">
+                  <h3 className="text-lg font-medium text-gray-800">
                     {project.title}
                   </h3>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-400">{project.year}</span>
+                  <span className="text-xs text-gray-600">{project.year}</span>
                   <div className="flex gap-1.5">
                     {project.technologies.map((tech, index) => (
                       <span
                         key={index}
-                        className="text-[9px] px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-sm border border-white/5"
-                        style={{ color: project.color }}
+                        className="text-[9px] px-2 py-0.5 rounded-full bg-white backdrop-blur-sm border border-gray-200"
+                        style={{ color: "#0d9488" }}
                       >
                         {tech}
                       </span>
@@ -956,7 +1050,7 @@ const Projects = () => {
               {hoveredProject === project.id && (
                 <motion.div
                   className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-current to-transparent"
-                  style={{ color: project.color }}
+                  style={{ color: "#0d9488" }}
                   initial={{ width: 0 }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -972,11 +1066,14 @@ const Projects = () => {
   return (
     <section
       id="projects"
-      className="relative min-h-screen w-full overflow-hidden bg-black py-20 px-4"
+      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 py-20 px-4"
     >
+      {/* Background Logo Animation */}
+      <BackgroundLogoAnimation />
+
       <canvas ref={containerRef} className="absolute inset-0 w-full h-full" />
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-teal-900/5 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-900/5 to-teal-900/5"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
         {/* Section Header */}
@@ -987,7 +1084,7 @@ const Projects = () => {
           transition={{ duration: 0.7 }}
         >
           <motion.h2
-            className="text-cyan-400 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
+            className="text-teal-600 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
@@ -995,18 +1092,18 @@ const Projects = () => {
             Portfolio Showcase
           </motion.h2>
           <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             Our{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-700">
               Visual Projects
             </span>
           </motion.h1>
           <motion.p
-            className="text-lg text-gray-300 max-w-3xl mx-auto"
+            className="text-lg text-gray-700 max-w-3xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.5 }}
@@ -1022,8 +1119,8 @@ const Projects = () => {
             onClick={() => setActiveLayout("grid")}
             className={`p-2 rounded-lg transition-all duration-300 ${
               activeLayout === "grid"
-                ? "bg-cyan-500/10 text-cyan-400 shadow-lg shadow-cyan-500/20"
-                : "bg-gray-800/50 text-gray-400 hover:bg-gray-700/60"
+                ? "bg-teal-500/10 text-teal-600 shadow-lg shadow-teal-500/20"
+                : "bg-white/50 text-gray-600 hover:bg-gray-100/60 border border-gray-200"
             }`}
           >
             <FiGrid className="w-5 h-5" />
@@ -1032,8 +1129,8 @@ const Projects = () => {
             onClick={() => setActiveLayout("stack")}
             className={`p-2 rounded-lg transition-all duration-300 ${
               activeLayout === "stack"
-                ? "bg-cyan-500/10 text-cyan-400 shadow-lg shadow-cyan-500/20"
-                : "bg-gray-800/50 text-gray-400 hover:bg-gray-700/60"
+                ? "bg-teal-500/10 text-teal-600 shadow-lg shadow-teal-500/20"
+                : "bg-white/50 text-gray-600 hover:bg-gray-100/60 border border-gray-200"
             }`}
           >
             <FiBox className="w-5 h-5" />
@@ -1052,8 +1149,8 @@ const Projects = () => {
               key={category.id}
               className={`px-5 py-3 rounded-xl flex items-center transition-all duration-300 ${
                 activeCategory === category.id
-                  ? "bg-gradient-to-r from-cyan-500/90 to-cyan-600/90 text-white shadow-lg shadow-cyan-500/30 border border-cyan-400/30"
-                  : "bg-gray-800/30 text-white/80 hover:bg-gray-700/40 backdrop-blur-sm border border-white/10 hover:border-cyan-500/30 hover:shadow-md hover:shadow-cyan-500/10"
+                  ? "bg-gradient-to-r from-teal-500/90 to-teal-600/90 text-white shadow-lg shadow-teal-500/30 border border-teal-400/30"
+                  : "bg-white/50 text-gray-700 hover:bg-gray-100/60 backdrop-blur-sm border border-gray-300 hover:border-teal-500/30 hover:shadow-md hover:shadow-teal-500/10"
               }`}
               onClick={() => setActiveCategory(category.id)}
               variants={containerVariants}
@@ -1069,8 +1166,8 @@ const Projects = () => {
         {/* Loading indicator for category changes */}
         {loading && projects.length > 0 && (
           <div className="text-center mb-6">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500 mx-auto"></div>
-            <p className="text-gray-400 text-sm mt-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-500 mx-auto"></div>
+            <p className="text-gray-600 text-sm mt-2">
               Loading{" "}
               {activeCategory === "all"
                 ? "all projects"
@@ -1085,12 +1182,12 @@ const Projects = () => {
 
         {/* Decorative elements */}
         <motion.div
-          className="absolute top-40 left-10 w-3 h-3 rounded-full bg-cyan-400"
+          className="absolute top-40 left-10 w-3 h-3 rounded-full bg-teal-400"
           animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-40 right-10 w-2 h-2 rounded-full bg-purple-500"
+          className="absolute bottom-40 right-10 w-2 h-2 rounded-full bg-teal-500"
           animate={{ scale: [1, 2, 1], opacity: [0.3, 0.7, 0.3] }}
           transition={{
             duration: 5,
@@ -1101,18 +1198,18 @@ const Projects = () => {
         />
       </div>
 
-      {/* Enhanced Project Detail Modal with HeroSection Video Player */}
+      {/* Enhanced Project Detail Modal with new color palette */}
       <AnimatePresence>
         {selectedProject && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-lg video-modal-container"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg video-modal-container"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
           >
             <motion.div
-              className="relative w-full max-w-6xl bg-gray-900 rounded-xl overflow-hidden border border-cyan-500/30 shadow-2xl"
+              className="relative w-full max-w-6xl bg-white rounded-xl overflow-hidden border border-teal-500/30 shadow-2xl"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -1120,21 +1217,21 @@ const Projects = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
-              <div className="flex items-center justify-between p-4 bg-gray-900 border-b border-cyan-500/20">
+              <div className="flex items-center justify-between p-4 bg-white border-b border-teal-500/20">
                 <div className="flex items-center">
                   <div className="flex gap-1 mr-4">
                     <span className="w-3 h-3 rounded-full bg-red-500"></span>
                     <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
                     <span className="w-3 h-3 rounded-full bg-green-500"></span>
                   </div>
-                  <h3 className="text-cyan-300 font-mono text-sm">
+                  <h3 className="text-teal-600 font-mono text-sm">
                     {selectedProject.title.toUpperCase().replace(/\s+/g, "_")}
                     .MP4
                   </h3>
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-gray-600 hover:text-gray-800 transition-colors"
                 >
                   <FiX className="w-6 h-6" />
                 </button>
@@ -1143,7 +1240,7 @@ const Projects = () => {
               {/* Enhanced Video Player Section */}
               <div
                 ref={videoContainerRef}
-                className="w-full h-[500px] lg:h-[600px] relative overflow-hidden bg-black group"
+                className="w-full h-[500px] lg:h-[600px] relative overflow-hidden bg-white group"
                 onMouseEnter={() => {
                   handleVideoHover(true);
                   setShowControls(true);
@@ -1172,7 +1269,7 @@ const Projects = () => {
                 {/* Loading indicator */}
                 {loadingVideo && (
                   <div className="absolute inset-0 flex items-center justify-center z-15 bg-black/20">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
                   </div>
                 )}
 
@@ -1192,7 +1289,7 @@ const Projects = () => {
                     >
                       {/* Outer glowing ring */}
                       <motion.div
-                        className="absolute inset-0 rounded-full bg-cyan-500/20"
+                        className="absolute inset-0 rounded-full bg-teal-500/20"
                         animate={{
                           scale: [1, 1.2, 1],
                           opacity: [0.5, 0.8, 0.5],
@@ -1205,7 +1302,7 @@ const Projects = () => {
                       />
                       {/* Main button */}
                       <div
-                        className="relative w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm border-2 border-white/20"
+                        className="relative w-20 h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm border-2 border-white/20"
                         onClick={videoEnded ? handleReplay : handlePlayPause}
                       >
                         <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent"></div>
@@ -1257,7 +1354,7 @@ const Projects = () => {
                     onClick={handleSeek}
                   >
                     <div
-                      className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full relative"
+                      className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full relative"
                       style={{
                         width: `${
                           duration ? (currentTime / duration) * 100 : 0
@@ -1275,7 +1372,7 @@ const Projects = () => {
                       {/* Play/Pause */}
                       <motion.button
                         onClick={handlePlayPause}
-                        className="text-white hover:text-cyan-300 transition-colors"
+                        className="text-white hover:text-teal-300 transition-colors"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -1290,7 +1387,7 @@ const Projects = () => {
                       <div className="flex items-center space-x-2">
                         <motion.button
                           onClick={toggleMute}
-                          className="text-white hover:text-cyan-300 transition-colors"
+                          className="text-white hover:text-teal-300 transition-colors"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                         >
@@ -1309,7 +1406,7 @@ const Projects = () => {
                           onClick={handleVolumeChange}
                         >
                           <div
-                            className="h-full bg-cyan-500 rounded-full"
+                            className="h-full bg-teal-500 rounded-full"
                             style={{ width: `${isMuted ? 0 : volume * 100}%` }}
                           >
                             <div className="absolute right-0 top-1/2 w-2 h-2 bg-white rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover/volume:opacity-100 transition-opacity shadow-lg"></div>
@@ -1327,7 +1424,7 @@ const Projects = () => {
                       {/* Playback Speed */}
                       <motion.button
                         onClick={changePlaybackRate}
-                        className="text-white hover:text-cyan-300 transition-colors text-sm font-mono px-2 py-1 rounded bg-black/30 hover:bg-black/50"
+                        className="text-white hover:text-teal-300 transition-colors text-sm font-mono px-2 py-1 rounded bg-black/30 hover:bg-black/50"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -1337,7 +1434,7 @@ const Projects = () => {
                       {/* Fullscreen */}
                       <motion.button
                         onClick={toggleFullscreen}
-                        className="text-white hover:text-cyan-300 transition-colors"
+                        className="text-white hover:text-teal-300 transition-colors"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -1353,24 +1450,24 @@ const Projects = () => {
 
                 {/* Decorative dots */}
                 <div className="absolute top-4 right-4 flex gap-2 z-20">
-                  <span className="w-3 h-3 rounded-full bg-cyan-500 shadow-lg shadow-cyan-900/50"></span>
-                  <span className="w-3 h-3 rounded-full bg-cyan-400 shadow-lg shadow-cyan-800/50"></span>
-                  <span className="w-3 h-3 rounded-full bg-cyan-300 shadow-lg shadow-cyan-700/50"></span>
+                  <span className="w-3 h-3 rounded-full bg-teal-500 shadow-lg shadow-teal-900/50"></span>
+                  <span className="w-3 h-3 rounded-full bg-teal-400 shadow-lg shadow-teal-800/50"></span>
+                  <span className="w-3 h-3 rounded-full bg-teal-300 shadow-lg shadow-teal-700/50"></span>
                 </div>
               </div>
 
               {/* Project details */}
-              <div className="p-6 bg-gray-900">
+              <div className="p-6 bg-white">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-2">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
                       {selectedProject.title}
                     </h2>
                     <div className="flex items-center gap-4">
-                      <p className="text-cyan-300 font-mono">
+                      <p className="text-teal-600 font-mono">
                         {selectedProject.year}
                       </p>
-                      <p className="text-gray-400">
+                      <p className="text-gray-600">
                         {selectedProject.duration}
                       </p>
                     </div>
@@ -1379,14 +1476,14 @@ const Projects = () => {
                     {selectedProject.technologies.map((tech, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 bg-cyan-900/50 text-cyan-300 text-sm rounded-full"
+                        className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full border border-teal-200"
                       >
                         {tech}
                       </span>
                     ))}
                   </div>
                 </div>
-                <p className="text-gray-300">{selectedProject.description}</p>
+                <p className="text-gray-700">{selectedProject.description}</p>
               </div>
             </motion.div>
           </motion.div>

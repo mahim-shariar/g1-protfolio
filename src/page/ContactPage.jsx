@@ -1,30 +1,216 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getContactInfo } from "../services/api";
 import emailjs from "@emailjs/browser";
+import {
+  FaEnvelope,
+  FaComments,
+  FaVideo,
+  FaClock,
+  FaCheckCircle,
+  FaArrowRight,
+  FaLightbulb,
+  FaRocket,
+  FaCalendarAlt,
+  FaStar,
+  FaShieldAlt,
+  FaHeadset,
+  FaYoutube,
+  FaInstagram,
+  FaFilm,
+  FaMagic,
+  FaAward,
+} from "react-icons/fa";
+import bg from "/ICON.png";
 
 const ContactPage = () => {
   const canvasRef = useRef(null);
   const formRef = useRef(null);
+  const animationRef = useRef(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    projectType: "",
+    subject: "",
     message: "",
-    phone: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contactData, setContactData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedSocial, setExpandedSocial] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingCompleted, setBookingCompleted] = useState(false);
 
-  // EmailJS configuration - REPLACE WITH YOUR ACTUAL CREDENTIALS
+  // EmailJS configuration
   const EMAILJS_CONFIG = {
     SERVICE_ID: import.meta.env.VITE_SERVICE_ID,
     TEMPLATE_ID: import.meta.env.VITE_TEMPLATE_ID,
     PUBLIC_KEY: import.meta.env.VITE_PUBLIC_KEY,
+  };
+
+  // Floating Gradient Blobs Animation
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    class Blob {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 120 + 80;
+        this.speedX = Math.random() * 0.3 - 0.15;
+        this.speedY = Math.random() * 0.3 - 0.15;
+        this.color = [
+          `rgba(45, 212, 191, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
+          `rgba(13, 148, 136, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
+          `rgba(20, 184, 166, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
+        ][Math.floor(Math.random() * 3)];
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < -this.size) this.x = canvas.width + this.size;
+        if (this.x > canvas.width + this.size) this.x = -this.size;
+        if (this.y < -this.size) this.y = canvas.height + this.size;
+        if (this.y > canvas.height + this.size) this.y = -this.size;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = 0.3; // Increased opacity for better visibility
+
+        const gradient = ctx.createRadialGradient(
+          this.x,
+          this.y,
+          0,
+          this.x,
+          this.y,
+          this.size
+        );
+        gradient.addColorStop(0, this.color);
+        gradient.addColorStop(1, "transparent");
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    const blobs = Array.from({ length: 10 }, () => new Blob()); // Increased number of blobs
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw subtle background gradient
+      const bgGradient = ctx.createLinearGradient(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+      bgGradient.addColorStop(0, "rgba(249, 250, 251, 0.95)"); // Less transparent
+      bgGradient.addColorStop(1, "rgba(255, 255, 255, 0.98)"); // Less transparent
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      blobs.forEach((blob) => {
+        blob.update();
+        blob.draw();
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener("resize", resizeCanvas);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
+
+  // Floating Logo Component - Only using bg logo
+  const FloatingLogos = () => {
+    const logoPositions = [
+      { left: "10%", top: "15%", size: 40, delay: 0 },
+      { left: "85%", top: "20%", size: 35, delay: 1 },
+      { left: "15%", top: "70%", size: 45, delay: 2 },
+      { left: "80%", top: "65%", size: 38, delay: 3 },
+      { left: "5%", top: "40%", size: 32, delay: 4 },
+      { left: "90%", top: "45%", size: 42, delay: 5 },
+      { left: "25%", top: "10%", size: 36, delay: 6 },
+      { left: "75%", top: "85%", size: 44, delay: 7 },
+      { left: "45%", top: "5%", size: 30, delay: 8 },
+      { left: "55%", top: "90%", size: 48, delay: 9 },
+      { left: "35%", top: "30%", size: 34, delay: 10 },
+      { left: "65%", top: "60%", size: 40, delay: 11 },
+    ];
+
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {logoPositions.map((position, index) => (
+          <motion.div
+            key={index}
+            className="absolute"
+            style={{
+              left: position.left,
+              top: position.top,
+              width: position.size,
+              height: position.size,
+            }}
+            animate={{
+              y: [0, -25, 0],
+              x: [0, 15, 0],
+              rotate: [0, 8, -6, 0],
+              scale: [0.8, 1.1, 0.8],
+            }}
+            transition={{
+              duration: 18 + index * 2,
+              repeat: Infinity,
+              delay: position.delay,
+              ease: "easeInOut",
+            }}
+          >
+            <div
+              className="relative group"
+              style={{
+                width: position.size,
+                height: position.size,
+              }}
+            >
+              <img
+                src={bg}
+                alt="Video Editor"
+                className="w-full h-full object-contain opacity-15 group-hover:opacity-30 transition-opacity duration-500"
+                style={{
+                  filter:
+                    "brightness(0) saturate(100%) invert(44%) sepia(45%) saturate(572%) hue-rotate(135deg) brightness(92%) contrast(90%)",
+                }}
+              />
+              {/* Subtle glow effect on hover */}
+              <div className="absolute inset-0 bg-teal-400/10 rounded-full blur-sm group-hover:bg-teal-400/20 transition-all duration-500 opacity-0 group-hover:opacity-100" />
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    );
   };
 
   // Fetch contact data from API
@@ -38,7 +224,6 @@ const ContactPage = () => {
       } catch (err) {
         console.error("Error fetching contact data:", err);
         setError("Failed to load contact information");
-        // Set fallback data
         setContactData({
           email: "hello@videoagency.com",
           phone: "+1 (555) 123-4567",
@@ -46,13 +231,6 @@ const ContactPage = () => {
             city: "Los Angeles",
             state: "CA",
             country: "USA",
-          },
-          socialLinks: {
-            facebook: "videoagency",
-            twitter: "videoagency",
-            instagram: "videoagency",
-            linkedin: "videoagency",
-            youtube: "videoagency",
           },
         });
       } finally {
@@ -68,122 +246,21 @@ const ContactPage = () => {
     emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
   }, []);
 
-  // Background grid animation
+  // Listen for booking completion
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    let animationFrameId;
-
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-
-    const drawGrid = (time) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw grid lines
-      ctx.strokeStyle = "rgba(66, 153, 225, 0.1)";
-      ctx.lineWidth = 1;
-
-      const cellSize = 50;
-      const offsetX = (time * 0.01) % cellSize;
-      const offsetY = (time * 0.01) % cellSize;
-
-      // Vertical lines
-      for (let x = offsetX; x < canvas.width; x += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+    const handleMessage = (event) => {
+      if (event.data.event === "calendly.event_scheduled") {
+        setBookingCompleted(true);
+        console.log("Booking completed!", event.data);
       }
-
-      // Horizontal lines
-      for (let y = offsetY; y < canvas.height; y += cellSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
-
-      // Draw pulsing gradient overlay
-      const gradient = ctx.createRadialGradient(
-        canvas.width / 2,
-        canvas.height / 2,
-        0,
-        canvas.width / 2,
-        canvas.height / 2,
-        Math.max(canvas.width, canvas.height) * 0.8
-      );
-
-      const pulseIntensity = (Math.sin(time * 0.002) + 1) * 0.2;
-      gradient.addColorStop(
-        0,
-        `rgba(100, 50, 255, ${0.03 + pulseIntensity * 0.03})`
-      );
-      gradient.addColorStop(
-        0.5,
-        `rgba(0, 0, 80, ${0.05 + pulseIntensity * 0.03})`
-      );
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0.6)");
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      animationFrameId = requestAnimationFrame(drawGrid);
     };
 
-    animationFrameId = requestAnimationFrame(drawGrid);
+    if (isBookingOpen) {
+      window.addEventListener("message", handleMessage);
+    }
 
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", resizeCanvas);
-    };
-  }, []);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-      },
-    },
-  };
-
-  const glowVariants = {
-    pulse: {
-      boxShadow: [
-        "0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.2)",
-        "0 0 10px rgba(59, 130, 246, 0.8), 0 0 20px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.3)",
-        "0 0 5px rgba(59, 130, 246, 0.5), 0 0 10px rgba(59, 130, 246, 0.3), 0 0 15px rgba(59, 130, 246, 0.2)",
-      ],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    },
-  };
+    return () => window.removeEventListener("message", handleMessage);
+  }, [isBookingOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -198,14 +275,12 @@ const ContactPage = () => {
     setIsSubmitting(true);
 
     try {
-      // Send email using EmailJS
       const templateParams = {
         name: formData.name,
         email: formData.email,
         message: formData.message,
-        subject: `New Project Inquiry: ${formData.projectType}`,
+        subject: formData.subject,
         time: new Date().toLocaleString(),
-        phone: formData.phone,
       };
 
       await emailjs.send(
@@ -218,13 +293,12 @@ const ContactPage = () => {
       console.log("Email sent successfully:", formData);
       setIsSubmitted(true);
 
-      // Reset form after successful submission
       setTimeout(() => {
         setIsSubmitted(false);
         setFormData({
           name: "",
           email: "",
-          projectType: "",
+          subject: "",
           message: "",
         });
       }, 5000);
@@ -238,659 +312,657 @@ const ContactPage = () => {
     }
   };
 
-  // Social media platform configurations
-  const socialPlatforms = [
+  const quickQueries = [
+    "Pricing information",
+    "Small edit requests",
+    "File format questions",
+    "Turnaround times",
+    "Portfolio examples",
+    "General information",
+  ];
+
+  const complexProjects = [
+    "Multi-video campaigns",
+    "Brand strategy development",
+    "Large budget projects ($5,000+)",
+    "Ongoing partnerships",
+    "Complex motion graphics",
+    "Full production services",
+  ];
+
+  const supportFeatures = [
     {
-      key: "instagram",
-      icon: "📷",
-      name: "Instagram",
-      baseUrl: "https://instagram.com/",
-      placeholder: "username",
+      icon: FaShieldAlt,
+      title: "Quality Guarantee",
+      description: "100% satisfaction or we'll make it right",
     },
     {
-      key: "facebook",
-      icon: "👥",
-      name: "Facebook",
-      baseUrl: "https://facebook.com/",
-      placeholder: "username",
+      icon: FaHeadset,
+      title: "Dedicated Support",
+      description: "Direct communication with your editor",
     },
     {
-      key: "twitter",
-      icon: "🐦",
-      name: "Twitter",
-      baseUrl: "https://twitter.com/",
-      placeholder: "username",
-    },
-    {
-      key: "linkedin",
-      icon: "💼",
-      name: "LinkedIn",
-      baseUrl: "https://linkedin.com/in/",
-      placeholder: "profile",
-    },
-    {
-      key: "youtube",
-      icon: "🎥",
-      name: "YouTube",
-      baseUrl: "https://youtube.com/",
-      placeholder: "channel",
+      icon: FaStar,
+      title: "Proven Results",
+      description: "500+ successful projects delivered",
     },
   ];
 
-  // Filter social platforms that have data
-  const activeSocialLinks = socialPlatforms.filter(
-    (platform) =>
-      contactData?.socialLinks?.[platform.key] &&
-      contactData.socialLinks[platform.key].trim() !== ""
-  );
-
-  // Dynamic contact info based on API data
-  const contactInfo = [
+  const services = [
     {
-      icon: "📧",
-      title: "Email",
-      value: contactData?.email || "hello@videoagency.com",
-      link: `mailto:${contactData?.email || "hello@videoagency.com"}`,
+      icon: FaYoutube,
+      name: "YouTube Videos",
+      color: "from-red-400 to-red-500",
     },
     {
-      icon: "📞",
-      title: "Phone",
-      value: contactData?.phone || "+1 (555) 123-4567",
-      link: `tel:${contactData?.phone || "+15551234567"}`,
+      icon: FaInstagram,
+      name: "Social Content",
+      color: "from-pink-400 to-pink-500",
     },
     {
-      icon: "📍",
-      title: "Location",
-      value: contactData?.address
-        ? `${contactData.address.city}, ${contactData.address.state}`
-        : "Los Angeles, CA",
-      link: contactData?.address
-        ? `https://maps.google.com/?q=${encodeURIComponent(
-            `${contactData.address.city}, ${contactData.address.state}, ${contactData.address.country}`
-          )}`
-        : "https://maps.google.com/?q=Los+Angeles",
-    },
-  ];
-
-  const projectTypes = [
-    "Commercial Advertisement",
-    "Social Media Content",
-    "Documentary",
-    "Music Video",
-    "Corporate Video",
-    "Event Coverage",
-    "Motion Graphics",
-    "Other",
-  ];
-
-  // Process steps for working together
-  const processSteps = [
-    {
-      step: "01",
-      title: "Consultation",
-      description: "We discuss your vision, goals, and requirements in detail.",
-      icon: "💬",
+      icon: FaFilm,
+      name: "Commercial Ads",
+      color: "from-blue-400 to-blue-500",
     },
     {
-      step: "02",
-      title: "Planning",
-      description: "We create a detailed project plan and timeline.",
-      icon: "📋",
-    },
-    {
-      step: "03",
-      title: "Production",
-      description:
-        "Our team brings your vision to life with creative execution.",
-      icon: "🎬",
-    },
-    {
-      step: "04",
-      title: "Delivery",
-      description: "We deliver the final product and ensure your satisfaction.",
-      icon: "🚀",
-    },
-  ];
-
-  // Why choose us points
-  const whyChooseUs = [
-    {
-      icon: "⏱️",
-      title: "Fast Turnaround",
-      description: "Quick project completion without compromising quality",
-    },
-    {
-      icon: "💎",
-      title: "Premium Quality",
-      description: "High-end production value for professional results",
-    },
-    {
-      icon: "🤝",
-      title: "Collaborative Process",
-      description: "We work closely with you throughout the entire process",
-    },
-    {
-      icon: "🔄",
-      title: "Flexible Revisions",
-      description: "Multiple revision rounds to perfect your project",
+      icon: FaMagic,
+      name: "Motion Graphics",
+      color: "from-purple-400 to-purple-500",
     },
   ];
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black flex flex-col items-center justify-center py-20">
-      {/* Animated background canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-gray-50 to-white flex flex-col items-center justify-center pt-20 pb-10 overflow-hidden">
+      {/* Animated Background Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+      />
 
-      {/* Gradient overlays for cinematic effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/80"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/5 to-cyan-900/5"></div>
+      {/* Floating Logos - Only using bg logo */}
+      <FloatingLogos />
+
+      {/* Multiple Teal Gradient Orbs - Only Teal Shades */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Top Left - Light Teal */}
+        <motion.div
+          className="absolute top-20 left-20 w-80 h-80 bg-gradient-to-r from-teal-300/25 to-teal-400/25 rounded-full blur-3xl"
+          animate={{
+            x: [0, 80, 0],
+            y: [0, -60, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Top Right - Medium Teal */}
+        <motion.div
+          className="absolute top-32 right-32 w-72 h-72 bg-gradient-to-r from-teal-400/30 to-teal-500/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, -70, 0],
+            y: [0, 50, 0],
+            scale: [1.2, 1, 1.2],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Bottom Left - Dark Teal */}
+        <motion.div
+          className="absolute bottom-40 left-40 w-96 h-96 bg-gradient-to-r from-teal-500/20 to-teal-600/20 rounded-full blur-3xl"
+          animate={{
+            x: [0, 60, 0],
+            y: [0, 70, 0],
+            scale: [1.1, 1.3, 1.1],
+          }}
+          transition={{
+            duration: 28,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Bottom Right - Cyan Teal */}
+        <motion.div
+          className="absolute bottom-20 right-20 w-64 h-64 bg-gradient-to-r from-cyan-400/25 to-teal-400/25 rounded-full blur-3xl"
+          animate={{
+            x: [0, -50, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Center - Bright Teal */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-teal-200/20 to-teal-300/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.4, 1],
+            opacity: [0.4, 0.7, 0.4],
+          }}
+          transition={{
+            duration: 35,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Middle Left - Emerald Teal */}
+        <motion.div
+          className="absolute top-1/3 -left-10 w-60 h-60 bg-gradient-to-r from-emerald-400/25 to-teal-400/25 rounded-full blur-3xl"
+          animate={{
+            x: [0, 90, 0],
+            y: [0, -30, 0],
+            scale: [1.2, 1, 1.2],
+          }}
+          transition={{
+            duration: 26,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Middle Right - Deep Teal */}
+        <motion.div
+          className="absolute bottom-1/3 -right-10 w-56 h-56 bg-gradient-to-r from-teal-500/30 to-teal-600/30 rounded-full blur-3xl"
+          animate={{
+            x: [0, -80, 0],
+            y: [0, 40, 0],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: 24,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 py-12">
         {/* Header Section */}
         <motion.div
-          className="text-center mb-16"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          className="mb-16 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
-          <motion.h2
-            className="text-cyan-400 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
-            variants={itemVariants}
+          <motion.div
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-teal-50 to-teal-100 border border-teal-200 mb-8 shadow-lg backdrop-blur-sm"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
-            Get In Touch
-          </motion.h2>
+            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
+            <span className="text-teal-600 font-semibold text-sm tracking-wider">
+              Choose Your Path
+            </span>
+            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
+          </motion.div>
 
           <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6"
-            variants={itemVariants}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
           >
-            Let's Create{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
-              Something Amazing
-            </span>{" "}
-            Together
+            <span className="text-gray-800">How Can We</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-teal-500">
+              Help You Today?
+            </span>
           </motion.h1>
 
           <motion.p
-            className="text-lg text-gray-300 max-w-3xl mx-auto"
-            variants={itemVariants}
+            className="text-lg text-gray-600 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
           >
-            Ready to bring your vision to life? Tell us about your project and
-            we'll get back to you within 24 hours.
+            Quick questions get quick answers via email. Complex projects
+            deserve proper discussion through a scheduled call.
           </motion.p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            <h3 className="text-2xl font-bold text-white mb-6">
-              Contact Information
-            </h3>
-
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="flex items-start p-4 rounded-xl bg-black/30 backdrop-blur-sm border border-white/10"
-                >
-                  <div className="w-8 h-8 bg-gray-700 rounded-lg animate-pulse mr-4"></div>
-                  <div className="flex-1">
-                    <div className="h-4 bg-gray-700 rounded w-1/3 mb-2 animate-pulse"></div>
-                    <div className="h-3 bg-gray-700 rounded w-1/2 animate-pulse"></div>
-                  </div>
-                </div>
-              ))
-            ) : error ? (
-              // Error state
-              <div className="text-red-400 p-4 bg-red-900/20 rounded-xl border border-red-500/30">
-                {error} - Showing default contact information
-              </div>
-            ) : (
-              <>
-                {/* Basic Contact Info */}
-                {contactInfo.map((item, index) => (
-                  <motion.a
-                    key={index}
-                    href={item.link}
-                    target={item.link.startsWith("http") ? "_blank" : "_self"}
-                    rel="noopener noreferrer"
-                    className="flex items-start p-4 rounded-xl bg-black/30 backdrop-blur-sm border border-white/10 hover:border-cyan-500/30 transition-all duration-300 group"
-                    whileHover={{ x: 10 }}
-                  >
-                    <span className="text-2xl mr-4">{item.icon}</span>
-                    <div>
-                      <h4 className="text-white font-semibold">{item.title}</h4>
-                      <p className="text-cyan-400">{item.value}</p>
-                    </div>
-                  </motion.a>
-                ))}
-
-                {/* Expandable Social Links */}
-                {activeSocialLinks.length > 0 && (
-                  <motion.div
-                    className="bg-black/30 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
-                    initial={false}
-                    animate={{ height: expandedSocial ? "auto" : "80px" }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                  >
-                    <button
-                      onClick={() => setExpandedSocial(!expandedSocial)}
-                      className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all duration-300"
-                    >
-                      <div className="flex items-center">
-                        <span className="text-2xl mr-4">🌐</span>
-                        <div className="text-left">
-                          <h4 className="text-white font-semibold">
-                            Social Media
-                          </h4>
-                          <p className="text-cyan-400 text-sm">
-                            {expandedSocial
-                              ? "Click to collapse"
-                              : `${activeSocialLinks.length} platforms available`}
-                          </p>
-                        </div>
-                      </div>
-                      <motion.span
-                        animate={{ rotate: expandedSocial ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-cyan-400 text-xl"
-                      >
-                        ▼
-                      </motion.span>
-                    </button>
-
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        opacity: expandedSocial ? 1 : 0,
-                        y: expandedSocial ? 0 : -10,
-                      }}
-                      transition={{ duration: 0.2 }}
-                      className="border-t border-white/10"
-                    >
-                      {activeSocialLinks.map((platform, index) => (
-                        <motion.a
-                          key={platform.key}
-                          href={`${platform.baseUrl}${
-                            contactData.socialLinks[platform.key]
-                          }`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center p-4 hover:bg-white/5 transition-all duration-200 group"
-                          whileHover={{ x: 5 }}
-                        >
-                          <span className="text-xl mr-4">{platform.icon}</span>
-                          <div className="flex-1">
-                            <span className="text-white font-medium">
-                              {platform.name}
-                            </span>
-                            <span className="text-cyan-400 ml-2">
-                              @{contactData.socialLinks[platform.key]}
-                            </span>
-                          </div>
-                          <span className="text-gray-500 group-hover:text-cyan-400 transition-colors">
-                            ↗
-                          </span>
-                        </motion.a>
-                      ))}
-                    </motion.div>
-                  </motion.div>
-                )}
-
-                {/* All Social Platforms (even empty ones for admin reference) */}
-                <motion.div
-                  className="bg-black/20 backdrop-blur-sm rounded-xl border border-white/5 p-4"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <h4 className="text-white font-semibold mb-3 text-sm">
-                    Available Platforms
-                  </h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {socialPlatforms.map((platform) => (
-                      <div
-                        key={platform.key}
-                        className={`text-center p-2 rounded-lg text-xs ${
-                          contactData?.socialLinks?.[platform.key] &&
-                          contactData.socialLinks[platform.key].trim() !== ""
-                            ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30"
-                            : "bg-gray-800/30 text-gray-500 border border-gray-700/30"
-                        }`}
-                      >
-                        <div className="text-lg mb-1">{platform.icon}</div>
-                        <div>{platform.name}</div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </>
-            )}
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 gap-4 mt-10">
-              <div className="text-center p-4 bg-black/30 backdrop-blur-sm rounded-xl border border-white/10">
-                <div className="text-2xl font-bold text-cyan-400 mb-2">24h</div>
-                <div className="text-gray-400 text-sm">Response Time</div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Contact Form */}
-          <div className="flex flex-col justify-center">
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Quick Questions - Left Side */}
+          <div className="space-y-8">
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7 }}
-              viewport={{ once: true }}
-              className="bg-black/30 backdrop-blur-sm p-8 rounded-2xl border border-white/10"
+              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-teal-200 p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              whileHover={{ y: -5 }}
             >
-              {isSubmitted ? (
+              {/* Header */}
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <FaEnvelope className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Quick Questions
+                </h2>
+                <p className="text-gray-600">
+                  Perfect for simple queries and fast responses
+                </p>
+              </div>
+
+              {/* When to Use */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <FaLightbulb className="w-4 h-4 text-teal-500" />
+                  Perfect for:
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {quickQueries.map((query, index) => (
+                    <motion.div
+                      key={index}
+                      className="flex items-center gap-3 text-sm text-gray-600 p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
+                      {query}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Response Info */}
+              <div className="bg-teal-50 rounded-xl p-4 mb-6 border border-teal-200">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <FaClock className="w-4 h-4 text-teal-500" />
+                    <span className="text-gray-700">Response Time</span>
+                  </div>
+                  <span className="font-semibold text-teal-600">
+                    Within 24 hours
+                  </span>
+                </div>
+              </div>
+
+              {/* Email Form */}
+              {!isSubmitted ? (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="Your Name"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="your.email@example.com"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="What's your question about?"
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={3}
+                      placeholder="Briefly describe your question..."
+                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300 resize-none"
+                    />
+                  </div>
+
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-4 bg-gradient-to-r from-teal-400 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-teal-200 transition-all duration-300 flex items-center justify-center gap-2 group"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Quick Message
+                        <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </motion.button>
+                </form>
+              ) : (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
+                  className="text-center py-8"
                 >
-                  <div className="text-6xl mb-6">🎬</div>
-                  <h3 className="text-2xl font-bold text-white mb-4">
-                    Thank You!
+                  <FaCheckCircle className="w-16 h-16 text-teal-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    Message Sent!
                   </h3>
-                  <p className="text-cyan-400">
-                    We've received your message and will get back to you within
-                    24 hours.
+                  <p className="text-gray-600">
+                    We'll get back to you within 24 hours with a response.
                   </p>
                 </motion.div>
-              ) : (
-                <>
-                  <h3 className="text-2xl font-bold text-white mb-6">
-                    Start Your Project
-                  </h3>
-                  <form
-                    ref={formRef}
-                    onSubmit={handleSubmit}
-                    className="space-y-6"
-                  >
-                    <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-sm font-medium text-gray-300 mb-2"
-                      >
-                        Your Name
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
-                        placeholder="Enter your name"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium text-gray-300 mb-2"
-                      >
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
-                        placeholder="your.email@example.com"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="block text-sm font-medium text-gray-300 mb-2"
-                      >
-                        Phone Number
-                      </label>
-                      <input
-                        type="number"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
-                        placeholder="Your phone number"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="projectType"
-                        className="block text-sm font-medium text-gray-300 mb-2"
-                      >
-                        Project Type
-                      </label>
-                      <select
-                        id="projectType"
-                        name="projectType"
-                        value={formData.projectType}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
-                      >
-                        <option value="">Select project type</option>
-                        {projectTypes.map((type, index) => (
-                          <option key={index} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="message"
-                        className="block text-sm font-medium text-gray-300 mb-2"
-                      >
-                        Project Details
-                      </label>
-                      <textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        required
-                        rows={5}
-                        className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all duration-300"
-                        placeholder="Tell us about your project, timeline, and any specific requirements..."
-                      />
-                    </div>
-
-                    <motion.button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium rounded-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-                      variants={glowVariants}
-                      animate="pulse"
-                      whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                      whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                    >
-                      <span className="relative z-10">
-                        {isSubmitting ? (
-                          <div className="flex items-center justify-center">
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                            Sending...
-                          </div>
-                        ) : (
-                          "Send Message"
-                        )}
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </motion.button>
-                  </form>
-                </>
               )}
+            </motion.div>
+
+            {/* Services Card - Clean White */}
+            <motion.div
+              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-gray-200 p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.9 }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <FaAward className="w-8 h-8 text-gray-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Our Services
+                </h2>
+                <p className="text-gray-600">
+                  Professional video editing across all platforms
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {services.map((service, index) => (
+                  <motion.div
+                    key={index}
+                    className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200 group hover:bg-gray-100 transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div
+                      className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <service.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-gray-800 font-semibold text-sm leading-tight">
+                      {service.name}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Side - Two Cards Stack */}
+          <div className="space-y-8">
+            {/* Complex Projects Card */}
+            <motion.div
+              className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              whileHover={{ y: -5 }}
+            >
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+              </div>
+
+              {/* Header */}
+              <div className="text-center mb-8 relative z-10">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
+                  <FaComments className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  Proper Discussion
+                </h2>
+                <p className="text-teal-100">
+                  For complex projects that need detailed planning
+                </p>
+              </div>
+
+              {/* When to Use */}
+              <div className="mb-6 relative z-10">
+                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
+                  <FaRocket className="w-4 h-4 text-teal-200" />
+                  Ideal for:
+                </h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {complexProjects.map((project, index) => (
+                    <motion.div
+                      key={index}
+                      className="flex items-center gap-3 text-sm text-teal-100 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="w-1.5 h-1.5 bg-teal-200 rounded-full"></div>
+                      {project}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Call Benefits */}
+              <div className="bg-white/10 rounded-xl p-4 mb-6 backdrop-blur-sm border border-white/20">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-teal-100">Session Type</span>
+                    <span className="font-semibold text-white">
+                      1:1 Video Call
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-teal-100">Duration</span>
+                    <span className="font-semibold text-white">60 Minutes</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-teal-100">Outcome</span>
+                    <span className="font-semibold text-white">
+                      Custom Plan
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="relative z-10">
+                <motion.button
+                  onClick={() => setIsBookingOpen(true)}
+                  className="w-full py-4 bg-white text-teal-600 font-semibold rounded-xl shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-3 group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FaCalendarAlt className="w-5 h-5" />
+                  Book Strategy Call
+                  <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </motion.button>
+
+                <p className="text-center text-teal-200 text-sm mt-3">
+                  Get instant access to our calendar
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Additional Support Card */}
+            <motion.div
+              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-orange-200 p-6 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.7 }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <FaHeadset className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  Why Choose Us?
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Professional video editing with exceptional support
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {supportFeatures.map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-orange-50 transition-colors group"
+                    whileHover={{ x: 5 }}
+                  >
+                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <feature.icon className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800 text-sm">
+                        {feature.title}
+                      </h4>
+                      <p className="text-gray-600 text-xs">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Client Satisfaction</span>
+                  <span className="font-bold text-orange-500">98%</span>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-2">
+                  <span className="text-gray-600">Projects Completed</span>
+                  <span className="font-bold text-orange-500">500+</span>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
 
-        {/* Process Section */}
+        {/* Bottom CTA */}
         <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.9 }}
         >
-          <h2 className="text-2xl font-bold text-white text-center mb-10">
-            Our Process
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {processSteps.map((step, index) => (
-              <motion.div
-                key={index}
-                className="bg-black/30 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 group"
-                whileHover={{ y: -5 }}
-              >
-                <div className="flex items-center mb-4">
-                  <div className="text-cyan-400 text-2xl mr-3">{step.icon}</div>
-                  <div className="text-cyan-400 font-mono text-sm font-bold bg-cyan-400/10 px-2 py-1 rounded">
-                    {step.step}
-                  </div>
-                </div>
-                <h4 className="text-white font-semibold mb-3">{step.title}</h4>
-                <p className="text-gray-300 text-sm">{step.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Why Choose Us Section */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-2xl font-bold text-white text-center mb-10">
-            Why Choose Us
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {whyChooseUs.map((item, index) => (
-              <motion.div
-                key={index}
-                className="flex items-start p-6 bg-black/30 backdrop-blur-sm rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 group"
-                whileHover={{ x: 5 }}
-              >
-                <span className="text-3xl mr-4 text-cyan-400">{item.icon}</span>
-                <div>
-                  <h4 className="text-white font-semibold mb-2">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-300">{item.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Call to Action */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Ready to Start Your Project?
-          </h2>
-          <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Don't wait any longer. Contact us today and let's discuss how we can
-            bring your creative vision to life with professional video
-            production services.
+          <p className="text-gray-600 mb-4">
+            Not sure which option is right for you?
           </p>
           <motion.button
-            onClick={() =>
-              document
-                .querySelector("form")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-            className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium rounded-lg relative overflow-hidden group"
+            onClick={() => setIsBookingOpen(true)}
+            className="px-8 py-3 border-2 border-teal-400 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-all duration-300 backdrop-blur-sm"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="relative z-10">Get Started Now</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            Let's Figure It Out Together
           </motion.button>
         </motion.div>
       </div>
 
-      {/* Animated decorative elements */}
-      <motion.div
-        className="absolute top-1/4 left-1/4 w-3 h-3 rounded-full bg-cyan-400"
-        animate={{
-          scale: [1, 1.5, 1],
-          opacity: [0.5, 1, 0.5],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Booking Modal */}
+      <AnimatePresence>
+        {isBookingOpen && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              {/* Header */}
+              <div className="bg-gradient-to-r from-teal-400 to-teal-500 p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">
+                      Book Your Strategy Call
+                    </h2>
+                    <p className="text-teal-100">
+                      60-minute video consultation for complex projects
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setIsBookingOpen(false)}
+                    className="text-white hover:text-teal-100 transition-colors"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
 
-      <motion.div
-        className="absolute bottom-1/3 right-1/3 w-2 h-2 rounded-full bg-purple-500"
-        animate={{
-          scale: [1, 2, 1],
-          opacity: [0.3, 0.7, 0.3],
-        }}
-        transition={{
-          duration: 5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1,
-        }}
-      />
+              {/* Calendly Iframe */}
+              <div className="h-[600px]">
+                <iframe
+                  src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=000000&primary_color=0d9488"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  title="Book Your Strategy Call"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                />
+              </div>
 
-      {/* Scrolling text effect at bottom */}
-      <motion.div
-        className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-5xl px-4 overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-        <motion.div
-          className="text-gray-500 text-xs md:text-sm font-mono whitespace-nowrap"
-          animate={{ x: [0, -1000] }}
-          transition={{
-            x: {
-              repeat: Infinity,
-              repeatType: "loop",
-              duration: 30,
-              ease: "linear",
-            },
-          }}
-        >
-          • CONTACT US • START YOUR PROJECT • GET A QUOTE • VIDEO EDITING •
-          MOTION GRAPHICS • COLOR GRADING • CINEMATIC EDITING • DRONE FOOTAGE •
-          VISUAL EFFECTS • 4K/8K EDITING •
-        </motion.div>
-      </motion.div>
+              {bookingCompleted && (
+                <motion.div
+                  className="bg-emerald-50 border border-emerald-200 p-4 text-center"
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                >
+                  <div className="flex items-center justify-center">
+                    <FaCheckCircle className="w-5 h-5 text-emerald-500 mr-2" />
+                    <span className="text-emerald-700 font-medium">
+                      Booking confirmed! Check your email for details.
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

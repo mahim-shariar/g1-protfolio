@@ -1,56 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  motion,
-  useInView,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { getReviews } from "../../services/api";
 
 const TestimonialSection = () => {
   const sectionRef = useRef(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const isInView = useInView(sectionRef, { once: false, amount: 0.4 });
-
-  // Initialize scroll effects only after component is mounted
-  const { scrollYProgress } = useScroll({
-    target: isMounted ? sectionRef : null,
-    offset: ["start end", "end start"],
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const scale = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.8, 1],
-    [0.8, 1, 1, 0.9]
-  );
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   // State for testimonials data
   const [testimonials, setTestimonials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedTestimonials, setExpandedTestimonials] = useState({});
   const [count, setCount] = useState(0);
 
-  // Set mounted state after initial render
+  // Set hasAnimated when section comes into view
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Toggle read more/less for a specific testimonial
-  const toggleReadMore = (testimonialId) => {
-    setExpandedTestimonials((prev) => ({
-      ...prev,
-      [testimonialId]: !prev[testimonialId],
-    }));
-  };
-
-  // Function to truncate text if it's too long
-  const truncateText = (text, maxLength = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substr(0, maxLength) + "...";
-  };
+    if (isInView && !hasAnimated) {
+      setHasAnimated(true);
+    }
+  }, [isInView, hasAnimated]);
 
   // Fetch testimonials from API
   useEffect(() => {
@@ -59,25 +27,20 @@ const TestimonialSection = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch only best reviews (isBest: true)
         const response = await getReviews({ isBest: true });
 
         if (response.status === "success" && response.data?.reviews) {
           setCount(response.results);
-          // Transform API data to match component structure
           const transformedTestimonials = response.data.reviews.map(
             (review, index) => ({
               id: review._id || index,
               quote: review.content,
               author: review.userName,
               role: review.user?.name || "Client",
-              stats: `${review.rating}/5 Rating`,
+              stats: `${review.rating}/5`,
               rating: review.rating,
-              screenshot: review.screenshot,
               isBest: review.isBest,
-              createdAt: review.createdAt,
-              // Add a flag to indicate if text needs truncation
-              needsTruncation: review.content.length > 150,
+              delay: index * 0.1, // Reduced delay for smoother entry
             })
           );
 
@@ -89,37 +52,67 @@ const TestimonialSection = () => {
         console.error("Error fetching testimonials:", err);
         setError("Failed to load testimonials");
 
-        // Fallback to default testimonials if API fails
+        // Enhanced fallback testimonials
         setTestimonials([
           {
             id: 1,
             quote:
-              "They turned our raw footage into an ad that tripled conversions. This was an amazing experience working with their team. The quality and professionalism exceeded our expectations.",
-            author: "Brand X",
+              "They turned our raw footage into an ad that tripled conversions. The quality and professionalism exceeded our expectations.",
+            author: "Sarah Chen",
             role: "Marketing Director",
-            stats: "3x higher conversions",
+            stats: "3x conversions",
             rating: 5,
-            needsTruncation: true,
+            delay: 0,
           },
           {
             id: 2,
             quote:
-              "The AI-powered editing cut our production time by 70% while improving quality.",
-            author: "TechCorp",
+              "The AI-powered editing cut our production time by 70% while improving quality dramatically.",
+            author: "Marcus Rodriguez",
             role: "Creative Lead",
-            stats: "70% faster production",
+            stats: "70% faster",
             rating: 5,
-            needsTruncation: false,
+            delay: 0.1,
           },
           {
             id: 3,
             quote:
-              "Our engagement increased by 240% after implementing their edited content. The results were phenomenal and the team was incredibly responsive throughout the entire process.",
-            author: "StartUp Y",
+              "Our engagement increased by 240% after implementing their edited content. Phenomenal results!",
+            author: "Alex Thompson",
             role: "CEO",
-            stats: "240% more engagement",
+            stats: "240% growth",
             rating: 5,
-            needsTruncation: true,
+            delay: 0.2,
+          },
+          {
+            id: 4,
+            quote:
+              "Outstanding service! The team delivered exceptional quality and met all our deadlines perfectly.",
+            author: "Jessica Kim",
+            role: "Project Manager",
+            stats: "100% on-time",
+            rating: 5,
+            delay: 0.3,
+          },
+          {
+            id: 5,
+            quote:
+              "The video editing transformed our brand presence and significantly boosted our social media engagement.",
+            author: "David Park",
+            role: "Brand Manager",
+            stats: "500% ROI",
+            rating: 5,
+            delay: 0.4,
+          },
+          {
+            id: 6,
+            quote:
+              "Professional, fast, and high-quality work. Will definitely work with them again! Amazing team.",
+            author: "Emily Watson",
+            role: "Founder",
+            stats: "5/5 Stars",
+            rating: 5,
+            delay: 0.5,
           },
         ]);
       } finally {
@@ -130,34 +123,286 @@ const TestimonialSection = () => {
     fetchTestimonials();
   }, []);
 
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  // Smoother Marquee Testimonial Component
+  const MarqueeTestimonial = ({ testimonial, index }) => {
+    return (
+      <motion.div
+        className="relative group cursor-default"
+        whileHover={{
+          scale: 1.02,
+          transition: {
+            type: "spring",
+            stiffness: 400,
+            damping: 25,
+            duration: 0.3,
+          },
+        }}
+        initial={{
+          opacity: 0,
+          y: 20,
+          scale: 0.95,
+        }}
+        animate={
+          hasAnimated
+            ? {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }
+            : {}
+        }
+        transition={{
+          delay: testimonial.delay,
+          duration: 0.6,
+          ease: [0.25, 0.46, 0.45, 0.94], // Custom ease for smoother motion
+        }}
+      >
+        {/* Enhanced glow effect on hover */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-3xl blur-xl"
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        />
 
-  // Auto-rotate testimonials only if there are testimonials and component is in view
-  useEffect(() => {
-    if (!isInView || testimonials.length === 0) return;
+        {/* Main card with enhanced transitions */}
+        <motion.div
+          className="relative bg-white/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 group-hover:shadow-3xl group-hover:border-teal-200/50"
+          whileHover={{
+            borderColor: "rgba(94, 234, 212, 0.5)",
+            transition: { duration: 0.3 },
+          }}
+        >
+          {/* Smoother gradient border */}
+          <motion.div
+            className="absolute inset-0 rounded-2xl bg-gradient-to-r from-teal-400/10 via-emerald-400/10 to-teal-400/10"
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          />
 
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
+          {/* Floating elements with smoother animation */}
+          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center">
+            <motion.div
+              className="w-1.5 h-1.5 bg-white rounded-full"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [1, 0.8, 1],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
 
-    return () => clearInterval(interval);
-  }, [isInView, testimonials.length]);
+          {/* Smoother rating stars animation */}
+          <div className="flex mb-4">
+            {[...Array(5)].map((_, i) => (
+              <motion.svg
+                key={i}
+                className={`w-5 h-5 ${
+                  i < testimonial.rating ? "text-amber-400" : "text-gray-300"
+                }`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={
+                  hasAnimated
+                    ? {
+                        scale: 1,
+                        opacity: 1,
+                        transition: {
+                          delay: testimonial.delay + i * 0.08,
+                          duration: 0.5,
+                          ease: "backOut",
+                        },
+                      }
+                    : {}
+                }
+                whileHover={{
+                  scale: 1.2,
+                  transition: { duration: 0.2 },
+                }}
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </motion.svg>
+            ))}
+          </div>
 
-  // Don't render if loading and no testimonials
+          {/* Smoother quote animation */}
+          <motion.p
+            className="text-gray-700 text-lg leading-relaxed mb-6 font-light relative z-10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={
+              hasAnimated
+                ? {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      delay: testimonial.delay + 0.2,
+                      duration: 0.5,
+                      ease: "easeOut",
+                    },
+                  }
+                : {}
+            }
+          >
+            <motion.span
+              className="text-4xl text-teal-400 font-serif leading-none"
+              initial={{ scale: 0 }}
+              animate={
+                hasAnimated
+                  ? {
+                      scale: 1,
+                      transition: {
+                        delay: testimonial.delay + 0.15,
+                        type: "spring",
+                        stiffness: 200,
+                      },
+                    }
+                  : {}
+              }
+            >
+              "
+            </motion.span>
+            {testimonial.quote}
+            <motion.span
+              className="text-4xl text-teal-400 font-serif leading-none"
+              initial={{ scale: 0 }}
+              animate={
+                hasAnimated
+                  ? {
+                      scale: 1,
+                      transition: {
+                        delay: testimonial.delay + 0.25,
+                        type: "spring",
+                        stiffness: 200,
+                      },
+                    }
+                  : {}
+              }
+            >
+              "
+            </motion.span>
+          </motion.p>
+
+          {/* Smoother author info animation */}
+          <div className="relative pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <motion.div
+                  className="font-bold text-gray-800 text-lg mb-1"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={
+                    hasAnimated
+                      ? {
+                          opacity: 1,
+                          x: 0,
+                          transition: {
+                            delay: testimonial.delay + 0.3,
+                            duration: 0.4,
+                          },
+                        }
+                      : {}
+                  }
+                >
+                  {testimonial.author}
+                </motion.div>
+                <motion.div
+                  className="text-gray-600 text-sm"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={
+                    hasAnimated
+                      ? {
+                          opacity: 1,
+                          x: 0,
+                          transition: {
+                            delay: testimonial.delay + 0.35,
+                            duration: 0.4,
+                          },
+                        }
+                      : {}
+                  }
+                >
+                  {testimonial.role}
+                </motion.div>
+              </div>
+
+              {/* Smoother stats badge animation */}
+              <motion.div
+                className="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full shadow-lg"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={
+                  hasAnimated
+                    ? {
+                        scale: 1,
+                        opacity: 1,
+                        transition: {
+                          delay: testimonial.delay + 0.4,
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 15,
+                        },
+                      }
+                    : {}
+                }
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.2 },
+                }}
+              >
+                <span className="text-white text-sm font-bold font-mono">
+                  {testimonial.stats}
+                </span>
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
   if (loading && testimonials.length === 0) {
     return (
       <section
         ref={sectionRef}
-        className="relative py-32 overflow-hidden bg-gradient-to-br from-white via-gray-50 to-teal-50/30"
+        className="relative py-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
       >
         <div className="container relative z-10 px-4 mx-auto text-center">
-          <div className="text-gray-600">Loading testimonials...</div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center gap-3"
+          >
+            <div className="flex gap-1">
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="w-2 h-2 bg-teal-500 rounded-full"
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.7, 1, 0.7],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.2,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+            <span className="text-gray-600 font-mono">
+              Loading testimonials...
+            </span>
+          </motion.div>
         </div>
       </section>
     );
   }
 
-  // Don't render if no testimonials available
   if (!loading && testimonials.length === 0) {
     return null;
   }
@@ -165,356 +410,359 @@ const TestimonialSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-32 overflow-hidden bg-gradient-to-br from-white via-gray-50 to-teal-50/30"
+      className="relative py-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
     >
-      {/* Animated background elements */}
+      {/* Smoother background effects */}
       <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Smoother gradient orbs */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-100 rounded-full blur-3xl"
-          animate={{
-            x: [0, 20, 0],
-            y: [0, -20, 0],
-          }}
+          className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-teal-200/30 to-emerald-200/20 rounded-full blur-3xl"
+          animate={
+            hasAnimated
+              ? {
+                  x: [0, 40, 0],
+                  y: [0, -30, 0],
+                  scale: [1, 1.15, 1],
+                }
+              : {}
+          }
           transition={{
-            duration: 15,
+            duration: 25,
             repeat: Infinity,
             repeatType: "reverse",
+            ease: "easeInOut",
           }}
-        ></motion.div>
-        <motion.div
-          className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-emerald-100 rounded-full blur-3xl"
-          animate={{
-            x: [0, -15, 0],
-            y: [0, 15, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            repeatType: "reverse",
-            delay: 1,
-          }}
-        ></motion.div>
+        />
 
-        {/* Grid overlay */}
-        <div
-          className="absolute inset-0 opacity-10"
+        <motion.div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-emerald-200/20 to-teal-200/30 rounded-full blur-3xl"
+          animate={
+            hasAnimated
+              ? {
+                  x: [0, -40, 0],
+                  y: [0, 30, 0],
+                  scale: [1.15, 1, 1.15],
+                }
+              : {}
+          }
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            repeatType: "reverse",
+            delay: 1.5,
+            ease: "easeInOut",
+          }}
+        />
+
+        {/* Smoother floating grid */}
+        <motion.div
+          className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(20, 184, 166, 0.05) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(20, 184, 166, 0.05) 1px, transparent 1px)
+              linear-gradient(rgba(20, 184, 166, 0.2) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(20, 184, 166, 0.2) 1px, transparent 1px)
             `,
-            backgroundSize: "50px 50px",
-            maskImage:
-              "radial-gradient(circle at center, black, transparent 80%)",
+            backgroundSize: "80px 80px",
           }}
-        ></div>
+          animate={
+            hasAnimated
+              ? {
+                  backgroundPosition: ["0px 0px", "80px 80px"],
+                }
+              : {}
+          }
+          transition={{
+            duration: 50,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
 
-        {/* Moving particles - Fixed positioning */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
+        {/* Smoother animated particles */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-teal-400/20 rounded-full"
+            initial={false}
+            animate={
+              hasAnimated
+                ? {
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    scale: [1, 1.4, 1],
+                    opacity: [0.3, 0.7, 0.3],
+                  }
+                : {}
+            }
+            transition={{
+              duration: Math.random() * 20 + 20,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: Math.random() * 10,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Smoother Header Section */}
+      <div className="container relative z-10 px-4 mx-auto text-center mb-20">
+        <motion.div
+          className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-teal-200 shadow-lg mb-6"
+          initial={{ opacity: 0, y: 20, scale: 0.9 }}
+          animate={
+            hasAnimated
+              ? {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  transition: {
+                    duration: 0.6,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  },
+                }
+              : {}
+          }
+        >
+          <motion.div
+            className="w-2 h-2 bg-teal-500 rounded-full"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.7, 1, 0.7],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <span className="text-teal-700 font-medium text-sm tracking-wide font-mono">
+            TRUSTED BY INDUSTRY LEADERS
+          </span>
+          <motion.div
+            className="w-2 h-2 bg-teal-500 rounded-full"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.7, 1, 0.7],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              delay: 0.5,
+              ease: "easeInOut",
+            }}
+          />
+        </motion.div>
+
+        <motion.h2
+          className="text-5xl md:text-7xl font-bold text-gray-800 mb-6"
+          initial={{ opacity: 0, y: 30 }}
+          animate={
+            hasAnimated
+              ? {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.8,
+                    delay: 0.1,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  },
+                }
+              : {}
+          }
+        >
+          <span className="bg-gradient-to-r from-teal-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent bg-size-200 animate-gradient">
+            Client Voices
+          </span>
+        </motion.h2>
+
+        <motion.p
+          className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={
+            hasAnimated
+              ? {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.7,
+                    delay: 0.2,
+                    ease: "easeOut",
+                  },
+                }
+              : {}
+          }
+        >
+          Discover why industry leaders trust us to transform their content into
+          extraordinary experiences
+        </motion.p>
+      </div>
+
+      {/* Smoother Dual Marquee Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 ">
+          {/* Left Marquee - Smoother Top to Bottom */}
+          <div className="relative h-[800px] overflow-hidden rounded-3xl  backdrop-blur-sm ">
             <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-teal-400 rounded-full opacity-20"
-              initial={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
+              className="flex flex-col gap-6 p-6"
+              animate={hasAnimated ? { y: [0, -2000] } : { y: 0 }}
               transition={{
-                duration: Math.random() * 20 + 20,
+                duration: 50, // Slower for smoother motion
                 repeat: Infinity,
-                repeatType: "reverse",
+                ease: "linear",
               }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="container relative z-10 px-4 mx-auto">
-        {/* Use motion.div only when mounted to prevent hydration issues */}
-        {isMounted ? (
-          <motion.div className="text-center mb-16" style={{ opacity, scale }}>
-            <motion.span
-              className="inline-block mb-4 text-sm tracking-widest text-teal-600 uppercase font-mono"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              viewport={{ once: true }}
             >
-              Client Success Stories
-            </motion.span>
-
-            <motion.h2
-              className="mb-6 text-4xl font-bold text-gray-800 md:text-5xl"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              Proven{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                Results
-              </span>
-            </motion.h2>
-          </motion.div>
-        ) : (
-          // Static fallback while mounting
-          <div className="text-center mb-16">
-            <span className="inline-block mb-4 text-sm tracking-widest text-teal-600 uppercase font-mono">
-              Client Success Stories
-            </span>
-            <h2 className="mb-6 text-4xl font-bold text-gray-800 md:text-5xl">
-              Proven{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                Results
-              </span>
-            </h2>
-          </div>
-        )}
-
-        {/* Error message */}
-        {error && (
-          <div className="max-w-4xl mx-auto mb-8 text-center">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-100 border border-red-200">
-              <div className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse"></div>
-              <span className="text-red-600 text-sm font-mono">{error}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Main testimonial content */}
-        <div className="relative max-w-4xl mx-auto">
-          <AnimatePresence mode="wait">
-            {testimonials.map(
-              (testimonial, index) =>
-                activeTestimonial === index && (
-                  <motion.div
-                    key={testimonial.id}
-                    className="text-center"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.7 }}
-                  >
-                    {/* Quote icon with halo effect */}
-                    <motion.div
-                      className="relative mb-10 text-teal-500 mx-auto w-16 h-16"
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.3, type: "spring" }}
-                    >
-                      <svg
-                        className="w-full h-full"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z" />
-                      </svg>
-                      <motion.div
-                        className="absolute inset-0 rounded-full bg-teal-400/20 -z-10"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                      ></motion.div>
-                    </motion.div>
-
-                    {/* Quote text with consistent height */}
-                    <motion.div
-                      className="px-4 mb-8 min-h-[120px] flex items-center justify-center"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.7, duration: 0.5 }}
-                    >
-                      <blockquote className="text-2xl font-bold text-gray-800 md:text-4xl md:leading-tight">
-                        <span className="quote-mark text-teal-500">"</span>
-                        {testimonial.needsTruncation &&
-                        !expandedTestimonials[testimonial.id] ? (
-                          <>
-                            {truncateText(testimonial.quote)}
-                            <button
-                              onClick={() => toggleReadMore(testimonial.id)}
-                              className="ml-2 text-teal-600 hover:text-teal-500 text-lg font-medium underline"
-                            >
-                              Read more
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            {testimonial.quote}
-                            {testimonial.needsTruncation && (
-                              <button
-                                onClick={() => toggleReadMore(testimonial.id)}
-                                className="ml-2 text-teal-600 hover:text-teal-500 text-lg font-medium underline"
-                              >
-                                Read less
-                              </button>
-                            )}
-                          </>
-                        )}
-                        <span className="quote-mark text-teal-500">"</span>
-                      </blockquote>
-                    </motion.div>
-
-                    {/* Author info */}
-                    <motion.div
-                      className="mb-6"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1 }}
-                    >
-                      <div className="text-xl font-semibold text-teal-600">
-                        {testimonial.author}
-                      </div>
-                      <div className="text-gray-600">{testimonial.role}</div>
-                    </motion.div>
-
-                    {/* Animated stat bar */}
-                    <motion.div
-                      className="relative h-2 bg-gray-200 rounded-full overflow-hidden max-w-md mx-auto mb-10"
-                      initial={{ width: 0 }}
-                      animate={{ width: "100%" }}
-                      transition={{ delay: 1.2, duration: 1 }}
-                    >
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-teal-400 to-emerald-500"
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{
-                          delay: 1.5,
-                          duration: 1.5,
-                          ease: "easeOut",
-                        }}
-                      />
-                      <motion.div
-                        className="absolute top-0 left-0 w-10 h-full bg-white/50"
-                        initial={{ x: "-100%" }}
-                        animate={{ x: "300%" }}
-                        transition={{
-                          delay: 1.8,
-                          duration: 1.5,
-                          repeat: Infinity,
-                          repeatDelay: 2,
-                        }}
-                      />
-                    </motion.div>
-
-                    {/* Stats indicator */}
-                    <motion.div
-                      className="inline-flex items-center px-4 py-2 rounded-full bg-teal-50 border border-teal-200"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.8 }}
-                    >
-                      <div className="w-2 h-2 bg-teal-500 rounded-full mr-2 animate-pulse"></div>
-                      <span className="text-teal-700 text-sm font-mono">
-                        {testimonial.stats}
-                      </span>
-                    </motion.div>
-                  </motion.div>
-                )
-            )}
-          </AnimatePresence>
-
-          {/* Navigation dots - Only show if there are multiple testimonials */}
-          {testimonials.length > 1 && (
-            <div className="flex justify-center mt-16 space-x-3">
-              {testimonials.map((_, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => setActiveTestimonial(index)}
-                  className={`relative w-3 h-3 rounded-full transition-all ${
-                    activeTestimonial === index
-                      ? "bg-teal-500"
-                      : "bg-gray-400 hover:bg-gray-600"
-                  }`}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {activeTestimonial === index && (
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-teal-400/30 -z-10"
-                      animate={{ scale: [1, 2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </motion.button>
+              {[...testimonials, ...testimonials].map((testimonial, index) => (
+                <MarqueeTestimonial
+                  key={`left-${index}`}
+                  testimonial={testimonial}
+                  index={index}
+                />
               ))}
-            </div>
-          )}
+            </motion.div>
+
+            {/* Smoother gradient fades */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
+
+          {/* Right Marquee - Smoother Bottom to Top */}
+          <div className="relative h-[800px] overflow-hidden rounded-3xl  backdrop-blur-sm ">
+            <motion.div
+              className="flex flex-col gap-6 p-6"
+              animate={hasAnimated ? { y: [-2000, 0] } : { y: 0 }}
+              transition={{
+                duration: 50, // Slower for smoother motion
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              {[...testimonials, ...testimonials].map((testimonial, index) => (
+                <MarqueeTestimonial
+                  key={`right-${index}`}
+                  testimonial={testimonial}
+                  index={index}
+                />
+              ))}
+            </motion.div>
+
+            {/* Smoother gradient fades */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+          </div>
         </div>
-
-        {/* Floating tech elements */}
-        <motion.div
-          className="absolute top-1/4 left-8 bg-teal-50 backdrop-blur-md rounded-xl p-3 border border-teal-200 shadow-lg"
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          viewport={{ once: true }}
-        >
-          <div className="flex items-center">
-            <div className="w-2 h-2 mr-2 bg-teal-500 rounded-full animate-pulse"></div>
-            <span className="text-sm text-teal-700 font-mono">
-              {count}+ Satisfied Clients
-            </span>
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="absolute bottom-1/4 right-8 bg-emerald-50 backdrop-blur-md rounded-xl p-3 border border-emerald-200 shadow-lg"
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1 }}
-          viewport={{ once: true }}
-        >
-          <div className="flex items-center">
-            <span className="text-sm text-emerald-700 font-mono mr-2">
-              {(
-                testimonials.reduce((acc, curr) => acc + curr.rating, 0) /
-                testimonials.length
-              ).toFixed(1)}
-              /5 Avg Rating
-            </span>
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          </div>
-        </motion.div>
       </div>
 
-      {/* Animated connection lines */}
-      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
+      {/* Smoother Floating Stats */}
+      <motion.div
+        className="absolute top-10 left-10 bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl"
+        initial={{ x: -50, opacity: 0, scale: 0.9 }}
+        animate={
+          hasAnimated
+            ? {
+                x: 0,
+                opacity: 1,
+                scale: 1,
+                transition: {
+                  duration: 0.6,
+                  delay: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                },
+              }
+            : {}
+        }
+        whileHover={{
+          scale: 1.05,
+          transition: { duration: 0.3 },
+        }}
+      >
+        <div className="text-center">
+          <div className="text-3xl font-bold text-teal-600 mb-1">{count}+</div>
+          <div className="text-gray-600 text-sm font-mono">Happy Clients</div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        className="absolute bottom-10 right-10 bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl"
+        initial={{ x: 50, opacity: 0, scale: 0.9 }}
+        animate={
+          hasAnimated
+            ? {
+                x: 0,
+                opacity: 1,
+                scale: 1,
+                transition: {
+                  duration: 0.6,
+                  delay: 0.5,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                },
+              }
+            : {}
+        }
+        whileHover={{
+          scale: 1.05,
+          transition: { duration: 0.3 },
+        }}
+      >
+        <div className="text-center">
+          <div className="text-3xl font-bold text-emerald-600 mb-1">
+            {testimonials.length > 0
+              ? (
+                  testimonials.reduce((acc, curr) => acc + curr.rating, 0) /
+                  testimonials.length
+                ).toFixed(1)
+              : "5.0"}
+          </div>
+          <div className="text-gray-600 text-sm font-mono">Avg Rating</div>
+        </div>
+      </motion.div>
+
+      {/* Smoother connection lines */}
+      <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
         <svg
           className="w-full h-full"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
         >
           <motion.path
-            d="M0,50 Q25,10 50,50 T100,50"
-            stroke="rgba(20, 184, 166, 0.2)"
-            strokeWidth="0.5"
+            d="M0,20 Q25,50 50,20 T100,20"
+            stroke="url(#gradient1)"
+            strokeWidth="0.3"
             fill="none"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
+            animate={hasAnimated ? { pathLength: 1 } : { pathLength: 0 }}
             transition={{
-              duration: 3,
+              duration: 15,
               repeat: Infinity,
               repeatType: "reverse",
+              ease: "easeInOut",
             }}
           />
           <motion.path
-            d="M0,30 Q25,70 50,30 T100,30"
-            stroke="rgba(16, 185, 129, 0.2)"
-            strokeWidth="0.5"
+            d="M0,80 Q25,50 50,80 T100,80"
+            stroke="url(#gradient2)"
+            strokeWidth="0.3"
             fill="none"
             initial={{ pathLength: 0 }}
-            animate={{ pathLength: 1 }}
+            animate={hasAnimated ? { pathLength: 1 } : { pathLength: 0 }}
             transition={{
-              duration: 4,
+              duration: 18,
               repeat: Infinity,
               repeatType: "reverse",
-              delay: 0.5,
+              delay: 2,
+              ease: "easeInOut",
             }}
           />
+          <defs>
+            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#0d9488" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
+            </linearGradient>
+            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#0d9488" stopOpacity="0.4" />
+            </linearGradient>
+          </defs>
         </svg>
       </div>
     </section>
