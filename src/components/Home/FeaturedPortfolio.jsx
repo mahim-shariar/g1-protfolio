@@ -1,16 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getVideoReels } from "../../services/api";
+import SectionHeader from "../Shared/SectionHeader";
 
 const FeaturedPortfolio = () => {
   const [activeVideo, setActiveVideo] = useState(0);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [isUserInteracting, setIsUserInteracting] = useState(false);
-  const containerRef = useRef(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [direction, setDirection] = useState(0);
+  const [showTitle, setShowTitle] = useState(true);
+  const [showPlayButton, setShowPlayButton] = useState(true);
   const videoRef = useRef(null);
-  const interactionTimeoutRef = useRef(null);
 
   // Fetch videos from API
   useEffect(() => {
@@ -44,622 +45,492 @@ const FeaturedPortfolio = () => {
     fetchBestVideos();
   }, []);
 
-  // User interaction handlers
-  const handleUserInteraction = () => {
-    setIsUserInteracting(true);
-
-    // Clear any existing timeout
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current);
-    }
-
-    // Set timeout to reset interaction state after 3 seconds of inactivity
-    interactionTimeoutRef.current = setTimeout(() => {
-      setIsUserInteracting(false);
-    }, 3000);
-  };
-
-  // Video navigation
-  const handleForward = () => {
-    const nextIndex = (activeVideo + 1) % videos.length;
-    switchVideo(nextIndex);
-    handleUserInteraction(); // Mark as user interaction
-  };
-
-  const handleBackward = () => {
-    const prevIndex = (activeVideo - 1 + videos.length) % videos.length;
-    switchVideo(prevIndex);
-    handleUserInteraction(); // Mark as user interaction
-  };
-
-  const switchVideo = (newIndex) => {
+  const navigateVideos = (newIndex) => {
+    setDirection(newIndex > activeVideo ? 1 : -1);
+    setActiveVideo(newIndex);
+    setShowTitle(true);
+    setShowPlayButton(true);
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
-    setActiveVideo(newIndex);
   };
 
-  // Card interaction handlers
-  const handleCardHoverStart = (index) => {
-    setHoveredIndex(index);
-    handleUserInteraction(); // Mark as user interaction
+  const handleForward = () => {
+    const nextIndex = (activeVideo + 1) % videos.length;
+    navigateVideos(nextIndex);
   };
 
-  const handleCardHoverEnd = () => {
-    setHoveredIndex(null);
+  const handleBackward = () => {
+    const prevIndex = (activeVideo - 1 + videos.length) % videos.length;
+    navigateVideos(prevIndex);
   };
 
-  const handleCardClick = (index) => {
-    setActiveVideo(index);
-    handleUserInteraction(); // Mark as user interaction
+  const handleVideoPlay = () => {
+    setShowTitle(false);
+    setShowPlayButton(false);
   };
 
-  // Video player interaction handlers
-  const handleVideoInteraction = () => {
-    handleUserInteraction(); // Mark as user interaction
+  const handleVideoPause = () => {
+    setShowTitle(true);
+    setShowPlayButton(true);
   };
 
-  // Swipe handlers
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-
-  const handleTouchStart = (e) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    handleUserInteraction(); // Mark as user interaction
+  const handleVideoEnd = () => {
+    setShowTitle(true);
+    setShowPlayButton(true);
   };
 
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd || videos.length === 0) return;
-
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-
-    if (isLeftSwipe) {
-      handleForward();
-    } else if (isRightSwipe) {
-      handleBackward();
-    }
-
-    setTouchStart(null);
-    setTouchEnd(null);
-  };
-
-  // Auto-rotate active video only when user is not interacting
-  useEffect(() => {
-    if (videos.length === 0 || isUserInteracting) return;
-
-    const interval = setInterval(() => {
-      handleForward();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [videos.length, activeVideo, isUserInteracting]);
-
-  // Reset video when active video changes
-  useEffect(() => {
+  const handlePlayButtonClick = () => {
     if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.volume = 0.8;
+      videoRef.current.play();
+      setShowPlayButton(false);
+      setShowTitle(false);
     }
-  }, [activeVideo]);
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (interactionTimeoutRef.current) {
-        clearTimeout(interactionTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // Calculate card positions
-  const getCardTransform = (index) => {
-    const totalVideos = videos.length;
-    if (totalVideos === 0)
-      return { transform: "translate(-50%, -50%)", opacity: 0, zIndex: 0 };
-
-    const angle =
-      (index * 360) / totalVideos - (activeVideo * 360) / totalVideos;
-    const radius = 400;
-    const active = index === activeVideo;
-
-    const x = Math.sin((angle * Math.PI) / 180) * radius;
-    const z = Math.cos((angle * Math.PI) / 180) * radius - radius;
-
-    const scale = active || index === hoveredIndex ? 1.1 : 0.9;
-    const opacity = active ? 1 : index === hoveredIndex ? 0.9 : 0.7;
-
-    return {
-      transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${-angle}deg) scale(${scale})`,
-      opacity,
-      zIndex: active
-        ? 50
-        : index === hoveredIndex
-        ? 40
-        : 30 - Math.abs(index - activeVideo),
-    };
   };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
     });
   };
 
   if (loading) {
     return (
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-        className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
-      >
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center">
-            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-4">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                PORTFOLIO GALLERY
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600">Loading featured videos...</p>
-          </div>
+      <section className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
+        <div className="relative z-10 text-center">
+          <div className="w-16 h-16 border-3 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <h2 className="text-2xl font-light text-gray-800">
+            Loading Creativity
+          </h2>
         </div>
-      </motion.section>
+      </section>
     );
   }
 
   if (videos.length === 0) {
     return (
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: true }}
-        className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
-      >
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center">
-            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-4">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                PORTFOLIO GALLERY
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600">
-              No featured videos available at the moment.
-            </p>
-          </div>
+      <section className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-light text-gray-800 mb-3">
+            No Content Available
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Check back later for featured videos.
+          </p>
         </div>
-      </motion.section>
+      </section>
     );
   }
 
   const currentVideo = videos[activeVideo];
 
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      viewport={{ once: true }}
-      className="relative py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden"
-      ref={containerRef}
-      onMouseMove={handleUserInteraction} // Track mouse movement in the entire section
-    >
-      {/* Animated grid background */}
-      <div className="absolute inset-0 z-0 opacity-10">
-        <div className="holographic-grid"></div>
+    <section className="min-h-screen bg-white relative overflow-hidden">
+      {/* Abstract Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-float"></div>
+        <div className="absolute top-3/4 right-1/4 w-64 h-64 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-float-delayed"></div>
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-float-slow"></div>
       </div>
 
-      {/* Big bubble background effect */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "500px",
-            height: "500px",
-            left: "10%",
-            top: "20%",
-            opacity: "0.08",
-            background:
-              "radial-gradient(circle at 30% 30%, rgba(20, 184, 166, 0.3), transparent)",
-            filter: "blur(40px)",
-          }}
-        ></div>
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: "600px",
-            height: "600px",
-            right: "5%",
-            bottom: "15%",
-            opacity: "0.08",
-            background:
-              "radial-gradient(circle at 70% 70%, rgba(16, 185, 129, 0.3), transparent)",
-            filter: "blur(50px)",
-          }}
-        ></div>
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Section header */}
+      {/* Main Grid Layout */}
+      <div className="relative z-10 container mx-auto px-4 py-16">
+        {/* Minimal Header */}
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <div className="inline-block relative">
-            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-4 relative">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                PORTFOLIO GALLERY
-              </span>
-              <div className="absolute -inset-6 bg-teal-500/5 blur-2xl -z-10 rounded-full"></div>
-            </h2>
-            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"></div>
+          <div className="inline-flex items-center gap-3 mb-4">
+            <div className="w-1.5 h-1.5 bg-teal-500 rounded-full"></div>
+            <div className="text-xs uppercase tracking-widest text-gray-500">
+              Featured Work
+            </div>
+            <div className="w-1.5 h-1.5 bg-teal-500 rounded-full"></div>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mt-6">
-            Immersive 3D video experience with modern technology
+          <h1 className="text-4xl md:text-6xl  text-gray-800 mb-4">
+            Visual
+            <br />
+            <span className="text-teal-600">Stories</span>
+          </h1>
+          <p className="text-gray-600  max-w-md mx-auto">
+            A curated collection of our most innovative visual narratives
           </p>
         </motion.div>
 
-        {/* 3D Video Gallery */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="relative h-[500px] md:h-[600px] mb-20 perspective-1000"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseEnter={handleUserInteraction} // Track when mouse enters gallery
-        >
-          <div className="relative w-full h-full transform-style-3d">
-            {videos.map((video, index) => {
-              const active = index === activeVideo;
-              const transformStyle = getCardTransform(index);
+        <SectionHeader
+          title="Visual"
+          subtitle="Featured Work"
+          highlight="Stories"
+          description="A curated collection of our most innovative visual narratives"
+          titleSize="2xl"
+          lineSpacing="tight"
+        />
 
-              return (
+        {/* Asymmetric Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column - Video Player */}
+          <div className="lg:col-span-8">
+            <motion.div
+              layout
+              className={`relative bg-gray-900 rounded-2xl overflow-hidden ${
+                isExpanded ? "aspect-square" : "aspect-video"
+              } transition-all duration-700 shadow-xl`}
+            >
+              <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
-                  key={video.id}
-                  className={`absolute top-1/2 left-1/2 w-72 md:w-96 h-44 md:h-60 transition-all duration-700 transform-style-3d cursor-pointer`}
-                  style={transformStyle}
-                  onClick={() => handleCardClick(index)}
-                  onHoverStart={() => handleCardHoverStart(index)}
-                  onHoverEnd={handleCardHoverEnd}
-                  whileHover={{
-                    transition: {
-                      type: "spring",
-                      stiffness: 300,
-                      scale: { duration: 0.3 },
-                    },
-                  }}
+                  key={currentVideo.id}
+                  className="relative w-full h-full"
                 >
-                  <div className="relative w-full h-full rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
-                    <img
-                      src={video.thumbnail}
-                      alt={video.title}
-                      className="w-full h-full object-cover"
-                    />
+                  {/* Default HTML5 Video Player */}
+                  <motion.video
+                    ref={videoRef}
+                    custom={direction}
+                    initial={{ opacity: 0, x: direction * 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction * -100 }}
+                    transition={{ duration: 0.5 }}
+                    src={currentVideo.videoUrl}
+                    className="w-full h-full object-cover"
+                    poster={currentVideo.thumbnail}
+                    controls
+                    controlsList="nodownload"
+                    playsInline
+                    preload="metadata"
+                    onPlay={handleVideoPlay}
+                    onPause={handleVideoPause}
+                    onEnded={handleVideoEnd}
+                  />
 
-                    {/* Modern effect */}
-                    <div className="absolute inset-0 border border-teal-400/20 rounded-xl modern-effect"></div>
-
-                    {/* Video info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                      <div className="flex items-center mb-2">
-                        <span className="px-3 py-1 bg-teal-500/20 text-teal-700 rounded-full text-sm font-medium">
-                          {video.category}
-                        </span>
-                      </div>
-                      <h3 className="text-lg md:text-xl font-bold text-white truncate">
-                        {video.title}
-                      </h3>
-                    </div>
-
-                    {/* Active indicator */}
-                    {active && (
-                      <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-teal-500 animate-ping"></div>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Navigation arrows */}
-          <button
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gray-700 hover:bg-teal-500 hover:text-white transition-all duration-300 shadow-lg"
-            onClick={handleBackward}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-gray-700 hover:bg-teal-500 hover:text-white transition-all duration-300 shadow-lg"
-            onClick={handleForward}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-
-          {/* Swipe instructions for mobile */}
-          <div className="md:hidden absolute bottom-2 left-0 right-0 flex justify-center items-center space-x-4 text-teal-600/70">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span className="text-sm">Swipe to navigate</span>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </div>
-        </motion.div>
-
-        {/* Active Video Detail Section */}
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7 }}
-          viewport={{ once: true }}
-          className="bg-white rounded-2xl p-6 md:p-8 border border-gray-200 shadow-lg mb-12"
-          onMouseEnter={handleUserInteraction} // Track when mouse enters video section
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            <div className="lg:col-span-2">
-              <div
-                className="relative rounded-xl overflow-hidden bg-gray-100 shadow-md"
-                onMouseEnter={handleUserInteraction} // Track video player interaction
-              >
-                {/* Standard HTML5 Video Player */}
-                <video
-                  ref={videoRef}
-                  src={currentVideo.videoUrl}
-                  className="w-full h-auto aspect-video"
-                  poster={currentVideo.thumbnail}
-                  controls
-                  controlsList="nodownload"
-                  preload="metadata"
-                  onPlay={handleVideoInteraction}
-                  onPause={handleVideoInteraction}
-                  onSeeking={handleVideoInteraction}
-                  onVolumeChange={handleVideoInteraction}
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </div>
-
-            {/* Video Info Section */}
-            <div
-              className="flex flex-col justify-center"
-              onMouseEnter={handleUserInteraction} // Track info section interaction
-            >
-              <div className="mb-4">
-                <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
-                  {currentVideo.category}
-                </span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-                {currentVideo.title}
-              </h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                {currentVideo.description || "No description available."}
-              </p>
-
-              {/* Tags */}
-              {currentVideo.tags && currentVideo.tags.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-teal-600 mb-2">
-                    Tags:
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {currentVideo.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm"
+                  {/* Play Button Overlay */}
+                  <AnimatePresence>
+                    {showPlayButton && (
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={handlePlayButtonClick}
+                        className="absolute inset-0 w-full h-full flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300 hover:bg-black/40"
                       >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+                        <div className="w-16 h-16 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-110">
+                          <svg
+                            className="w-8 h-8 text-gray-900 ml-0.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                            />
+                          </svg>
+                        </div>
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </AnimatePresence>
 
-              {/* Video Details */}
-              <div className="space-y-3 text-sm text-gray-600 mb-6">
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="font-medium">Upload date:</span>
-                  <span className="text-teal-600">
-                    {formatDate(currentVideo.createdAt)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                  <span className="font-medium">Category:</span>
-                  <span className="text-teal-600 capitalize">
-                    {currentVideo.category}
-                  </span>
+              {/* Floating Info Card - Hidden when playing */}
+              <AnimatePresence>
+                {showTitle && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-light text-gray-800 mb-1">
+                          {currentVideo.title}
+                        </h3>
+                        <p className="text-gray-600 text-xs leading-relaxed">
+                          {currentVideo.description}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="flex-shrink-0 w-10 h-10 bg-teal-500 hover:bg-teal-600 rounded-full flex items-center justify-center text-white transition-all duration-300 ml-3"
+                      >
+                        {isExpanded ? (
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        ) : (
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Navigation and Details */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Video Navigation */}
+            <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-medium text-gray-800">
+                  Browse Collection
+                </h3>
+                <div className="text-xs text-gray-500">
+                  {activeVideo + 1} / {videos.length}
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 mt-4">
-                <button
-                  className="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-full transition-all duration-300 flex items-center space-x-2 shadow-md hover:shadow-lg"
-                  onClick={() => {
-                    handleVideoInteraction(); // Mark as interaction
-                    if (videoRef.current) {
-                      videoRef.current.paused
-                        ? videoRef.current.play()
-                        : videoRef.current.pause();
-                    }
-                  }}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleBackward}
+                  className="p-3 bg-gray-100 hover:bg-teal-500 hover:text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-600 text-sm"
                 >
                   <svg
                     className="w-4 h-4"
-                    fill="currentColor"
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M8 5v14l11-7z" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
-                  <span>Play/Pause</span>
-                </button>
+                  Previous
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleForward}
+                  className="p-3 bg-gray-100 hover:bg-teal-500 hover:text-white rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-600 text-sm"
+                >
+                  Next
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </motion.button>
+              </div>
 
-                <button
-                  className="px-6 py-3 bg-transparent border border-teal-500 text-teal-600 hover:bg-teal-50 rounded-full transition-all duration-300 flex items-center space-x-2"
-                  onClick={() => {
-                    handleVideoInteraction(); // Mark as interaction
-                    if (videoRef.current) {
-                      videoRef.current.currentTime = 0;
-                      videoRef.current.play();
-                    }
-                  }}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04.32.07.64.07.97 0 5.5-4.5 10-10 10S2 17.5 2 12 6.5 2 12 2c4.32 0 8 2.75 9.43 6.97z" />
-                  </svg>
-                  <span>Replay</span>
-                </button>
+              {/* Video Thumbnails Scroll */}
+              <div className="overflow-x-auto">
+                <div className="flex gap-2 pb-3">
+                  {videos.map((video, index) => (
+                    <motion.button
+                      key={video.id}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => navigateVideos(index)}
+                      className={`flex-shrink-0 w-20 h-14 rounded-lg overflow-hidden relative transition-all duration-300 ${
+                        index === activeVideo
+                          ? "ring-2 ring-teal-500 scale-105"
+                          : "opacity-70 hover:opacity-100"
+                      }`}
+                    >
+                      <img
+                        src={video.thumbnail}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/20 hover:bg-transparent transition-colors"></div>
+                    </motion.button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
 
-        {/* Tech badges */}
-        <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-4 md:gap-6 mb-12"
-        >
-          <div className="px-4 py-2 md:px-5 md:py-3 bg-teal-50 rounded-xl border border-teal-200 flex items-center gap-2 md:gap-3">
-            <div className="w-2 h-2 md:w-3 md:h-3 bg-teal-500 rounded-full animate-pulse"></div>
-            <span className="text-teal-700 text-sm md:text-base">
-              Modern Display
-            </span>
-          </div>
-          <div className="px-4 py-2 md:px-5 md:py-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center gap-2 md:gap-3">
-            <div className="w-2 h-2 md:w-3 md:h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span className="text-emerald-700 text-sm md:text-base">
-              3D Spatial Audio
-            </span>
-          </div>
-          <div className="px-4 py-2 md:px-5 md:py-3 bg-teal-50 rounded-xl border border-teal-200 flex items-center gap-2 md:gap-3">
-            <div className="w-2 h-2 md:w-3 md:h-3 bg-teal-500 rounded-full animate-pulse"></div>
-            <span className="text-teal-700 text-sm md:text-base">
-              Neural Rendering
-            </span>
-          </div>
-          <div className="px-4 py-2 md:px-5 md:py-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center gap-2 md:gap-3">
-            <div className="w-2 h-2 md:w-3 md:h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-            <span className="text-emerald-700 text-sm md:text-base">
-              Smart Compression
-            </span>
-          </div>
-        </motion.div>
+            {/* Video Details */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100"
+            >
+              <div className="space-y-4">
+                {/* Meta Information */}
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="text-gray-500 mb-1">Category</div>
+                    <div className="text-gray-800 font-medium capitalize">
+                      {currentVideo.category}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-gray-500 mb-1">Published</div>
+                    <div className="text-gray-800 font-medium">
+                      {formatDate(currentVideo.createdAt)}
+                    </div>
+                  </div>
+                </div>
 
-        {/* View All Projects Button */}
+                {/* Tags */}
+                {currentVideo.tags && currentVideo.tags.length > 0 && (
+                  <div>
+                    <div className="text-gray-500 text-xs mb-2">Tags</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {currentVideo.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Creator Info */}
+                {currentVideo.user && (
+                  <div>
+                    <div className="text-gray-500 text-xs mb-2">Creator</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                        {currentVideo.user.name?.[0] || "U"}
+                      </div>
+                      <div>
+                        <div className="text-gray-800 font-medium text-sm">
+                          {currentVideo.user.name || "Unknown Creator"}
+                        </div>
+                        <div className="text-gray-500 text-xs">
+                          {currentVideo.user.role || "Content Creator"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl p-5 text-white shadow-lg"
+            >
+              <h3 className="text-base font-medium mb-3">Ready to Create?</h3>
+              <p className="text-teal-100 text-xs mb-4">
+                Start your own visual story with our creative team
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-white text-teal-600 py-2.5 rounded-xl font-medium transition-colors hover:bg-gray-100 text-sm"
+              >
+                Start Project
+              </motion.button>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Bottom Stats */}
         <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
         >
-          <button
-            className="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full font-semibold text-lg hover:from-teal-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-teal-500/25"
-            onClick={handleUserInteraction} // Mark button click as interaction
-          >
-            View All Projects
-          </button>
+          {[
+            { number: "50+", label: "Projects Completed" },
+            { number: "15+", label: "Creative Awards" },
+            { number: "98%", label: "Client Satisfaction" },
+            { number: "24/7", label: "Creative Support" },
+          ].map((stat, index) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-2xl md:text-3xl font-light text-gray-800 mb-1">
+                {stat.number}
+              </div>
+              <div className="text-gray-600 text-xs">{stat.label}</div>
+            </div>
+          ))}
         </motion.div>
       </div>
 
-      {/* Custom animations */}
+      {/* Custom Animations */}
       <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(180deg);
+          }
         }
-        .transform-style-3d {
-          transform-style: preserve-3d;
+        @keyframes float-delayed {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-10px) rotate(90deg);
+          }
         }
-        .holographic-grid {
-          background-image: linear-gradient(
-              rgba(20, 184, 166, 0.05) 1px,
-              transparent 1px
-            ),
-            linear-gradient(
-              90deg,
-              rgba(20, 184, 166, 0.05) 1px,
-              transparent 1px
-            );
-          background-size: 50px 50px;
-          background-position: center center;
-          width: 100%;
-          height: 100%;
+        @keyframes float-slow {
+          0%,
+          100% {
+            transform: translateY(0px) scale(1);
+          }
+          50% {
+            transform: translateY(-8px) scale(1.05);
+          }
         }
-        .modern-effect {
-          box-shadow: 0 0 15px rgba(20, 184, 166, 0.2),
-            inset 0 0 15px rgba(20, 184, 166, 0.1);
+        .animate-float {
+          animation: float 15s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 20s ease-in-out infinite;
+        }
+        .animate-float-slow {
+          animation: float-slow 25s ease-in-out infinite;
         }
       `}</style>
-    </motion.section>
+    </section>
   );
 };
 

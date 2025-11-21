@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { getReviews } from "../../services/api";
+import SectionHeader from "../Shared/SectionHeader";
 
 const TestimonialSection = () => {
   const sectionRef = useRef(null);
@@ -40,7 +41,7 @@ const TestimonialSection = () => {
               stats: `${review.rating}/5`,
               rating: review.rating,
               isBest: review.isBest,
-              delay: index * 0.1, // Reduced delay for smoother entry
+              delay: index * 0.1,
             })
           );
 
@@ -52,8 +53,8 @@ const TestimonialSection = () => {
         console.error("Error fetching testimonials:", err);
         setError("Failed to load testimonials");
 
-        // Enhanced fallback testimonials
-        setTestimonials([
+        // Enhanced fallback testimonials with same structure as API data
+        const fallbackTestimonials = [
           {
             id: 1,
             quote:
@@ -114,7 +115,10 @@ const TestimonialSection = () => {
             rating: 5,
             delay: 0.5,
           },
-        ]);
+        ];
+
+        setTestimonials(fallbackTestimonials);
+        setCount(fallbackTestimonials.length);
       } finally {
         setLoading(false);
       }
@@ -123,13 +127,16 @@ const TestimonialSection = () => {
     fetchTestimonials();
   }, []);
 
-  // Smoother Marquee Testimonial Component
+  // Calculate marquee content height for proper looping (increased for larger cards)
+  const marqueeContentHeight = testimonials.length * 220; // Increased from 180 to 220
+
+  // Optimized Marquee Testimonial Component with larger dimensions
   const MarqueeTestimonial = ({ testimonial, index }) => {
     return (
       <motion.div
-        className="relative group cursor-default"
+        className="relative group cursor-default mb-5" // Increased margin bottom
         whileHover={{
-          scale: 1.02,
+          scale: 1.03, // Slightly increased hover scale
           transition: {
             type: "spring",
             stiffness: 400,
@@ -154,20 +161,20 @@ const TestimonialSection = () => {
         transition={{
           delay: testimonial.delay,
           duration: 0.6,
-          ease: [0.25, 0.46, 0.45, 0.94], // Custom ease for smoother motion
+          ease: [0.25, 0.46, 0.45, 0.94],
         }}
       >
         {/* Enhanced glow effect on hover */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-3xl blur-xl"
+          className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-2xl blur-xl"
           initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
 
-        {/* Main card with enhanced transitions */}
+        {/* Main card with increased padding and larger layout */}
         <motion.div
-          className="relative bg-white/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl p-6 group-hover:shadow-3xl group-hover:border-teal-200/50"
+          className="relative bg-white/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl p-6 group-hover:shadow-2xl group-hover:border-teal-200/50 h-[190px] flex flex-col" // Increased height, padding, and shadow
           whileHover={{
             borderColor: "rgba(94, 234, 212, 0.5)",
             transition: { duration: 0.3 },
@@ -181,8 +188,8 @@ const TestimonialSection = () => {
             transition={{ duration: 0.4 }}
           />
 
-          {/* Floating elements with smoother animation */}
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center">
+          {/* Floating elements - slightly larger */}
+          <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center">
             <motion.div
               className="w-1.5 h-1.5 bg-white rounded-full"
               animate={{
@@ -197,12 +204,13 @@ const TestimonialSection = () => {
             />
           </div>
 
-          {/* Smoother rating stars animation */}
-          <div className="flex mb-4">
+          {/* Larger rating stars */}
+          <div className="flex mb-3">
             {[...Array(5)].map((_, i) => (
               <motion.svg
                 key={i}
-                className={`w-5 h-5 ${
+                className={`w-4 h-4 ${
+                  // Increased from w-3 h-3
                   i < testimonial.rating ? "text-amber-400" : "text-gray-300"
                 }`}
                 fill="currentColor"
@@ -231,9 +239,9 @@ const TestimonialSection = () => {
             ))}
           </div>
 
-          {/* Smoother quote animation */}
+          {/* Larger quote with bigger text */}
           <motion.p
-            className="text-gray-700 text-lg leading-relaxed mb-6 font-light relative z-10"
+            className="text-gray-700 text-sm leading-relaxed mb-4 font-light relative z-10 line-clamp-3 flex-1" // Increased text size
             initial={{ opacity: 0, y: 10 }}
             animate={
               hasAnimated
@@ -250,7 +258,7 @@ const TestimonialSection = () => {
             }
           >
             <motion.span
-              className="text-4xl text-teal-400 font-serif leading-none"
+              className="text-2xl text-teal-400 font-serif leading-none mr-1"
               initial={{ scale: 0 }}
               animate={
                 hasAnimated
@@ -269,7 +277,7 @@ const TestimonialSection = () => {
             </motion.span>
             {testimonial.quote}
             <motion.span
-              className="text-4xl text-teal-400 font-serif leading-none"
+              className="text-2xl text-teal-400 font-serif leading-none ml-1"
               initial={{ scale: 0 }}
               animate={
                 hasAnimated
@@ -288,12 +296,12 @@ const TestimonialSection = () => {
             </motion.span>
           </motion.p>
 
-          {/* Smoother author info animation */}
-          <div className="relative pt-4 border-t border-gray-100">
+          {/* Larger author info */}
+          <div className="relative pt-3 border-t border-gray-100">
             <div className="flex items-center justify-between">
-              <div>
+              <div className="min-w-0 flex-1">
                 <motion.div
-                  className="font-bold text-gray-800 text-lg mb-1"
+                  className="font-bold text-gray-800 text-sm mb-1 truncate" // Increased text size
                   initial={{ opacity: 0, x: -10 }}
                   animate={
                     hasAnimated
@@ -311,7 +319,7 @@ const TestimonialSection = () => {
                   {testimonial.author}
                 </motion.div>
                 <motion.div
-                  className="text-gray-600 text-sm"
+                  className="text-gray-600 text-xs truncate"
                   initial={{ opacity: 0, x: -10 }}
                   animate={
                     hasAnimated
@@ -330,9 +338,9 @@ const TestimonialSection = () => {
                 </motion.div>
               </div>
 
-              {/* Smoother stats badge animation */}
+              {/* Larger stats badge */}
               <motion.div
-                className="px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full shadow-lg"
+                className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full shadow-lg flex-shrink-0 ml-2" // Increased padding
                 initial={{ scale: 0, opacity: 0 }}
                 animate={
                   hasAnimated
@@ -353,7 +361,9 @@ const TestimonialSection = () => {
                   transition: { duration: 0.2 },
                 }}
               >
-                <span className="text-white text-sm font-bold font-mono">
+                <span className="text-white text-sm font-bold font-mono whitespace-nowrap">
+                  {" "}
+                  {/* Increased text size */}
                   {testimonial.stats}
                 </span>
               </motion.div>
@@ -368,7 +378,7 @@ const TestimonialSection = () => {
     return (
       <section
         ref={sectionRef}
-        className="relative py-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
+        className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
       >
         <div className="container relative z-10 px-4 mx-auto text-center">
           <motion.div
@@ -394,7 +404,7 @@ const TestimonialSection = () => {
                 />
               ))}
             </div>
-            <span className="text-gray-600 font-mono">
+            <span className="text-gray-600 font-mono text-sm">
               Loading testimonials...
             </span>
           </motion.div>
@@ -410,19 +420,38 @@ const TestimonialSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
+      className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
     >
-      {/* Smoother background effects */}
+      {/* Optimized background effects */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Smoother gradient orbs */}
+        {/* Gradient orbs */}
         <motion.div
-          className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-teal-200/30 to-emerald-200/20 rounded-full blur-3xl"
+          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-teal-200/30 to-emerald-200/20 rounded-full blur-2xl"
           animate={
             hasAnimated
               ? {
-                  x: [0, 40, 0],
-                  y: [0, -30, 0],
-                  scale: [1, 1.15, 1],
+                  x: [0, 30, 0],
+                  y: [0, -20, 0],
+                  scale: [1, 1.1, 1],
+                }
+              : {}
+          }
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-r from-emerald-200/20 to-teal-200/30 rounded-full blur-2xl"
+          animate={
+            hasAnimated
+              ? {
+                  x: [0, -30, 0],
+                  y: [0, 20, 0],
+                  scale: [1.1, 1, 1.1],
                 }
               : {}
           }
@@ -430,31 +459,12 @@ const TestimonialSection = () => {
             duration: 25,
             repeat: Infinity,
             repeatType: "reverse",
-            ease: "easeInOut",
-          }}
-        />
-
-        <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-emerald-200/20 to-teal-200/30 rounded-full blur-3xl"
-          animate={
-            hasAnimated
-              ? {
-                  x: [0, -40, 0],
-                  y: [0, 30, 0],
-                  scale: [1.15, 1, 1.15],
-                }
-              : {}
-          }
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            repeatType: "reverse",
             delay: 1.5,
             ease: "easeInOut",
           }}
         />
 
-        {/* Smoother floating grid */}
+        {/* Floating grid */}
         <motion.div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -462,225 +472,134 @@ const TestimonialSection = () => {
               linear-gradient(rgba(20, 184, 166, 0.2) 1px, transparent 1px),
               linear-gradient(90deg, rgba(20, 184, 166, 0.2) 1px, transparent 1px)
             `,
-            backgroundSize: "80px 80px",
+            backgroundSize: "60px 60px",
           }}
           animate={
             hasAnimated
               ? {
-                  backgroundPosition: ["0px 0px", "80px 80px"],
+                  backgroundPosition: ["0px 0px", "60px 60px"],
                 }
               : {}
           }
           transition={{
-            duration: 50,
+            duration: 40,
             repeat: Infinity,
             ease: "linear",
           }}
         />
-
-        {/* Smoother animated particles */}
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-teal-400/20 rounded-full"
-            initial={false}
-            animate={
-              hasAnimated
-                ? {
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    scale: [1, 1.4, 1],
-                    opacity: [0.3, 0.7, 0.3],
-                  }
-                : {}
-            }
-            transition={{
-              duration: Math.random() * 20 + 20,
-              repeat: Infinity,
-              repeatType: "reverse",
-              delay: Math.random() * 10,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
       </div>
 
-      {/* Smoother Header Section */}
-      <div className="container relative z-10 px-4 mx-auto text-center mb-20">
-        <motion.div
-          className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-teal-200 shadow-lg mb-6"
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={
-            hasAnimated
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  transition: {
-                    duration: 0.6,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  },
-                }
-              : {}
-          }
-        >
-          <motion.div
-            className="w-2 h-2 bg-teal-500 rounded-full"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <span className="text-teal-700 font-medium text-sm tracking-wide font-mono">
-            TRUSTED BY INDUSTRY LEADERS
-          </span>
-          <motion.div
-            className="w-2 h-2 bg-teal-500 rounded-full"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.7, 1, 0.7],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: 0.5,
-              ease: "easeInOut",
-            }}
-          />
-        </motion.div>
+      <SectionHeader
+        subtitle="TRUSTED BY INDUSTRY LEADERS"
+        title="Our"
+        highlight="Client Voices"
+        description="Discover why industry leaders trust us to transform their content"
+        center={true}
+        titleSize="2xl"
+        titleWeight="normal"
+        descriptionSize="lg"
+        lineSpacing="tight"
+        highlightColor="teal-500"
+        dotColor="teal-500"
+        highlightOnNewLine={false}
+      />
 
-        <motion.h2
-          className="text-5xl md:text-7xl font-bold text-gray-800 mb-6"
-          initial={{ opacity: 0, y: 30 }}
-          animate={
-            hasAnimated
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.8,
-                    delay: 0.1,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  },
-                }
-              : {}
-          }
-        >
-          <span className="bg-gradient-to-r from-teal-600 via-emerald-500 to-teal-600 bg-clip-text text-transparent bg-size-200 animate-gradient">
-            Client Voices
-          </span>
-        </motion.h2>
-
-        <motion.p
-          className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={
-            hasAnimated
-              ? {
-                  opacity: 1,
-                  y: 0,
-                  transition: {
-                    duration: 0.7,
-                    delay: 0.2,
-                    ease: "easeOut",
-                  },
-                }
-              : {}
-          }
-        >
-          Discover why industry leaders trust us to transform their content into
-          extraordinary experiences
-        </motion.p>
-      </div>
-
-      {/* Three Column Marquee Container */}
+      {/* Synchronized Three Column Marquee Container with increased height */}
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Top to Bottom */}
-          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
+        {" "}
+        {/* Increased max-width */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {" "}
+          {/* Increased gap */}
+          {/* Left Column - Top to Bottom (Starts at top) */}
+          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+            {" "}
+            {/* Increased height */}
             <motion.div
-              className="flex flex-col gap-6 p-6"
-              animate={hasAnimated ? { y: [0, -2000] } : { y: 0 }}
+              className="flex flex-col"
+              animate={
+                hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }
+              }
               transition={{
-                duration: 50,
+                duration: 35, // Slightly increased duration for larger cards
                 repeat: Infinity,
                 ease: "linear",
               }}
             >
               {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <MarqueeTestimonial
-                  key={`left-${index}`}
-                  testimonial={testimonial}
-                  index={index}
-                />
+                <div key={`left-${index}`} className="px-4 pb-5">
+                  {" "}
+                  {/* Increased padding */}
+                  <MarqueeTestimonial testimonial={testimonial} index={index} />
+                </div>
               ))}
             </motion.div>
-
             {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           </div>
-
-          {/* Middle Column - Bottom to Top */}
-          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
+          {/* Middle Column - Bottom to Top (Starts at visible position) */}
+          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+            {" "}
+            {/* Increased height */}
             <motion.div
-              className="flex flex-col gap-6 p-6"
-              animate={hasAnimated ? { y: [-2000, 0] } : { y: 0 }}
+              className="flex flex-col"
+              animate={
+                hasAnimated
+                  ? { y: [-marqueeContentHeight, 0] }
+                  : { y: -marqueeContentHeight }
+              }
               transition={{
-                duration: 50,
+                duration: 35, // Slightly increased duration for larger cards
                 repeat: Infinity,
                 ease: "linear",
               }}
             >
               {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <MarqueeTestimonial
-                  key={`middle-${index}`}
-                  testimonial={testimonial}
-                  index={index}
-                />
+                <div key={`middle-${index}`} className="px-4 pb-5">
+                  {" "}
+                  {/* Increased padding */}
+                  <MarqueeTestimonial testimonial={testimonial} index={index} />
+                </div>
               ))}
             </motion.div>
-
             {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           </div>
-
-          {/* Right Column - Top to Bottom */}
-          <div className="relative h-[800px] overflow-hidden rounded-3xl backdrop-blur-sm">
+          {/* Right Column - Top to Bottom (Starts at top) */}
+          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+            {" "}
+            {/* Increased height */}
             <motion.div
-              className="flex flex-col gap-6 p-6"
-              animate={hasAnimated ? { y: [0, -2000] } : { y: 0 }}
+              className="flex flex-col"
+              animate={
+                hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }
+              }
               transition={{
-                duration: 50,
+                duration: 35, // Slightly increased duration for larger cards
                 repeat: Infinity,
                 ease: "linear",
               }}
             >
               {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <MarqueeTestimonial
-                  key={`right-${index}`}
-                  testimonial={testimonial}
-                  index={index}
-                />
+                <div key={`right-${index}`} className="px-4 pb-5">
+                  {" "}
+                  {/* Increased padding */}
+                  <MarqueeTestimonial testimonial={testimonial} index={index} />
+                </div>
               ))}
             </motion.div>
-
             {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* Smoother Floating Stats */}
+      {/* Floating Stats */}
       <motion.div
-        className="absolute top-10 left-10 bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl"
+        className="absolute top-6 left-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
         initial={{ x: -50, opacity: 0, scale: 0.9 }}
         animate={
           hasAnimated
@@ -702,13 +621,13 @@ const TestimonialSection = () => {
         }}
       >
         <div className="text-center">
-          <div className="text-3xl font-bold text-teal-600 mb-1">{count}+</div>
-          <div className="text-gray-600 text-sm font-mono">Happy Clients</div>
+          <div className="text-xl font-bold text-teal-600 mb-1">{count}+</div>
+          <div className="text-gray-600 text-xs font-mono">Happy Clients</div>
         </div>
       </motion.div>
 
       <motion.div
-        className="absolute bottom-10 right-10 bg-white/90 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl"
+        className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
         initial={{ x: 50, opacity: 0, scale: 0.9 }}
         animate={
           hasAnimated
@@ -730,7 +649,7 @@ const TestimonialSection = () => {
         }}
       >
         <div className="text-center">
-          <div className="text-3xl font-bold text-emerald-600 mb-1">
+          <div className="text-xl font-bold text-emerald-600 mb-1">
             {testimonials.length > 0
               ? (
                   testimonials.reduce((acc, curr) => acc + curr.rating, 0) /
@@ -738,58 +657,9 @@ const TestimonialSection = () => {
                 ).toFixed(1)
               : "5.0"}
           </div>
-          <div className="text-gray-600 text-sm font-mono">Avg Rating</div>
+          <div className="text-gray-600 text-xs font-mono">Avg Rating</div>
         </div>
       </motion.div>
-
-      {/* Smoother connection lines */}
-      <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M0,20 Q25,50 50,20 T100,20"
-            stroke="url(#gradient1)"
-            strokeWidth="0.3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={hasAnimated ? { pathLength: 1 } : { pathLength: 0 }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              repeatType: "reverse",
-              ease: "easeInOut",
-            }}
-          />
-          <motion.path
-            d="M0,80 Q25,50 50,80 T100,80"
-            stroke="url(#gradient2)"
-            strokeWidth="0.3"
-            fill="none"
-            initial={{ pathLength: 0 }}
-            animate={hasAnimated ? { pathLength: 1 } : { pathLength: 0 }}
-            transition={{
-              duration: 18,
-              repeat: Infinity,
-              repeatType: "reverse",
-              delay: 2,
-              ease: "easeInOut",
-            }}
-          />
-          <defs>
-            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#0d9488" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0.4" />
-            </linearGradient>
-            <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#0d9488" stopOpacity="0.4" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
     </section>
   );
 };

@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useInView, useAnimation } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useAnimation,
+  AnimatePresence,
+} from "framer-motion";
 import { getStatistics, getActiveStatistics } from "../../services/api";
+import SectionHeader from "../Shared/SectionHeader";
 
 const MotionCredibilityStrip = () => {
   const controls = useAnimation();
@@ -11,6 +17,53 @@ const MotionCredibilityStrip = () => {
   const [statistics, setStatistics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Video Reviews State
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  // Video reviews data - EXACTLY as you provided
+  const videoReviews = [
+    {
+      id: 1,
+      name: "Sarah Johnson",
+      role: "Content Creator",
+      company: "Beauty Vlog",
+      videoThumbnail:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=600&h=400&fit=crop",
+      review:
+        "I was amazed by how quickly they turned around my weekly vlog. The editing was so professional and they perfectly captured my brand's aesthetic. The color grading made my footage look cinematic!",
+      rating: 5,
+      stats: "3x faster delivery than my previous editor",
+      duration: "2:34",
+    },
+    {
+      id: 2,
+      name: "Mike Chen",
+      role: "Marketing Director",
+      company: "TechStart Inc",
+      videoThumbnail:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=400&fit=crop",
+      review:
+        "Our product launch video needed to be perfect, and they delivered beyond expectations. The attention to detail in the motion graphics and sound design was exceptional. Our engagement rates skyrocketed!",
+      rating: 5,
+      stats: "215% increase in engagement",
+      duration: "1:45",
+    },
+    {
+      id: 3,
+      name: "Emily Rodriguez",
+      role: "Documentary Filmmaker",
+      company: "Independent Films",
+      videoThumbnail:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&h=400&fit=crop",
+      review:
+        "As a documentary filmmaker, storytelling is everything. They understood my vision completely and helped me craft a narrative that moved my audience. The pacing and emotional impact were perfect.",
+      rating: 5,
+      stats: "Film festival selection",
+      duration: "3:12",
+    },
+  ];
 
   // Fetch statistics data
   useEffect(() => {
@@ -42,7 +95,69 @@ const MotionCredibilityStrip = () => {
     }
   }, [isInView, controls]);
 
-  // Particle background effect
+  // Auto-advance video reviews - EXACTLY as you provided
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDirection(1);
+      setCurrentReviewIndex((prev) => (prev + 1) % videoReviews.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [videoReviews.length]);
+
+  // Navigation functions - EXACTLY as you provided
+  const nextReview = () => {
+    setDirection(1);
+    setCurrentReviewIndex((prev) => (prev + 1) % videoReviews.length);
+  };
+
+  const prevReview = () => {
+    setDirection(-1);
+    setCurrentReviewIndex(
+      (prev) => (prev - 1 + videoReviews.length) % videoReviews.length
+    );
+  };
+
+  // Slide variants for smooth transitions - EXACTLY as you provided
+  const slideVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+    },
+    exit: (direction) => ({
+      x: direction > 0 ? -300 : 300,
+      opacity: 0,
+    }),
+  };
+
+  const slideTransition = {
+    x: { type: "spring", stiffness: 300, damping: 30 },
+    opacity: { duration: 0.2 },
+  };
+
+  // Star rating component - EXACTLY as you provided
+  const StarRating = ({ rating }) => {
+    return (
+      <div className="flex items-center space-x-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-lg ${
+              star <= rating ? "text-yellow-400" : "text-gray-400"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  // Particle background effect - EXACTLY as you provided
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -169,6 +284,202 @@ const MotionCredibilityStrip = () => {
     },
   ];
 
+  // Video Review Component - EXACTLY as you provided but integrated
+  const VideoReviewSection = () => {
+    const currentReview = videoReviews[currentReviewIndex];
+
+    return (
+      <div className="mb-20">
+        <div className="max-w-6xl mx-auto">
+          {/* Card Container */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-200 shadow-2xl overflow-hidden relative">
+            {/* Navigation Buttons */}
+            <div className="absolute top-1/2 left-4 right-4 transform -translate-y-1/2 flex justify-between z-10">
+              {/* Previous Button */}
+              <button
+                onClick={prevReview}
+                className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 border border-gray-200"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={nextReview}
+                className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-300 border border-gray-200"
+              >
+                <svg
+                  className="w-6 h-6 text-gray-700"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[500px]">
+              {/* Video Section */}
+              <div className="relative p-8 bg-gradient-to-br from-gray-50 to-white">
+                {/* Video Container */}
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl h-64 lg:h-80 bg-gray-200">
+                  {/* Animated Thumbnail with Slide Transition */}
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.img
+                      key={currentReview.id}
+                      src={currentReview.videoThumbnail}
+                      alt="Video review thumbnail"
+                      className="absolute inset-0 w-full h-full object-cover"
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={slideTransition}
+                    />
+                  </AnimatePresence>
+
+                  {/* Play Button */}
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <button className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center shadow-2xl hover:scale-105 transition-transform duration-300">
+                      <svg
+                        className="w-6 h-6 text-white ml-1"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Video Duration */}
+                  <div className="absolute bottom-4 right-4 bg-black/80 text-white px-2 py-1 rounded text-sm">
+                    {currentReview.duration}
+                  </div>
+                </div>
+
+                {/* Client Info with Slide Transition */}
+                <div className="mt-6 text-center h-24">
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                      key={currentReview.id}
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={slideTransition}
+                    >
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {currentReview.name}
+                      </h3>
+                      <p className="text-teal-600 font-medium">
+                        {currentReview.role}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        {currentReview.company}
+                      </p>
+                      <div className="mt-2 flex justify-center">
+                        <StarRating rating={currentReview.rating} />
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Review Text Section */}
+              <div className="p-8 flex flex-col justify-center">
+                <div className="mb-6">
+                  <div className="text-teal-500 text-6xl mb-4">"</div>
+
+                  {/* Review Text with Slide Transition */}
+                  <div className="h-48 overflow-hidden">
+                    <AnimatePresence mode="wait" custom={direction}>
+                      <motion.p
+                        key={currentReview.id}
+                        className="text-gray-700 text-lg leading-relaxed"
+                        custom={direction}
+                        variants={slideVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={slideTransition}
+                      >
+                        {currentReview.review}
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Stats Badge with Slide Transition */}
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                      key={currentReview.stats}
+                      className="bg-teal-50 inline-flex items-center px-4 py-2 rounded-full mt-4"
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={slideTransition}
+                    >
+                      <span className="text-teal-700 font-semibold text-sm">
+                        🎯 {currentReview.stats}
+                      </span>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Navigation Dots and Counter */}
+                <div className="flex items-center justify-between mt-8">
+                  <div className="flex items-center space-x-3">
+                    {videoReviews.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          const newDirection =
+                            index > currentReviewIndex ? 1 : -1;
+                          setDirection(newDirection);
+                          setCurrentReviewIndex(index);
+                        }}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentReviewIndex
+                            ? "bg-teal-500 scale-125"
+                            : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="text-gray-500 text-sm">
+                    {currentReviewIndex + 1} of {videoReviews.length}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <motion.section
       ref={ref}
@@ -208,28 +519,20 @@ const MotionCredibilityStrip = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4">
-        <motion.div
-          className="text-center mb-16"
-          variants={{
-            hidden: { opacity: 0, y: 20 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 0.8,
-                ease: "easeOut",
-              },
-            },
-          }}
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Trusted by Creators Worldwide
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto font-light">
-            Delivering exceptional video editing results that transform content
-            and drive engagement
-          </p>
-        </motion.div>
+        <SectionHeader
+          subtitle="What Our Clients Say"
+          title="Trusted by Creators"
+          highlight="Worldwide"
+          description="Delivering exceptional video editing results that transform content
+            and drive engagement"
+          center={true}
+          titleSize="2xl"
+          titleWeight="normal"
+          descriptionSize="lg"
+          highlightColor="teal-500"
+          lineSpacing="tight"
+          dotColor="teal-500"
+        />
 
         {/* Loading State */}
         {loading && (
@@ -249,6 +552,9 @@ const MotionCredibilityStrip = () => {
             <p className="text-amber-600">{error}</p>
           </div>
         )}
+
+        {/* Video Reviews Section - EXACTLY as you provided */}
+        <VideoReviewSection />
 
         {/* Scrolling Credibility Strip */}
         <div className="relative overflow-hidden py-8 border-y border-teal-200 bg-gradient-to-r from-teal-50 to-emerald-50 backdrop-blur-sm">

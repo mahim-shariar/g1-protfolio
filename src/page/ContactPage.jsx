@@ -22,6 +22,7 @@ import {
   FaAward,
 } from "react-icons/fa";
 import bg from "/ICON.png";
+import SectionHeader from "../components/Shared/SectionHeader";
 
 const ContactPage = () => {
   const canvasRef = useRef(null);
@@ -68,13 +69,13 @@ const ContactPage = () => {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 120 + 80;
+        this.size = Math.random() * 80 + 60; // Reduced size
         this.speedX = Math.random() * 0.3 - 0.15;
         this.speedY = Math.random() * 0.3 - 0.15;
         this.color = [
-          `rgba(45, 212, 191, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
-          `rgba(13, 148, 136, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
-          `rgba(20, 184, 166, ${Math.random() * 0.3 + 0.2})`, // Teal shades with higher opacity
+          `rgba(45, 212, 191, ${Math.random() * 0.3 + 0.2})`,
+          `rgba(13, 148, 136, ${Math.random() * 0.3 + 0.2})`,
+          `rgba(20, 184, 166, ${Math.random() * 0.3 + 0.2})`,
         ][Math.floor(Math.random() * 3)];
       }
 
@@ -90,7 +91,7 @@ const ContactPage = () => {
 
       draw() {
         ctx.save();
-        ctx.globalAlpha = 0.3; // Increased opacity for better visibility
+        ctx.globalAlpha = 0.3;
 
         const gradient = ctx.createRadialGradient(
           this.x,
@@ -111,7 +112,7 @@ const ContactPage = () => {
       }
     }
 
-    const blobs = Array.from({ length: 10 }, () => new Blob()); // Increased number of blobs
+    const blobs = Array.from({ length: 8 }, () => new Blob()); // Reduced number of blobs
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -123,8 +124,8 @@ const ContactPage = () => {
         canvas.width,
         canvas.height
       );
-      bgGradient.addColorStop(0, "rgba(249, 250, 251, 0.95)"); // Less transparent
-      bgGradient.addColorStop(1, "rgba(255, 255, 255, 0.98)"); // Less transparent
+      bgGradient.addColorStop(0, "rgba(249, 250, 251, 0.95)");
+      bgGradient.addColorStop(1, "rgba(255, 255, 255, 0.98)");
       ctx.fillStyle = bgGradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -146,21 +147,15 @@ const ContactPage = () => {
     };
   }, []);
 
-  // Floating Logo Component - Only using bg logo
+  // Floating Logo Component - Reduced size and quantity
   const FloatingLogos = () => {
     const logoPositions = [
-      { left: "10%", top: "15%", size: 40, delay: 0 },
-      { left: "85%", top: "20%", size: 35, delay: 1 },
-      { left: "15%", top: "70%", size: 45, delay: 2 },
-      { left: "80%", top: "65%", size: 38, delay: 3 },
-      { left: "5%", top: "40%", size: 32, delay: 4 },
-      { left: "90%", top: "45%", size: 42, delay: 5 },
-      { left: "25%", top: "10%", size: 36, delay: 6 },
-      { left: "75%", top: "85%", size: 44, delay: 7 },
-      { left: "45%", top: "5%", size: 30, delay: 8 },
-      { left: "55%", top: "90%", size: 48, delay: 9 },
-      { left: "35%", top: "30%", size: 34, delay: 10 },
-      { left: "65%", top: "60%", size: 40, delay: 11 },
+      { left: "10%", top: "15%", size: 30, delay: 0 },
+      { left: "85%", top: "20%", size: 25, delay: 1 },
+      { left: "15%", top: "70%", size: 35, delay: 2 },
+      { left: "80%", top: "65%", size: 28, delay: 3 },
+      { left: "5%", top: "40%", size: 22, delay: 4 },
+      { left: "90%", top: "45%", size: 32, delay: 5 },
     ];
 
     return (
@@ -176,13 +171,13 @@ const ContactPage = () => {
               height: position.size,
             }}
             animate={{
-              y: [0, -25, 0],
-              x: [0, 15, 0],
+              y: [0, -20, 0],
+              x: [0, 10, 0],
               rotate: [0, 8, -6, 0],
-              scale: [0.8, 1.1, 0.8],
+              scale: [0.8, 1, 0.8],
             }}
             transition={{
-              duration: 18 + index * 2,
+              duration: 15 + index * 2, // Reduced duration
               repeat: Infinity,
               delay: position.delay,
               ease: "easeInOut",
@@ -198,14 +193,13 @@ const ContactPage = () => {
               <img
                 src={bg}
                 alt="Video Editor"
-                className="w-full h-full object-contain opacity-15 group-hover:opacity-30 transition-opacity duration-500"
+                className="w-full h-full object-contain opacity-15 group-hover:opacity-25 transition-opacity duration-500"
                 style={{
                   filter:
                     "brightness(0) saturate(100%) invert(44%) sepia(45%) saturate(572%) hue-rotate(135deg) brightness(92%) contrast(90%)",
                 }}
               />
-              {/* Subtle glow effect on hover */}
-              <div className="absolute inset-0 bg-teal-400/10 rounded-full blur-sm group-hover:bg-teal-400/20 transition-all duration-500 opacity-0 group-hover:opacity-100" />
+              <div className="absolute inset-0 bg-teal-400/10 rounded-full blur-sm group-hover:bg-teal-400/15 transition-all duration-500 opacity-0 group-hover:opacity-100" />
             </div>
           </motion.div>
         ))}
@@ -372,25 +366,39 @@ const ContactPage = () => {
   ];
 
   return (
-    <div className="relative min-h-screen w-full bg-gradient-to-br from-gray-50 to-white flex flex-col items-center justify-center pt-20 pb-10 overflow-hidden">
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-gray-50 to-white flex flex-col items-center justify-center pt-16 pb-8 overflow-hidden">
       {/* Animated Background Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full pointer-events-none"
       />
 
-      {/* Floating Logos - Only using bg logo */}
+      {/* Floating Logos */}
       <FloatingLogos />
 
-      {/* Multiple Teal Gradient Orbs - Only Teal Shades */}
+      {/* Reduced Gradient Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Top Left - Light Teal */}
+        {/* Smaller gradient orbs */}
         <motion.div
-          className="absolute top-20 left-20 w-80 h-80 bg-gradient-to-r from-teal-300/25 to-teal-400/25 rounded-full blur-3xl"
+          className="absolute top-16 left-16 w-60 h-60 bg-gradient-to-r from-teal-300/20 to-teal-400/20 rounded-full blur-2xl"
           animate={{
-            x: [0, 80, 0],
-            y: [0, -60, 0],
-            scale: [1, 1.3, 1],
+            x: [0, 60, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute top-24 right-24 w-56 h-56 bg-gradient-to-r from-teal-400/25 to-teal-500/25 rounded-full blur-2xl"
+          animate={{
+            x: [0, -50, 0],
+            y: [0, 40, 0],
+            scale: [1.1, 1, 1.1],
           }}
           transition={{
             duration: 25,
@@ -399,42 +407,11 @@ const ContactPage = () => {
           }}
         />
 
-        {/* Top Right - Medium Teal */}
         <motion.div
-          className="absolute top-32 right-32 w-72 h-72 bg-gradient-to-r from-teal-400/30 to-teal-500/30 rounded-full blur-3xl"
+          className="absolute bottom-32 left-32 w-72 h-72 bg-gradient-to-r from-teal-500/15 to-teal-600/15 rounded-full blur-2xl"
           animate={{
-            x: [0, -70, 0],
+            x: [0, 40, 0],
             y: [0, 50, 0],
-            scale: [1.2, 1, 1.2],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Bottom Left - Dark Teal */}
-        <motion.div
-          className="absolute bottom-40 left-40 w-96 h-96 bg-gradient-to-r from-teal-500/20 to-teal-600/20 rounded-full blur-3xl"
-          animate={{
-            x: [0, 60, 0],
-            y: [0, 70, 0],
-            scale: [1.1, 1.3, 1.1],
-          }}
-          transition={{
-            duration: 28,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Bottom Right - Cyan Teal */}
-        <motion.div
-          className="absolute bottom-20 right-20 w-64 h-64 bg-gradient-to-r from-cyan-400/25 to-teal-400/25 rounded-full blur-3xl"
-          animate={{
-            x: [0, -50, 0],
-            y: [0, -40, 0],
             scale: [1, 1.2, 1],
           }}
           transition={{
@@ -444,45 +421,15 @@ const ContactPage = () => {
           }}
         />
 
-        {/* Center - Bright Teal */}
         <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-teal-200/20 to-teal-300/20 rounded-full blur-3xl"
+          className="absolute bottom-16 right-16 w-52 h-52 bg-gradient-to-r from-cyan-400/20 to-teal-400/20 rounded-full blur-2xl"
           animate={{
-            scale: [1, 1.4, 1],
-            opacity: [0.4, 0.7, 0.4],
-          }}
-          transition={{
-            duration: 35,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Middle Left - Emerald Teal */}
-        <motion.div
-          className="absolute top-1/3 -left-10 w-60 h-60 bg-gradient-to-r from-emerald-400/25 to-teal-400/25 rounded-full blur-3xl"
-          animate={{
-            x: [0, 90, 0],
+            x: [0, -40, 0],
             y: [0, -30, 0],
-            scale: [1.2, 1, 1.2],
+            scale: [1, 1.1, 1],
           }}
           transition={{
-            duration: 26,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        {/* Middle Right - Deep Teal */}
-        <motion.div
-          className="absolute bottom-1/3 -right-10 w-56 h-56 bg-gradient-to-r from-teal-500/30 to-teal-600/30 rounded-full blur-3xl"
-          animate={{
-            x: [0, -80, 0],
-            y: [0, 40, 0],
-            scale: [1, 1.3, 1],
-          }}
-          transition={{
-            duration: 24,
+            duration: 18,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -490,98 +437,70 @@ const ContactPage = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 py-12">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <motion.div
-          className="mb-16 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <motion.div
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-teal-50 to-teal-100 border border-teal-200 mb-8 shadow-lg backdrop-blur-sm"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-            <span className="text-teal-600 font-semibold text-sm tracking-wider">
-              Choose Your Path
-            </span>
-            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-          </motion.div>
+        <SectionHeader
+          subtitle="Choose Your Path"
+          title="How Can We"
+          highlight="Help You Today?"
+          description="Quick questions get quick answers via email. Complex projects deserve proper discussion through a scheduled call."
+          center={true}
+          titleSize="xl"
+          descriptionSize="md"
+          lineSpacing="tight"
+          highlightColor="teal-500"
+          dotColor="teal-500"
+        />
 
-          <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <span className="text-gray-800">How Can We</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-teal-500">
-              Help You Today?
-            </span>
-          </motion.h1>
-
-          <motion.p
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-          >
-            Quick questions get quick answers via email. Complex projects
-            deserve proper discussion through a scheduled call.
-          </motion.p>
-        </motion.div>
-
-        {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        {/* Two Column Layout - Reduced gap */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Quick Questions - Left Side */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             <motion.div
-              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-teal-200 p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-teal-200 p-6 shadow-lg hover:shadow-xl transition-all duration-500 group"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
             >
-              {/* Header */}
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <FaEnvelope className="w-8 h-8 text-white" />
+              {/* Header - Reduced size */}
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300">
+                  <FaEnvelope className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                <h2 className="text-xl font-bold text-gray-800 mb-1">
                   Quick Questions
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   Perfect for simple queries and fast responses
                 </p>
               </div>
 
-              {/* When to Use */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <FaLightbulb className="w-4 h-4 text-teal-500" />
+              {/* When to Use - Compact layout */}
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2 text-sm">
+                  <FaLightbulb className="w-3 h-3 text-teal-500" />
                   Perfect for:
                 </h3>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1">
                   {quickQueries.map((query, index) => (
                     <motion.div
                       key={index}
-                      className="flex items-center gap-3 text-sm text-gray-600 p-2 rounded-lg hover:bg-teal-50 transition-colors"
-                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-2 text-xs text-gray-600 p-1 rounded hover:bg-teal-50 transition-colors"
+                      whileHover={{ x: 3 }}
                     >
-                      <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
+                      <div className="w-1 h-1 bg-teal-400 rounded-full"></div>
                       {query}
                     </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* Response Info */}
-              <div className="bg-teal-50 rounded-xl p-4 mb-6 border border-teal-200">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <FaClock className="w-4 h-4 text-teal-500" />
+              {/* Response Info - Smaller */}
+              <div className="bg-teal-50 rounded-lg p-3 mb-4 border border-teal-200">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1">
+                    <FaClock className="w-3 h-3 text-teal-500" />
                     <span className="text-gray-700">Response Time</span>
                   </div>
                   <span className="font-semibold text-teal-600">
@@ -590,9 +509,9 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              {/* Email Form */}
+              {/* Email Form - Compact */}
               {!isSubmitted ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-3">
                   <div>
                     <input
                       type="text"
@@ -601,7 +520,7 @@ const ContactPage = () => {
                       onChange={handleInputChange}
                       required
                       placeholder="Your Name"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                      className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-200 transition-all duration-300"
                     />
                   </div>
 
@@ -613,7 +532,7 @@ const ContactPage = () => {
                       onChange={handleInputChange}
                       required
                       placeholder="your.email@example.com"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                      className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-200 transition-all duration-300"
                     />
                   </div>
 
@@ -625,7 +544,7 @@ const ContactPage = () => {
                       onChange={handleInputChange}
                       required
                       placeholder="What's your question about?"
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300"
+                      className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-200 transition-all duration-300"
                     />
                   </div>
 
@@ -635,28 +554,28 @@ const ContactPage = () => {
                       value={formData.message}
                       onChange={handleInputChange}
                       required
-                      rows={3}
+                      rows={2}
                       placeholder="Briefly describe your question..."
-                      className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all duration-300 resize-none"
+                      className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:border-teal-500 focus:ring-1 focus:ring-teal-200 transition-all duration-300 resize-none"
                     />
                   </div>
 
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-gradient-to-r from-teal-400 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-teal-200 transition-all duration-300 flex items-center justify-center gap-2 group"
+                    className="w-full py-2.5 bg-gradient-to-r from-teal-400 to-teal-500 text-white font-semibold rounded-lg shadow-md hover:shadow-teal-200 transition-all duration-300 flex items-center justify-center gap-2 text-sm group"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         Sending...
                       </>
                     ) : (
                       <>
                         Send Quick Message
-                        <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <FaArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                       </>
                     )}
                   </motion.button>
@@ -665,52 +584,52 @@ const ContactPage = () => {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-8"
+                  className="text-center py-4"
                 >
-                  <FaCheckCircle className="w-16 h-16 text-teal-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  <FaCheckCircle className="w-10 h-10 text-teal-500 mx-auto mb-2" />
+                  <h3 className="text-lg font-bold text-gray-800 mb-1">
                     Message Sent!
                   </h3>
-                  <p className="text-gray-600">
-                    We'll get back to you within 24 hours with a response.
+                  <p className="text-gray-600 text-sm">
+                    We'll get back to you within 24 hours.
                   </p>
                 </motion.div>
               )}
             </motion.div>
 
-            {/* Services Card - Clean White */}
+            {/* Services Card - Compact */}
             <motion.div
-              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-gray-200 p-8 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-gray-200 p-5 shadow-lg hover:shadow-xl transition-all duration-500 group"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.9 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
             >
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <FaAward className="w-8 h-8 text-gray-600" />
+              <div className="text-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-105 transition-transform duration-300">
+                  <FaAward className="w-5 h-5 text-gray-600" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg font-bold text-gray-800 mb-1">
                   Our Services
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-xs">
                   Professional video editing across all platforms
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {services.map((service, index) => (
                   <motion.div
                     key={index}
-                    className="bg-gray-50 rounded-xl p-4 text-center border border-gray-200 group hover:bg-gray-100 transition-all duration-300"
-                    whileHover={{ scale: 1.05 }}
+                    className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200 group hover:bg-gray-100 transition-all duration-300"
+                    whileHover={{ scale: 1.03 }}
                   >
                     <div
-                      className={`w-12 h-12 bg-gradient-to-br ${service.color} rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-8 h-8 bg-gradient-to-br ${service.color} rounded-lg flex items-center justify-center mx-auto mb-1 group-hover:scale-105 transition-transform duration-300`}
                     >
-                      <service.icon className="w-6 h-6 text-white" />
+                      <service.icon className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-gray-800 font-semibold text-sm leading-tight">
+                    <div className="text-gray-800 font-semibold text-xs leading-tight">
                       {service.name}
                     </div>
                   </motion.div>
@@ -720,48 +639,48 @@ const ContactPage = () => {
           </div>
 
           {/* Right Side - Two Cards Stack */}
-          <div className="space-y-8">
-            {/* Complex Projects Card */}
+          <div className="space-y-6">
+            {/* Complex Projects Card - Compact */}
             <motion.div
-              className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
+              className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-500 group relative overflow-hidden"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.7, delay: 0.5 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
             >
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full translate-y-12 -translate-x-12"></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white rounded-full -translate-y-12 translate-x-12"></div>
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-white rounded-full translate-y-8 -translate-x-8"></div>
               </div>
 
               {/* Header */}
-              <div className="text-center mb-8 relative z-10">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
-                  <FaComments className="w-8 h-8 text-white" />
+              <div className="text-center mb-6 relative z-10">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform duration-300 backdrop-blur-sm">
+                  <FaComments className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-xl font-bold text-white mb-1">
                   Proper Discussion
                 </h2>
-                <p className="text-teal-100">
+                <p className="text-teal-100 text-sm">
                   For complex projects that need detailed planning
                 </p>
               </div>
 
               {/* When to Use */}
-              <div className="mb-6 relative z-10">
-                <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
-                  <FaRocket className="w-4 h-4 text-teal-200" />
+              <div className="mb-4 relative z-10">
+                <h3 className="font-semibold text-white mb-2 flex items-center gap-2 text-sm">
+                  <FaRocket className="w-3 h-3 text-teal-200" />
                   Ideal for:
                 </h3>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1">
                   {complexProjects.map((project, index) => (
                     <motion.div
                       key={index}
-                      className="flex items-center gap-3 text-sm text-teal-100 p-2 rounded-lg hover:bg-white/10 transition-colors"
-                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-2 text-xs text-teal-100 p-1 rounded hover:bg-white/10 transition-colors"
+                      whileHover={{ x: 3 }}
                     >
-                      <div className="w-1.5 h-1.5 bg-teal-200 rounded-full"></div>
+                      <div className="w-1 h-1 bg-teal-200 rounded-full"></div>
                       {project}
                     </motion.div>
                   ))}
@@ -769,8 +688,8 @@ const ContactPage = () => {
               </div>
 
               {/* Call Benefits */}
-              <div className="bg-white/10 rounded-xl p-4 mb-6 backdrop-blur-sm border border-white/20">
-                <div className="space-y-3 text-sm">
+              <div className="bg-white/10 rounded-lg p-3 mb-4 backdrop-blur-sm border border-white/20">
+                <div className="space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-teal-100">Session Type</span>
                     <span className="font-semibold text-white">
@@ -794,53 +713,53 @@ const ContactPage = () => {
               <div className="relative z-10">
                 <motion.button
                   onClick={() => setIsBookingOpen(true)}
-                  className="w-full py-4 bg-white text-teal-600 font-semibold rounded-xl shadow-2xl hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-3 group"
+                  className="w-full py-2.5 bg-white text-teal-600 font-semibold rounded-lg shadow-lg hover:shadow-white/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm group"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FaCalendarAlt className="w-5 h-5" />
+                  <FaCalendarAlt className="w-4 h-4" />
                   Book Strategy Call
-                  <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <FaArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                 </motion.button>
 
-                <p className="text-center text-teal-200 text-sm mt-3">
+                <p className="text-center text-teal-200 text-xs mt-2">
                   Get instant access to our calendar
                 </p>
               </div>
             </motion.div>
 
-            {/* Additional Support Card */}
+            {/* Additional Support Card - Compact */}
             <motion.div
-              className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-orange-200 p-6 shadow-xl hover:shadow-2xl transition-all duration-500 group"
+              className="bg-white/80 backdrop-blur-sm rounded-2xl border-2 border-orange-200 p-5 shadow-lg hover:shadow-xl transition-all duration-500 group"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.7 }}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
             >
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                  <FaHeadset className="w-6 h-6 text-white" />
+              <div className="text-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:scale-105 transition-transform duration-300">
+                  <FaHeadset className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                <h3 className="text-lg font-bold text-gray-800 mb-1">
                   Why Choose Us?
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-xs">
                   Professional video editing with exceptional support
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {supportFeatures.map((feature, index) => (
                   <motion.div
                     key={index}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-orange-50 transition-colors group"
-                    whileHover={{ x: 5 }}
+                    className="flex items-start gap-2 p-2 rounded-lg hover:bg-orange-50 transition-colors group"
+                    whileHover={{ x: 3 }}
                   >
-                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <feature.icon className="w-5 h-5 text-orange-500" />
+                    <div className="w-8 h-8 bg-orange-100 rounded-md flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                      <feature.icon className="w-4 h-4 text-orange-500" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800 text-sm">
+                      <h4 className="font-semibold text-gray-800 text-xs">
                         {feature.title}
                       </h4>
                       <p className="text-gray-600 text-xs">
@@ -851,12 +770,12 @@ const ContactPage = () => {
                 ))}
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="flex items-center justify-between text-sm">
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-600">Client Satisfaction</span>
                   <span className="font-bold text-orange-500">98%</span>
                 </div>
-                <div className="flex items-center justify-between text-sm mt-2">
+                <div className="flex items-center justify-between text-xs mt-1">
                   <span className="text-gray-600">Projects Completed</span>
                   <span className="font-bold text-orange-500">500+</span>
                 </div>
@@ -865,28 +784,28 @@ const ContactPage = () => {
           </div>
         </div>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA - Smaller */}
         <motion.div
-          className="text-center mt-12"
+          className="text-center mt-8"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9 }}
         >
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 text-sm mb-3">
             Not sure which option is right for you?
           </p>
           <motion.button
             onClick={() => setIsBookingOpen(true)}
-            className="px-8 py-3 border-2 border-teal-400 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-all duration-300 backdrop-blur-sm"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="px-6 py-2 border-2 border-teal-400 text-teal-600 font-semibold rounded-lg hover:bg-teal-50 transition-all duration-300 backdrop-blur-sm text-sm"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
             Let's Figure It Out Together
           </motion.button>
         </motion.div>
       </div>
 
-      {/* Booking Modal */}
+      {/* Booking Modal - Slightly smaller */}
       <AnimatePresence>
         {isBookingOpen && (
           <motion.div
@@ -896,19 +815,19 @@ const ContactPage = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl"
+              className="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-hidden shadow-2xl"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-teal-400 to-teal-500 p-6">
+              <div className="bg-gradient-to-r from-teal-400 to-teal-500 p-4">
                 <div className="flex justify-between items-center">
                   <div>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-xl font-bold text-white">
                       Book Your Strategy Call
                     </h2>
-                    <p className="text-teal-100">
+                    <p className="text-teal-100 text-sm">
                       60-minute video consultation for complex projects
                     </p>
                   </div>
@@ -917,7 +836,7 @@ const ContactPage = () => {
                     className="text-white hover:text-teal-100 transition-colors"
                   >
                     <svg
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -934,7 +853,7 @@ const ContactPage = () => {
               </div>
 
               {/* Calendly Iframe */}
-              <div className="h-[600px]">
+              <div className="h-[500px]">
                 <iframe
                   src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=000000&primary_color=0d9488"
                   width="100%"
@@ -947,13 +866,13 @@ const ContactPage = () => {
 
               {bookingCompleted && (
                 <motion.div
-                  className="bg-emerald-50 border border-emerald-200 p-4 text-center"
+                  className="bg-emerald-50 border border-emerald-200 p-3 text-center"
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                 >
                   <div className="flex items-center justify-center">
-                    <FaCheckCircle className="w-5 h-5 text-emerald-500 mr-2" />
-                    <span className="text-emerald-700 font-medium">
+                    <FaCheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
+                    <span className="text-emerald-700 font-medium text-sm">
                       Booking confirmed! Check your email for details.
                     </span>
                   </div>

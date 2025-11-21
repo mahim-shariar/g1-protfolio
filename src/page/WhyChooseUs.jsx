@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SectionHeader from "../components/Shared/SectionHeader";
 
 const WhyChooseUs = () => {
   const canvasRef = useRef(null);
@@ -914,23 +915,19 @@ const WhyChooseUs = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="inline-flex items-center space-x-2 mb-4 px-4 py-2 rounded-full bg-white/95 backdrop-blur-md text-teal-700 text-sm font-medium border border-teal-200 shadow-lg">
-            <span className="w-2 h-2 bg-teal-500 rounded-full"></span>
-            <span className="text-teal-800">Why We're Different</span>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-            Video Editing That{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-teal-500 to-teal-400">
-              Actually Delivers
-            </span>
-          </h1>
-
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto font-medium mb-12">
-            While other editors make promises, we deliver results. Faster
-            turnaround, better communication, and features that actually matter
-            to content creators.
-          </p>
+          <SectionHeader
+            subtitle="Why We're Different"
+            title="Video Editing That "
+            highlight="Actually Delivers"
+            description="While other editors make promises, we deliver results. Faster turnaround, better communication, and features that actually matter to content creators."
+            center={true}
+            titleSize="2xl"
+            descriptionSize="lg"
+            lineSpacing="tight"
+            highlightColor="teal-500"
+            dotColor="teal-500"
+            highlightOnNewLine={false}
+          />
 
           {/* Differentiator Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">

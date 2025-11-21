@@ -6,12 +6,8 @@ import {
   FiGrid,
   FiBox,
   FiFilm,
-  FiPause,
-  FiVolume2,
-  FiVolumeX,
-  FiVolume1,
-  FiMaximize,
-  FiMinimize,
+  FiClock,
+  FiCalendar,
 } from "react-icons/fi";
 import {
   getVideoReels,
@@ -19,8 +15,9 @@ import {
   getVideoReelsByCategory,
 } from "../services/api";
 import bg from "/ICON.png";
+import SectionHeader from "../components/Shared/SectionHeader";
 
-// Background Logo Only Animation
+// Background Logo Only Animation (Original)
 const BackgroundLogoAnimation = () => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -122,37 +119,169 @@ const BackgroundLogoAnimation = () => {
   );
 };
 
+// Glass Morphism Video Card (New Design)
+const GlassVideoCard = ({
+  project,
+  isHovered,
+  onHoverStart,
+  onHoverEnd,
+  onClick,
+  showPlayButton,
+}) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isHovered) {
+        videoRef.current.currentTime = 0;
+        videoRef.current
+          .play()
+          .catch((e) => console.log("Autoplay prevented:", e));
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isHovered]);
+
+  return (
+    <motion.div
+      className="group relative rounded-3xl overflow-hidden cursor-pointer"
+      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={{
+        y: -8,
+        transition: { duration: 0.3, ease: "easeOut" },
+      }}
+      transition={{
+        duration: 0.6,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
+      onHoverStart={onHoverStart}
+      onHoverEnd={onHoverEnd}
+      onClick={onClick}
+    >
+      {/* Glass Background */}
+      <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl" />
+
+      {/* Glow Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-400/10 to-emerald-400/10 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      {/* Content Container */}
+      <div className="relative z-10 p-6">
+        {/* Video Container */}
+        <div className="relative rounded-2xl overflow-hidden mb-4 aspect-video bg-gradient-to-br from-gray-900 to-gray-800">
+          {/* Thumbnail */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${project.thumbnail})`,
+              opacity: isHovered ? 0 : 1,
+              transition: "opacity 0.4s ease",
+            }}
+          />
+
+          {/* Video */}
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster={project.thumbnail}
+            style={{
+              opacity: isHovered ? 1 : 0,
+              transition: "opacity 0.4s ease",
+            }}
+          >
+            <source src={project.videoUrl} type="video/mp4" />
+          </video>
+
+          {/* Play Button */}
+          <AnimatePresence>
+            {showPlayButton && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              >
+                <motion.div
+                  className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-full flex items-center justify-center shadow-2xl shadow-teal-500/30"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <FiPlay className="w-6 h-6 text-white ml-1" />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Category Badge */}
+          <div className="absolute top-3 left-3">
+            <span className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-white text-xs font-medium rounded-full border border-white/20">
+              {project.category}
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-3">
+          {/* Title */}
+          <h3 className="text-lg font-bold text-gray-800 line-clamp-2 leading-tight">
+            {project.title}
+          </h3>
+
+          {/* Meta Information */}
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-1.5">
+              <FiCalendar className="w-4 h-4" />
+              <span>{project.year}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <FiClock className="w-4 h-4" />
+              <span>{project.duration}</span>
+            </div>
+          </div>
+
+          {/* Technologies */}
+          {project.technologies && project.technologies.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.slice(0, 3).map((tech, index) => (
+                <motion.span
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="px-3 py-1.5 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-700 text-xs font-medium rounded-full border border-teal-200/50 backdrop-blur-sm"
+                >
+                  {tech}
+                </motion.span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hover Border Effect */}
+      <div className="absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-r from-teal-400/0 via-teal-400/20 to-emerald-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    </motion.div>
+  );
+};
+
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [hoveredProject, setHoveredProject] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
-  const [modalVideoPlaying, setModalVideoPlaying] = useState(false);
   const [activeLayout, setActiveLayout] = useState("grid");
   const [projects, setProjects] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Video player states for modal
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [playbackRate, setPlaybackRate] = useState(1);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const [showCentralButton, setShowCentralButton] = useState(true);
-  const [videoEnded, setVideoEnded] = useState(false);
-  const [controlsTimeout, setControlsTimeout] = useState(null);
-  const [loadingVideo, setLoadingVideo] = useState(false);
-
-  const videoRefs = useRef({});
-  const hoverVideoRefs = useRef({});
   const modalVideoRef = useRef(null);
   const containerRef = useRef(null);
-  const progressBarRef = useRef(null);
-  const volumeBarRef = useRef(null);
-  const videoContainerRef = useRef(null);
 
   // Fetch projects and categories on component mount
   useEffect(() => {
@@ -305,215 +434,6 @@ const Projects = () => {
     fetchProjectsByCategory();
   }, [activeCategory]);
 
-  // Video event handlers for modal
-  useEffect(() => {
-    const video = modalVideoRef.current;
-    if (!video || !selectedProject) return;
-
-    const updateTime = () => setCurrentTime(video.currentTime);
-    const updateDuration = () => setDuration(video.duration);
-    const handleWaiting = () => setLoadingVideo(true);
-    const handlePlaying = () => setLoadingVideo(false);
-
-    const handleEnded = () => {
-      setModalVideoPlaying(false);
-      setVideoEnded(true);
-      setShowCentralButton(true);
-    };
-
-    const handlePlay = () => {
-      setModalVideoPlaying(true);
-      setVideoEnded(false);
-      setShowCentralButton(false);
-    };
-
-    const handlePause = () => {
-      setModalVideoPlaying(false);
-      if (!videoEnded) {
-        setShowCentralButton(true);
-      }
-    };
-
-    video.addEventListener("timeupdate", updateTime);
-    video.addEventListener("loadedmetadata", updateDuration);
-    video.addEventListener("canplay", updateDuration);
-    video.addEventListener("waiting", handleWaiting);
-    video.addEventListener("playing", handlePlaying);
-    video.addEventListener("ended", handleEnded);
-    video.addEventListener("play", handlePlay);
-    video.addEventListener("pause", handlePause);
-
-    video.volume = volume;
-    video.muted = isMuted;
-    video.pause();
-
-    return () => {
-      video.removeEventListener("timeupdate", updateTime);
-      video.removeEventListener("loadedmetadata", updateDuration);
-      video.removeEventListener("canplay", updateDuration);
-      video.removeEventListener("waiting", handleWaiting);
-      video.removeEventListener("playing", handlePlaying);
-      video.removeEventListener("ended", handleEnded);
-      video.removeEventListener("play", handlePlay);
-      video.removeEventListener("pause", handlePause);
-    };
-  }, [selectedProject, volume, isMuted, videoEnded]);
-
-  // Fullscreen change handler
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(
-        document.fullscreenElement ||
-          document.webkitFullscreenElement ||
-          document.msFullscreenElement
-      );
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
-    document.addEventListener("msfullscreenchange", handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      document.removeEventListener(
-        "webkitfullscreenchange",
-        handleFullscreenChange
-      );
-      document.removeEventListener(
-        "msfullscreenchange",
-        handleFullscreenChange
-      );
-    };
-  }, []);
-
-  // Controls auto-hide for modal
-  useEffect(() => {
-    if (showControls && modalVideoPlaying) {
-      const timeout = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
-      setControlsTimeout(timeout);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [showControls, modalVideoPlaying]);
-
-  // Video player control functions for modal
-  const handlePlayPause = () => {
-    if (modalVideoRef.current) {
-      if (modalVideoRef.current.paused || modalVideoRef.current.ended) {
-        modalVideoRef.current.play();
-        setShowCentralButton(false);
-        setVideoEnded(false);
-      } else {
-        modalVideoRef.current.pause();
-        setShowCentralButton(true);
-      }
-    }
-  };
-
-  const handleReplay = () => {
-    if (modalVideoRef.current) {
-      modalVideoRef.current.currentTime = 0;
-      modalVideoRef.current.play();
-      setShowCentralButton(false);
-      setVideoEnded(false);
-    }
-  };
-
-  const handleSeek = (e) => {
-    if (!modalVideoRef.current) return;
-
-    const progressBar = progressBarRef.current;
-    const rect = progressBar.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    const newTime = percent * duration;
-
-    modalVideoRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const handleVolumeChange = (e) => {
-    if (!modalVideoRef.current) return;
-
-    const volumeBar = volumeBarRef.current;
-    const rect = volumeBar.getBoundingClientRect();
-    let newVolume = (e.clientX - rect.left) / rect.width;
-    newVolume = Math.max(0, Math.min(1, newVolume));
-
-    setVolume(newVolume);
-    modalVideoRef.current.volume = newVolume;
-    if (newVolume === 0) {
-      setIsMuted(true);
-    } else if (isMuted) {
-      setIsMuted(false);
-    }
-  };
-
-  const toggleMute = () => {
-    if (modalVideoRef.current) {
-      modalVideoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const changePlaybackRate = () => {
-    const rates = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const currentIndex = rates.indexOf(playbackRate);
-    const nextIndex = (currentIndex + 1) % rates.length;
-    const newRate = rates[nextIndex];
-
-    setPlaybackRate(newRate);
-    if (modalVideoRef.current) {
-      modalVideoRef.current.playbackRate = newRate;
-    }
-  };
-
-  const toggleFullscreen = () => {
-    const videoContainer = videoContainerRef.current;
-    if (!videoContainer) return;
-
-    if (!isFullscreen) {
-      if (videoContainer.requestFullscreen) {
-        videoContainer.requestFullscreen();
-      } else if (videoContainer.webkitRequestFullscreen) {
-        videoContainer.webkitRequestFullscreen();
-      } else if (videoContainer.msRequestFullscreen) {
-        videoContainer.msRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
-  };
-
-  const handleMouseMove = () => {
-    setShowControls(true);
-    if (controlsTimeout) {
-      clearTimeout(controlsTimeout);
-    }
-  };
-
-  const formatTime = (time) => {
-    if (isNaN(time)) return "0:00";
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
-  const handleVideoHover = (isHovering) => {
-    if (modalVideoRef.current && isHovering && modalVideoPlaying) {
-      modalVideoRef.current.playbackRate = 1.2;
-    } else if (modalVideoRef.current) {
-      modalVideoRef.current.playbackRate = 1.0;
-    }
-  };
-
   // Helper functions
   const getColorByCategory = (category) => {
     const colorMap = {
@@ -600,113 +520,27 @@ const Projects = () => {
       ? projects
       : projects.filter((project) => project.category === activeCategory);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
-  };
-
-  const popupCardVariants = {
-    hidden: { y: 40, opacity: 0, scale: 0.95 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-    hover: {
-      y: -8,
-      scale: 1.02,
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-    },
-    tap: {
-      scale: 0.98,
-      transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
-  const stackCardVariants = {
-    hidden: { opacity: 0, x: -100 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: { delay: i * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] },
-    }),
-    hover: {
-      x: 20,
-      scale: 1.01,
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
-  const fluidCardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-    hover: {
-      scale: 1.05,
-      y: -4,
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
   // Handle project interactions
-  const handleProjectHover = (project) => {
-    setHoveredProject(project.id);
-    if (hoverVideoRefs.current[project.id]) {
-      hoverVideoRefs.current[project.id].currentTime = 0;
-      hoverVideoRefs.current[project.id]
-        .play()
-        .catch((e) => console.log("Autoplay prevented:", e));
-    }
+  const handleProjectHover = (projectId) => {
+    setHoveredProject(projectId);
   };
 
-  const handleProjectLeave = (project) => {
+  const handleProjectLeave = () => {
     setHoveredProject(null);
-    if (hoverVideoRefs.current[project.id]) {
-      hoverVideoRefs.current[project.id].pause();
-    }
   };
 
   const handleProjectSelect = (project) => {
     setSelectedProject(project);
-    setModalVideoPlaying(false);
-    setShowCentralButton(true);
-    setVideoEnded(false);
-    setCurrentTime(0);
-    setVolume(1);
-    setIsMuted(false);
-    setPlaybackRate(1);
   };
 
   const closeModal = () => {
     if (modalVideoRef.current) {
       modalVideoRef.current.pause();
     }
-    if (isFullscreen) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
     setSelectedProject(null);
-    setModalVideoPlaying(false);
-    setShowControls(true);
   };
 
-  // Background grid animation with new color palette
+  // Background grid animation
   useEffect(() => {
     const canvas = containerRef.current;
     if (!canvas) return;
@@ -843,100 +677,20 @@ const Projects = () => {
     if (activeLayout === "stack") {
       return (
         <motion.div
-          className="projects-stack flex flex-col gap-6 max-w-4xl mx-auto"
-          variants={containerVariants}
+          className="projects-stack flex flex-col gap-8 max-w-4xl mx-auto"
           initial="hidden"
           animate="visible"
         >
           {filteredProjects.map((project, i) => (
-            <motion.div
+            <GlassVideoCard
               key={project.id}
-              className="project-card group relative rounded-xl overflow-hidden cursor-pointer"
-              variants={stackCardVariants}
-              custom={i}
-              initial="hidden"
-              animate="visible"
-              whileHover="hover"
-              whileTap="tap"
-              onHoverStart={() => handleProjectHover(project)}
-              onHoverEnd={() => handleProjectLeave(project)}
+              project={project}
+              isHovered={hoveredProject === project.id}
+              onHoverStart={() => handleProjectHover(project.id)}
+              onHoverEnd={handleProjectLeave}
               onClick={() => handleProjectSelect(project)}
-            >
-              <div className="flex h-48 bg-gradient-to-r from-white to-gray-50 rounded-xl overflow-hidden border border-gray-200 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="thumbnail-container relative w-1/3 overflow-hidden">
-                  <div
-                    className="thumbnail w-full h-full bg-cover bg-center absolute inset-0"
-                    style={{
-                      backgroundImage: `url(${project.thumbnail})`,
-                      opacity: hoveredProject === project.id ? 0 : 1,
-                      transition: "opacity 0.3s ease",
-                    }}
-                  />
-                  <video
-                    ref={(el) => (hoverVideoRefs.current[project.id] = el)}
-                    className="w-full h-full object-cover absolute inset-0"
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    style={{
-                      opacity: hoveredProject === project.id ? 1 : 0,
-                      transition: "opacity 0.3s ease",
-                    }}
-                  >
-                    <source src={project.videoUrl} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <motion.div
-                      className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center shadow-lg"
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <FiPlay className="text-lg text-white ml-1" />
-                    </motion.div>
-                  </div>
-                </div>
-                <div className="project-info p-5 flex-1 flex flex-col justify-center">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-xl font-bold text-gray-800">
-                      {project.title}
-                    </h3>
-                    <span
-                      className="text-xs uppercase tracking-wider font-medium px-2 py-1 rounded-full bg-teal-100 border border-teal-200"
-                      style={{
-                        color: "#0d9488",
-                      }}
-                    >
-                      {formatCategoryName(project.category)}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {project.description}
-                  </p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 font-mono">
-                      {project.year}
-                    </span>
-                    <div className="flex gap-1.5">
-                      {project.technologies.slice(0, 2).map((tech, index) => (
-                        <span
-                          key={index}
-                          className="text-[9px] px-2 py-0.5 rounded-full bg-white backdrop-blur-sm border border-gray-200"
-                          style={{ color: "#0d9488" }}
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                      {project.technologies.length > 2 && (
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-white text-gray-500 border border-gray-200">
-                          +{project.technologies.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              showPlayButton={hoveredProject !== project.id}
+            />
           ))}
         </motion.div>
       );
@@ -945,119 +699,20 @@ const Projects = () => {
     // Default grid layout
     return (
       <motion.div
-        className="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        variants={containerVariants}
+        className="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         initial="hidden"
         animate="visible"
       >
-        {filteredProjects.map((project, i) => (
-          <motion.div
+        {filteredProjects.map((project) => (
+          <GlassVideoCard
             key={project.id}
-            className="project-card group relative rounded-xl overflow-hidden cursor-pointer"
-            variants={popupCardVariants}
-            initial="hidden"
-            animate="visible"
-            whileHover="hover"
-            whileTap="tap"
-            custom={i}
-            onHoverStart={() => handleProjectHover(project)}
-            onHoverEnd={() => handleProjectLeave(project)}
+            project={project}
+            isHovered={hoveredProject === project.id}
+            onHoverStart={() => handleProjectHover(project.id)}
+            onHoverEnd={handleProjectLeave}
             onClick={() => handleProjectSelect(project)}
-          >
-            <motion.div
-              className="relative h-full w-full rounded-xl overflow-hidden border border-gray-200 bg-white/50 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300"
-              initial={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}
-              whileHover={{
-                boxShadow: `0 20px 40px rgba(13, 148, 136, 0.1), 0 8px 32px rgba(0, 0, 0, 0.1)`,
-                backgroundColor: "rgba(255, 255, 255, 0.8)",
-                borderColor: `#0d9488`,
-                transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-              }}
-            >
-              <div className="thumbnail-container relative h-72 overflow-hidden">
-                <div
-                  className="thumbnail w-full h-full bg-cover bg-center absolute inset-0"
-                  style={{
-                    backgroundImage: `url(${project.thumbnail})`,
-                    opacity: hoveredProject === project.id ? 0 : 1,
-                    transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                />
-                <video
-                  ref={(el) => (hoverVideoRefs.current[project.id] = el)}
-                  className="w-full h-full object-cover absolute inset-0"
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  style={{
-                    opacity: hoveredProject === project.id ? 1 : 0,
-                    transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
-                  }}
-                >
-                  <source src={project.videoUrl} type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-80 transition-opacity duration-300" />
-                <motion.div
-                  className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-medium border border-gray-200 z-10"
-                  style={{
-                    color: "#0d9488",
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                >
-                  {formatCategoryName(project.category)}
-                </motion.div>
-                <div
-                  className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-mono border border-gray-200"
-                  style={{ color: "#0d9488" }}
-                >
-                  {project.year}
-                </div>
-                <motion.div
-                  className="absolute inset-0 m-auto bg-teal-500 w-14 h-14 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <FiPlay className="text-xl text-white ml-1" />
-                </motion.div>
-              </div>
-              <motion.div
-                className="project-info p-5 bg-gradient-to-b from-white/70 to-white/50"
-                initial={{ y: 0 }}
-                whileHover={{ y: -3 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              >
-                <div className="flex justify-start items-start mb-2">
-                  <h3 className="text-lg font-medium text-gray-800">
-                    {project.title}
-                  </h3>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-600">{project.year}</span>
-                  <div className="flex gap-1.5">
-                    {project.technologies.map((tech, index) => (
-                      <span
-                        key={index}
-                        className="text-[9px] px-2 py-0.5 rounded-full bg-white backdrop-blur-sm border border-gray-200"
-                        style={{ color: "#0d9488" }}
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-              {hoveredProject === project.id && (
-                <motion.div
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-current to-transparent"
-                  style={{ color: "#0d9488" }}
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                />
-              )}
-            </motion.div>
-          </motion.div>
+            showPlayButton={hoveredProject !== project.id}
+          />
         ))}
       </motion.div>
     );
@@ -1068,7 +723,7 @@ const Projects = () => {
       id="projects"
       className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 py-20 px-4"
     >
-      {/* Background Logo Animation */}
+      {/* Background Logo Animation (Original) */}
       <BackgroundLogoAnimation />
 
       <canvas ref={containerRef} className="absolute inset-0 w-full h-full" />
@@ -1076,44 +731,23 @@ const Projects = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-teal-900/5 to-teal-900/5"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
-          <motion.h2
-            className="text-teal-600 font-mono uppercase tracking-widest text-sm md:text-base mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            Portfolio Showcase
-          </motion.h2>
-          <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-          >
-            Our{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-teal-700">
-              Visual Projects
-            </span>
-          </motion.h1>
-          <motion.p
-            className="text-lg text-gray-700 max-w-3xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            Explore our collection of video editing projects that showcase our
-            expertise in storytelling, color grading, and visual effects.
-          </motion.p>
-        </motion.div>
+        {/* Original Section Header */}
+        <SectionHeader
+          subtitle="Portfolio Showcase"
+          title="Our"
+          highlight="Visual Projects"
+          description="Explore our collection of video editing projects that showcase our expertise in storytelling, color grading, and visual effects."
+          center={true}
+          titleSize="2xl"
+          titleWeight="normal"
+          descriptionSize="lg"
+          lineSpacing="tight"
+          highlightColor="teal-500"
+          dotColor="teal-500"
+          highlightOnNewLine={false}
+        />
 
-        {/* Layout switcher */}
+        {/* Layout switcher (Original) */}
         <div className="flex justify-center items-center gap-2 mb-8">
           <button
             onClick={() => setActiveLayout("grid")}
@@ -1137,10 +771,9 @@ const Projects = () => {
           </button>
         </div>
 
-        {/* Category Filters */}
+        {/* Category Filters (Original) */}
         <motion.div
           className="flex flex-wrap justify-center gap-3 mb-12"
-          variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
@@ -1153,7 +786,6 @@ const Projects = () => {
                   : "bg-white/50 text-gray-700 hover:bg-gray-100/60 backdrop-blur-sm border border-gray-300 hover:border-teal-500/30 hover:shadow-md hover:shadow-teal-500/10"
               }`}
               onClick={() => setActiveCategory(category.id)}
-              variants={containerVariants}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -1177,10 +809,10 @@ const Projects = () => {
           </div>
         )}
 
-        {/* Projects Grid */}
+        {/* Projects Grid with New Glass Cards */}
         {renderProjects()}
 
-        {/* Decorative elements */}
+        {/* Decorative elements (Original) */}
         <motion.div
           className="absolute top-40 left-10 w-3 h-3 rounded-full bg-teal-400"
           animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
@@ -1198,299 +830,78 @@ const Projects = () => {
         />
       </div>
 
-      {/* Enhanced Project Detail Modal with new color palette */}
+      {/* Simplified Modal Video Player (Original) */}
       <AnimatePresence>
         {selectedProject && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg video-modal-container"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={closeModal}
           >
             <motion.div
-              className="relative w-full max-w-6xl bg-white rounded-xl overflow-hidden border border-teal-500/30 shadow-2xl"
+              className="relative w-full max-w-6xl bg-black rounded-xl overflow-hidden shadow-2xl"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", damping: 25 }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal header */}
-              <div className="flex items-center justify-between p-4 bg-white border-b border-teal-500/20">
-                <div className="flex items-center">
-                  <div className="flex gap-1 mr-4">
-                    <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                    <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-                    <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                  </div>
-                  <h3 className="text-teal-600 font-mono text-sm">
-                    {selectedProject.title.toUpperCase().replace(/\s+/g, "_")}
-                    .MP4
-                  </h3>
-                </div>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-600 hover:text-gray-800 transition-colors"
-                >
-                  <FiX className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Enhanced Video Player Section */}
-              <div
-                ref={videoContainerRef}
-                className="w-full h-[500px] lg:h-[600px] relative overflow-hidden bg-white group"
-                onMouseEnter={() => {
-                  handleVideoHover(true);
-                  setShowControls(true);
-                }}
-                onMouseLeave={() => handleVideoHover(false)}
-                onMouseMove={handleMouseMove}
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 z-20 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
               >
-                {/* Video element */}
+                <FiX className="w-6 h-6" />
+              </button>
+
+              {/* Video Player */}
+              <div className="w-full h-auto max-h-[80vh]">
                 <video
                   ref={modalVideoRef}
-                  muted={isMuted}
-                  loop={false}
-                  playsInline
-                  className="w-full h-full object-contain"
+                  controls
+                  autoPlay
+                  className="w-full h-full"
                   poster={selectedProject.thumbnail}
-                  onClick={handlePlayPause}
                 >
                   <source src={selectedProject.videoUrl} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
-
-                {/* Gradient overlays for better control visibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none z-10"></div>
-                <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/50 to-transparent pointer-events-none z-10"></div>
-
-                {/* Loading indicator */}
-                {loadingVideo && (
-                  <div className="absolute inset-0 flex items-center justify-center z-15 bg-black/20">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
-                  </div>
-                )}
-
-                {/* Attractive Central Play/Replay Button */}
-                {(showCentralButton || !modalVideoPlaying) && (
-                  <motion.div
-                    className="absolute inset-0 flex items-center justify-center z-20 cursor-pointer"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  >
-                    <motion.div
-                      className="relative"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      {/* Outer glowing ring */}
-                      <motion.div
-                        className="absolute inset-0 rounded-full bg-teal-500/20"
-                        animate={{
-                          scale: [1, 1.2, 1],
-                          opacity: [0.5, 0.8, 0.5],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                      />
-                      {/* Main button */}
-                      <div
-                        className="relative w-20 h-20 bg-gradient-to-br from-teal-500 to-teal-600 rounded-full flex items-center justify-center shadow-2xl backdrop-blur-sm border-2 border-white/20"
-                        onClick={videoEnded ? handleReplay : handlePlayPause}
-                      >
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent"></div>
-                        {/* Icon - Always show play button when video is not playing */}
-                        {videoEnded ? (
-                          <motion.div
-                            className="text-white text-2xl"
-                            initial={{ rotate: -180 }}
-                            animate={{ rotate: 0 }}
-                            transition={{ duration: 0.5 }}
-                          >
-                            <FiPlay className="ml-1" />
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            className="text-white text-2xl"
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <FiPlay className="ml-1" />
-                          </motion.div>
-                        )}
-                      </div>
-                      {/* Text label */}
-                      <motion.div
-                        className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm"
-                        initial={{ y: 10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        {videoEnded ? "Replay" : "Play"}
-                      </motion.div>
-                    </motion.div>
-                  </motion.div>
-                )}
-
-                {/* Enhanced Video Controls */}
-                <motion.div
-                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 z-20 transition-opacity duration-300 ${
-                    showControls ? "opacity-100" : "opacity-0"
-                  }`}
-                  onMouseEnter={() => setShowControls(true)}
-                >
-                  {/* Progress Bar */}
-                  <div
-                    ref={progressBarRef}
-                    className="w-full h-2 bg-gray-600/50 rounded-full mb-4 cursor-pointer relative group/progress"
-                    onClick={handleSeek}
-                  >
-                    <div
-                      className="h-full bg-gradient-to-r from-teal-500 to-teal-600 rounded-full relative"
-                      style={{
-                        width: `${
-                          duration ? (currentTime / duration) * 100 : 0
-                        }%`,
-                      }}
-                    >
-                      <div className="absolute right-0 top-1/2 w-3 h-3 bg-white rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover/progress:opacity-100 transition-opacity shadow-lg"></div>
-                    </div>
-                    <div className="absolute inset-0 bg-gray-400/20 rounded-full group-hover/progress:bg-gray-400/30 transition-colors"></div>
-                  </div>
-
-                  {/* Control Buttons */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      {/* Play/Pause */}
-                      <motion.button
-                        onClick={handlePlayPause}
-                        className="text-white hover:text-teal-300 transition-colors"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        {modalVideoPlaying ? (
-                          <FiPause className="w-6 h-6" />
-                        ) : (
-                          <FiPlay className="w-6 h-6 ml-1" />
-                        )}
-                      </motion.button>
-
-                      {/* Volume Control */}
-                      <div className="flex items-center space-x-2">
-                        <motion.button
-                          onClick={toggleMute}
-                          className="text-white hover:text-teal-300 transition-colors"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          {isMuted || volume === 0 ? (
-                            <FiVolumeX className="w-5 h-5" />
-                          ) : volume > 0.5 ? (
-                            <FiVolume2 className="w-5 h-5" />
-                          ) : (
-                            <FiVolume1 className="w-5 h-5" />
-                          )}
-                        </motion.button>
-
-                        <div
-                          ref={volumeBarRef}
-                          className="w-20 h-1 bg-gray-600/50 rounded-full cursor-pointer relative group/volume"
-                          onClick={handleVolumeChange}
-                        >
-                          <div
-                            className="h-full bg-teal-500 rounded-full"
-                            style={{ width: `${isMuted ? 0 : volume * 100}%` }}
-                          >
-                            <div className="absolute right-0 top-1/2 w-2 h-2 bg-white rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover/volume:opacity-100 transition-opacity shadow-lg"></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Time Display */}
-                      <div className="text-white text-sm font-mono">
-                        {formatTime(currentTime)} / {formatTime(duration)}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                      {/* Playback Speed */}
-                      <motion.button
-                        onClick={changePlaybackRate}
-                        className="text-white hover:text-teal-300 transition-colors text-sm font-mono px-2 py-1 rounded bg-black/30 hover:bg-black/50"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        {playbackRate}x
-                      </motion.button>
-
-                      {/* Fullscreen */}
-                      <motion.button
-                        onClick={toggleFullscreen}
-                        className="text-white hover:text-teal-300 transition-colors"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        {isFullscreen ? (
-                          <FiMinimize className="w-5 h-5" />
-                        ) : (
-                          <FiMaximize className="w-5 h-5" />
-                        )}
-                      </motion.button>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Decorative dots */}
-                <div className="absolute top-4 right-4 flex gap-2 z-20">
-                  <span className="w-3 h-3 rounded-full bg-teal-500 shadow-lg shadow-teal-900/50"></span>
-                  <span className="w-3 h-3 rounded-full bg-teal-400 shadow-lg shadow-teal-800/50"></span>
-                  <span className="w-3 h-3 rounded-full bg-teal-300 shadow-lg shadow-teal-700/50"></span>
-                </div>
               </div>
 
-              {/* Project details */}
+              {/* Project Info */}
               <div className="p-6 bg-white">
-                <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
-                  <div>
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                  <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">
                       {selectedProject.title}
                     </h2>
-                    <div className="flex items-center gap-4">
-                      <p className="text-teal-600 font-mono">
-                        {selectedProject.year}
-                      </p>
-                      <p className="text-gray-600">
-                        {selectedProject.duration}
-                      </p>
-                    </div>
+                    <p className="text-gray-600 mb-4">
+                      {selectedProject.description}
+                    </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProject.technologies.map((tech, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full border border-teal-200"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
+                  {selectedProject.technologies &&
+                    selectedProject.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.technologies.map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-teal-100 text-teal-700 text-sm rounded-full border border-teal-200"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                 </div>
-                <p className="text-gray-700">{selectedProject.description}</p>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Scrolling text effect at bottom */}
+      {/* Scrolling text effect at bottom (Original) */}
       <motion.div
         className="absolute bottom-10 left-0 right-0 mx-auto w-full max-w-5xl px-4 overflow-hidden"
         initial={{ opacity: 0 }}

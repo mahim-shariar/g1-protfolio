@@ -19,6 +19,7 @@ import {
   FiMessageCircle,
 } from "react-icons/fi";
 import { getFAQs } from "../services/api";
+import SectionHeader from "../components/Shared/SectionHeader";
 
 const FaqsPage = () => {
   const canvasRef = useRef(null);
@@ -448,31 +449,18 @@ const FaqsPage = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-teal-200 rounded-full px-4 py-2 mb-6 shadow-lg"
-          >
-            <FiMessageSquare className="w-4 h-4 text-teal-600" />
-            <span className="text-teal-600 font-mono text-sm uppercase tracking-widest">
-              Video Editing Support
-            </span>
-          </motion.div>
-
-          <motion.h1
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight"
-            variants={itemVariants}
-          >
-            <span className="block">Expert Answers</span>
-            <span className="text-teal-600">For Creators</span>
-          </motion.h1>
-
-          <motion.p
-            className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed"
-            variants={itemVariants}
-          >
-            Get instant answers about video editing, pricing, turnaround times,
-            and professional workflow. Powered by industry expertise.
-          </motion.p>
+          <SectionHeader
+            subtitle="VIDEO EDITING SUPPORT"
+            title="Expert Answers"
+            highlight="For Creators"
+            description="Get instant answers about video editing, pricing, turnaround times, and professional workflow. Powered by industry expertise."
+            center={true}
+            titleSize="3xl"
+            descriptionSize="lg"
+            lineSpacing="tight"
+            highlightColor="teal-500"
+            dotColor="teal-500"
+          />
 
           {/* Enhanced Search Bar */}
           <motion.div

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { Link } from "react-router-dom";
+import SectionHeader from "../Shared/SectionHeader";
 
 const CallToAction = () => {
   const ctaRef = useRef(null);
@@ -78,23 +79,19 @@ const CallToAction = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="mb-12"
-          >
-            <h2 className="text-5xl md:text-7xl font-bold text-gray-800 mb-8">
-              Your footage deserves an{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">
-                unforgettable edit
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Transform your raw footage into captivating visual stories that
-              engage your audience and elevate your brand.
-            </p>
-          </motion.div>
+          <SectionHeader
+            title="Your footage deserves "
+            highlight="an unforgettable edit"
+            description="Transform your raw footage into captivating visual stories that engage your audience and elevate your brand."
+            center={true}
+            titleSize="2xl"
+            titleWeight="semibold"
+            highlightWeight="semibold"
+            descriptionSize="lg"
+            lineSpacing="tight"
+            highlightColor="teal-500"
+            dotColor="teal-500"
+          />
 
           {/* Teal CTA Button */}
           <motion.div

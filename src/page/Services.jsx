@@ -23,6 +23,7 @@ import development from "../assets/video-development.jpg";
 import delivery from "../assets/video-delivry.png";
 import production from "../assets/production.jpg";
 import bg from "/ICON.png";
+import SectionHeader from "../components/Shared/SectionHeader";
 
 const Services = () => {
   const [selectedService, setSelectedService] = useState(null);
@@ -540,48 +541,20 @@ const Services = () => {
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 py-12">
         {/* Header Section */}
-        <motion.div
-          className="mb-16 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Enhanced Badge */}
-          <motion.div
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-teal-50 to-teal-100 backdrop-blur-sm border border-teal-200 mb-8 shadow-lg shadow-teal-100"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 300 }}
-          >
-            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-            <span className="text-teal-600 font-semibold text-sm tracking-wider">
-              Core services
-            </span>
-            <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-          </motion.div>
 
-          {/* Main Title */}
-          <motion.h1
-            className="mb-8 text-2xl font-bold tracking-tight text-gray-800 md:text-3xl lg:text-4xl"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            Types of work
-            <span className="bg-gradient-to-r from-teal-400 via-teal-500 to-teal-400 bg-clip-text text-transparent bg-size-200 animate-gradient block mt-2">
-              ‍We do
-            </span>
-          </motion.h1>
-
-          <motion.p
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-          >
-            Professional video editing services tailored to your unique needs
-            and vision
-          </motion.p>
-        </motion.div>
+        <SectionHeader
+          subtitle="Core services"
+          title="Types of work"
+          highlight="‍We do"
+          description="Professional video editing services tailored to your unique needs and vision"
+          center={true}
+          titleSize="2xl"
+          titleWeight="normal"
+          descriptionSize="lg"
+          lineSpacing="tight"
+          highlightColor="teal-500"
+          dotColor="teal-500"
+        />
 
         {/* Marquee Section */}
         <div className="relative py-12 overflow-hidden mb-20">
@@ -702,31 +675,20 @@ const Services = () => {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-teal-50 to-teal-100 backdrop-blur-sm border border-teal-200 mb-6 shadow-lg shadow-teal-100">
-              <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-              <span className="text-teal-600 font-semibold text-sm tracking-wider">
-                Our Process
-              </span>
-              <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-            </div>
-
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              How We Bring Your{" "}
-              <span className="bg-gradient-to-r from-teal-400 to-teal-500 bg-clip-text text-transparent">
-                Vision to Life
-              </span>
-            </h2>
-
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A seamless, collaborative journey from concept to final delivery
-            </p>
-          </motion.div>
+          <SectionHeader
+            subtitle="Our Process"
+            title="How We Bring Your"
+            highlight="Vision to Life"
+            description="A seamless, collaborative journey from concept to final delivery"
+            center={true}
+            titleSize="2xl"
+            titleWeight="normal"
+            descriptionSize="lg"
+            lineSpacing="tight"
+            highlightColor="teal-500"
+            dotColor="teal-500"
+            highlightOnNewLine={false}
+          />
 
           {/* Professional Video Editing Process Steps */}
           <div className="relative">

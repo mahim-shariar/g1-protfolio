@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import SectionHeader from "../Shared/SectionHeader";
 
 const NextGenServices = () => {
   const containerRef = useRef(null);
@@ -143,7 +144,7 @@ const NextGenServices = () => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col text-left justify-center items-center w-full mx-auto py-16 gap-20 md:gap-32 relative overflow-hidden"
+      className="flex flex-col text-left justify-center items-center w-full mx-auto py-12 gap-16 md:gap-24 relative overflow-hidden"
     >
       {/* Enhanced Animated Background Elements */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
@@ -155,7 +156,7 @@ const NextGenServices = () => {
             opacity: [0.3, 0.6, 0.3],
           }}
           transition={{
-            duration: 12, // Slowed down
+            duration: 12,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -168,7 +169,7 @@ const NextGenServices = () => {
             opacity: [0.4, 0.2, 0.4],
           }}
           transition={{
-            duration: 10, // Slowed down
+            duration: 10,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 2,
@@ -183,7 +184,7 @@ const NextGenServices = () => {
             rotate: [0, 5, 0],
           }}
           transition={{
-            duration: 8, // Slowed down
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -196,7 +197,7 @@ const NextGenServices = () => {
             x: [0, 10, 0],
           }}
           transition={{
-            duration: 7, // Slowed down
+            duration: 7,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 1,
@@ -210,7 +211,7 @@ const NextGenServices = () => {
             rotate: 360,
           }}
           transition={{
-            duration: 40, // Slowed down
+            duration: 40,
             repeat: Infinity,
             ease: "linear",
           }}
@@ -222,7 +223,7 @@ const NextGenServices = () => {
             rotate: -360,
           }}
           transition={{
-            duration: 35, // Slowed down
+            duration: 35,
             repeat: Infinity,
             ease: "linear",
             delay: 3,
@@ -231,12 +232,12 @@ const NextGenServices = () => {
 
         {/* Enhanced Visible Grid Pattern */}
         <motion.div
-          className="absolute inset-0 opacity-25" // Increased opacity
+          className="absolute inset-0 opacity-25"
           animate={{
             backgroundPosition: ["0% 0%", "100% 100%"],
           }}
           transition={{
-            duration: 30, // Slowed down
+            duration: 30,
             repeat: Infinity,
             ease: "linear",
           }}
@@ -245,7 +246,7 @@ const NextGenServices = () => {
               linear-gradient(rgba(20, 184, 166, 0.4) 1px, transparent 1px),
               linear-gradient(90deg, rgba(20, 184, 166, 0.4) 1px, transparent 1px)
             `,
-            backgroundSize: "60px 60px", // Slightly larger grid
+            backgroundSize: "60px 60px",
           }}
         />
 
@@ -265,7 +266,7 @@ const NextGenServices = () => {
               opacity: [0.7, 1, 0.7],
             }}
             transition={{
-              duration: 6 + Math.random() * 4, // Slowed down
+              duration: 6 + Math.random() * 4,
               repeat: Infinity,
               ease: "easeInOut",
               delay: Math.random() * 3,
@@ -282,7 +283,7 @@ const NextGenServices = () => {
             scale: [1, 1.3, 1],
           }}
           transition={{
-            duration: 9, // Slowed down
+            duration: 9,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 0.5,
@@ -297,7 +298,7 @@ const NextGenServices = () => {
             scale: [1, 1.4, 1],
           }}
           transition={{
-            duration: 8, // Slowed down
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 2.5,
@@ -312,7 +313,7 @@ const NextGenServices = () => {
             opacity: [0.8, 0, 0.8],
           }}
           transition={{
-            duration: 5, // Slowed down
+            duration: 5,
             repeat: Infinity,
             ease: "easeInOut",
           }}
@@ -325,7 +326,7 @@ const NextGenServices = () => {
             opacity: [0.7, 0, 0.7],
           }}
           transition={{
-            duration: 6, // Slowed down
+            duration: 6,
             repeat: Infinity,
             ease: "easeInOut",
             delay: 2,
@@ -340,7 +341,7 @@ const NextGenServices = () => {
             opacity: [0, 1, 0],
           }}
           transition={{
-            duration: 3, // Slowed down
+            duration: 3,
             repeat: Infinity,
             ease: "easeOut",
             delay: 1,
@@ -354,7 +355,7 @@ const NextGenServices = () => {
             opacity: [0, 0.8, 0],
           }}
           transition={{
-            duration: 4, // Slowed down
+            duration: 4,
             repeat: Infinity,
             ease: "easeOut",
             delay: 3,
@@ -391,50 +392,25 @@ const NextGenServices = () => {
       </div>
 
       {/* Header Section */}
-      <div className="flex flex-col items-center justify-center gap-5 px-4 mx-auto text-center relative z-10">
-        {/* Cozy Badge */}
-        <motion.div
-          className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-teal-200 shadow-sm"
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
-          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-          <span className="text-teal-700 font-medium text-sm tracking-wide">
-            Our Services
-          </span>
-          <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
-        </motion.div>
 
-        {/* Main Title */}
-        <motion.h1
-          className="text-2xl font-bold md:text-4xl lg:text-5xl"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          viewport={{ once: true }}
-        >
-          <span className="text-gray-800">Professional</span>
-          <span className="bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 bg-clip-text text-transparent bg-size-200 animate-gradient block mt-2">
-            Video Editing Services
-          </span>
-        </motion.h1>
-        <motion.p
-          className="text-lg text-gray-600 max-w-2xl mx-auto mt-4"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          viewport={{ once: true }}
-        >
-          Tailored solutions to elevate your content and grow your audience
-        </motion.p>
-      </div>
+      <SectionHeader
+        subtitle="Our Services"
+        title="Professional"
+        highlight="Video Editing Services"
+        description="Tailored solutions to elevate your content and grow your audience"
+        center={true}
+        titleSize="2xl"
+        titleWeight="normal"
+        descriptionSize="lg"
+        lineSpacing="tight"
+        highlightColor="teal-500"
+        dotColor="teal-500"
+      />
 
-      {/* Services Steps */}
-      <div className="relative flex flex-col items-center justify-center w-full gap-20 p-4 md:gap-48 z-10">
+      {/* Services Steps - REDUCED SPACING */}
+      <div className="relative flex flex-col items-center justify-center w-full gap-12 p-4 md:gap-20 z-10">
         {/* Service 1 & 2 */}
-        <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-16 md:flex-row md:gap-48">
+        <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-12 md:flex-row md:gap-32">
           {/* Service 2 */}
           <motion.div
             className="relative z-20 order-2 md:order-1"
@@ -478,7 +454,7 @@ const NextGenServices = () => {
           </motion.div>
 
           {/* Connector - Hidden on mobile/tablet, visible on desktop */}
-          <div className="absolute z-10 w-96 h-48 transform md:top-8 md:rotate-[0deg] rotate-[70deg] hidden md:block">
+          <div className="absolute z-10 w-80 h-40 transform md:top-6 md:rotate-[0deg] rotate-[70deg] hidden md:block">
             <svg
               width="100%"
               height="100%"
@@ -549,8 +525,8 @@ const NextGenServices = () => {
           </motion.div>
         </div>
 
-        {/* Connector between sections - WIDER - Hidden on mobile/tablet */}
-        <div className="absolute z-10 md:top-[22rem] top-[55rem] w-[30rem] h-72 transform md:rotate-[45deg] -rotate-[90deg] hidden md:block">
+        {/* Connector between sections - REDUCED SIZE */}
+        <div className="absolute z-10 md:top-[18rem] top-[45rem] w-80 h-56 transform md:rotate-[45deg] -rotate-[90deg] hidden md:block">
           <svg
             width="100%"
             height="100%"
@@ -579,8 +555,8 @@ const NextGenServices = () => {
         </div>
 
         {/* Service 3 & 4 */}
-        <div className="relative flex flex-col items-center justify-center w-full gap-16 p-4 md:gap-48">
-          <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-16 md:flex-row md:gap-48">
+        <div className="relative flex flex-col items-center justify-center w-full gap-12 p-4 md:gap-20">
+          <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-12 md:flex-row md:gap-32">
             {/* Service 4 */}
             <motion.div
               className="relative z-20 order-2 md:order-1"
@@ -624,7 +600,7 @@ const NextGenServices = () => {
             </motion.div>
 
             {/* Connector - Hidden on mobile/tablet */}
-            <div className="absolute z-10 w-96 h-48 transform md:top-8 md:rotate-[0deg] rotate-[70deg] hidden md:block">
+            <div className="absolute z-10 w-80 h-40 transform md:top-6 md:rotate-[0deg] rotate-[70deg] hidden md:block">
               <svg
                 width="100%"
                 height="100%"
@@ -701,8 +677,8 @@ const NextGenServices = () => {
             </motion.div>
           </div>
 
-          {/* Connector between sections - WIDER - Hidden on mobile/tablet */}
-          <div className="absolute z-10 md:top-[22rem] top-[55rem] w-[30rem] h-72 transform md:rotate-[50deg] -rotate-[90deg] hidden md:block">
+          {/* Connector between sections - REDUCED SIZE */}
+          <div className="absolute z-10 md:top-[18rem] top-[45rem] w-80 h-56 transform md:rotate-[50deg] -rotate-[90deg] hidden md:block">
             <svg
               width="100%"
               height="100%"
@@ -738,8 +714,8 @@ const NextGenServices = () => {
         </div>
 
         {/* Service 5 & 6 */}
-        <div className="relative flex flex-col items-center justify-center w-full gap-16 p-4 md:gap-48">
-          <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-16 md:flex-row md:gap-48">
+        <div className="relative flex flex-col items-center justify-center w-full gap-12 p-4 md:gap-20">
+          <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-12 md:flex-row md:gap-32">
             {/* Service 6 */}
             <motion.div
               className="relative z-20 order-2 md:order-1"
@@ -783,7 +759,7 @@ const NextGenServices = () => {
             </motion.div>
 
             {/* Connector - Hidden on mobile/tablet */}
-            <div className="absolute z-10 w-96 h-48 transform md:top-8 md:rotate-[0deg] rotate-[70deg] hidden md:block">
+            <div className="absolute z-10 w-80 h-40 transform md:top-6 md:rotate-[0deg] rotate-[70deg] hidden md:block">
               <svg
                 width="100%"
                 height="100%"
@@ -868,7 +844,7 @@ const NextGenServices = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4 }}
         viewport={{ once: true }}
-        className="text-center mt-16 relative z-10"
+        className="text-center mt-12 relative z-10"
       >
         <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-teal-200 shadow-sm mb-6">
           <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
