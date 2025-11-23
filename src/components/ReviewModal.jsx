@@ -9,9 +9,9 @@ import {
   FiX,
   FiMessageSquare,
   FiFileText,
-  FiSettings,
   FiImage,
   FiThumbsUp,
+  FiVideo,
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 
@@ -179,7 +179,7 @@ export default function ReviewModal({
               <div className="flex space-x-1 mt-6">
                 {[
                   { id: "basic", icon: FiFileText, label: "Basic Info" },
-                  { id: "media", icon: FiImage, label: "Media" },
+                  { id: "media", icon: FiVideo, label: "Video" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -285,30 +285,30 @@ export default function ReviewModal({
                   </motion.div>
                 )}
 
-                {/* Media Tab */}
+                {/* Video Tab */}
                 {activeTab === "media" && (
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     className="space-y-6"
                   >
-                    {/* Screenshot Upload Card */}
+                    {/* Video Upload Card */}
                     <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border-2 border-dashed border-gray-300 p-6 hover:border-red-400 transition-all duration-200">
                       <label className="flex items-center text-sm font-semibold text-gray-700 mb-4">
-                        <FiImage className="h-4 w-4 mr-2 text-red-500" />
-                        Review Screenshot (Optional)
+                        <FiVideo className="h-4 w-4 mr-2 text-red-500" />
+                        Review Video (Optional)
                       </label>
                       <div className="space-y-4">
                         <input
                           type="text"
-                          name="screenshot"
-                          value={reviewForm.screenshot || ""}
+                          name="video"
+                          value={reviewForm.video || ""}
                           onChange={handleReviewChange}
                           className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                          placeholder="Paste screenshot URL or upload image"
+                          placeholder="Paste video URL or upload video file"
                         />
                         <label className="flex items-center justify-center space-x-3 w-full px-4 py-3 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors group">
-                          {uploading?.screenshot ? (
+                          {uploading?.video ? (
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{
@@ -319,24 +319,32 @@ export default function ReviewModal({
                             >
                               <FiLoader className="h-5 w-5 text-red-500" />
                             </motion.div>
-                          ) : reviewForm.screenshot ? (
+                          ) : reviewForm.video ? (
                             <FiCheckCircle className="h-5 w-5 text-green-500" />
                           ) : (
                             <FiUpload className="h-5 w-5 text-gray-400 group-hover:text-red-500" />
                           )}
                           <span className="text-sm font-medium text-gray-600 group-hover:text-red-600">
-                            {uploading?.screenshot
-                              ? "Uploading..."
-                              : "Upload Screenshot"}
+                            {uploading?.video
+                              ? "Uploading Video..."
+                              : "Upload Video"}
                           </span>
                           <input
                             type="file"
-                            accept="image/*"
+                            accept="video/*"
                             className="hidden"
-                            onChange={(e) => handleFileUpload(e, "screenshot")}
-                            disabled={uploading?.screenshot}
+                            onChange={(e) => handleFileUpload(e, "video")}
+                            disabled={uploading?.video}
                           />
                         </label>
+                        {reviewForm.video && (
+                          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p className="text-sm text-green-700 flex items-center">
+                              <FiCheckCircle className="h-4 w-4 mr-2" />
+                              Video uploaded successfully!
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -454,7 +462,7 @@ export default function ReviewModal({
                         className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl hover:from-red-600 hover:to-orange-600 transition-all duration-200 font-medium flex items-center space-x-2"
                       >
                         <span>Next</span>
-                        <FiImage size={16} />
+                        <FiVideo size={16} />
                       </button>
                     )}
                   </div>

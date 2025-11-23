@@ -20,6 +20,127 @@ import {
 } from "react-icons/fi";
 import { getFAQs } from "../services/api";
 import SectionHeader from "../components/Shared/SectionHeader";
+import bg from "/ICON.png"; // Import your logo
+
+// Background Logo Only Animation (Same as Projects)
+// Background Logo Only Animation (More Visible)
+const BackgroundLogoAnimation = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Main Background Logo - Increased Opacity */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [0.15, 0.25, 0.15],
+          rotate: [0, 1, 0, -1, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo"
+          className="w-[85%] max-w-[1100px] h-auto"
+          style={{
+            filter: `
+              brightness(1.3)
+              contrast(1.2)
+              drop-shadow(0 0 200px rgba(13, 148, 136, 0.25))
+            `,
+          }}
+        />
+      </motion.div>
+
+      {/* Secondary Larger Logo for Depth - Increased Visibility */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1.05, 1.15, 1.05],
+          opacity: [0.08, 0.15, 0.08],
+          rotate: [0, -2, 0, 2, 0],
+        }}
+        transition={{
+          duration: 16,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+          delay: 2,
+        }}
+      >
+        <img
+          src={bg}
+          alt="Background Logo Glow"
+          className="w-[90%] max-w-[1300px] h-auto opacity-70"
+          style={{
+            filter: "blur(30px) brightness(1.4)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+      </motion.div>
+
+      {/* Enhanced Floating Particles */}
+      {Array.from({ length: 15 }).map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
+          className="absolute w-2 h-2 bg-gradient-to-r from-teal-400/70 to-teal-300/50 rounded-full z-5"
+          style={{
+            left: `${8 + i * 6}%`,
+            top: `${12 + i * 6}%`,
+          }}
+          animate={{
+            y: [0, -25, 0, -15, 0],
+            x: [0, 8, -6, 7, 0],
+            scale: [1, 1.4, 0.9, 1.3, 1],
+            opacity: [0.3, 0.6, 0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8 + i * 1.2,
+            repeat: Infinity,
+            delay: i * 0.3,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Enhanced Glow Effect Behind Background Logo */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1, 1.15, 1],
+          opacity: [0.12, 0.2, 0.12],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+      >
+        <div className="w-[800px] h-[800px] bg-teal-400/20 rounded-full blur-3xl" />
+      </motion.div>
+
+      {/* Additional Glow Layers for More Visibility */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-0"
+        animate={{
+          scale: [1.1, 1.2, 1.1],
+          opacity: [0.05, 0.1, 0.05],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1,
+        }}
+      >
+        <div className="w-[900px] h-[900px] bg-teal-300/15 rounded-full blur-2xl" />
+      </motion.div>
+    </div>
+  );
+};
 
 const FaqsPage = () => {
   const canvasRef = useRef(null);
@@ -403,7 +524,9 @@ const FaqsPage = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-white via-teal-50 to-blue-50">
-      {/* Enhanced Animated Background */}
+      {/* Background Logo Animation */}
+      <BackgroundLogoAnimation />
+
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
       {/* Multi-layer Gradient Overlays */}

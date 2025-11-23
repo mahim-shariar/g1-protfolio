@@ -19,14 +19,14 @@ const ReviewsPage = () => {
   const [showOnlyBestReviews, setShowOnlyBestReviews] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
-  const [uploading, setUploading] = useState({ screenshot: false });
+  const [uploading, setUploading] = useState({ video: false });
   const [submitting, setSubmitting] = useState(false);
 
   const [reviewForm, setReviewForm] = useState({
     content: "",
     rating: 5,
-    screenshot: "",
-    screenshotId: "",
+    video: "",
+    videoId: "",
     userName: "",
     isBest: false,
   });
@@ -60,11 +60,11 @@ const ReviewsPage = () => {
       const toastId = toast.loading(`Uploading ${type}...`);
       const res = await uploadFile(file);
 
-      if (type === "screenshot") {
+      if (type === "video") {
         setReviewForm((prev) => ({
           ...prev,
-          screenshot: res.url,
-          screenshotId: res.public_id,
+          video: res.url,
+          videoId: res.public_id,
         }));
       }
 
@@ -119,8 +119,8 @@ const ReviewsPage = () => {
       setReviewForm({
         content: "",
         rating: 5,
-        screenshot: "",
-        screenshotId: "",
+        video: "",
+        videoId: "",
         userName: "",
         isBest: false,
       });
@@ -138,8 +138,8 @@ const ReviewsPage = () => {
     setReviewForm({
       content: review.content,
       rating: review.rating,
-      screenshot: review.screenshot,
-      screenshotId: review.screenshotId,
+      video: review.video,
+      videoId: review.videoId,
       userName: review.userName || "",
       isBest: review.isBest || false,
     });
@@ -202,8 +202,8 @@ const ReviewsPage = () => {
                 setReviewForm({
                   content: "",
                   rating: 5,
-                  screenshot: "",
-                  screenshotId: "",
+                  video: "",
+                  videoId: "",
                   userName: "",
                   isBest: false,
                 });

@@ -127,16 +127,119 @@ const TestimonialSection = () => {
     fetchTestimonials();
   }, []);
 
-  // Calculate marquee content height for proper looping (increased for larger cards)
-  const marqueeContentHeight = testimonials.length * 220; // Increased from 180 to 220
+  // Calculate marquee content height for proper looping
+  const marqueeContentHeight = testimonials.length * 220;
 
-  // Optimized Marquee Testimonial Component with larger dimensions
+  // Mobile Marquee Component
+  const MobileMarquee = () => {
+    return (
+      <div className="lg:hidden relative h-[400px] overflow-hidden rounded-2xl backdrop-blur-sm">
+        <motion.div
+          className="flex flex-col"
+          animate={hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }}
+          transition={{
+            duration: 40,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {[...testimonials, ...testimonials].map((testimonial, index) => (
+            <div key={`mobile-${index}`} className="px-3 pb-4">
+              <MarqueeTestimonial testimonial={testimonial} index={index} />
+            </div>
+          ))}
+        </motion.div>
+        {/* Stronger gradient fades to hide top and bottom cards completely */}
+        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white to-transparent pointer-events-none z-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none z-20" />
+      </div>
+    );
+  };
+
+  // Desktop Three Column Marquee
+  const DesktopMarquee = () => {
+    return (
+      <div className="hidden lg:grid grid-cols-3 gap-5">
+        {/* Left Column - Top to Bottom */}
+        <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+          <motion.div
+            className="flex flex-col"
+            animate={hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }}
+            transition={{
+              duration: 35,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <div key={`left-${index}`} className="px-4 pb-5">
+                <MarqueeTestimonial testimonial={testimonial} index={index} />
+              </div>
+            ))}
+          </motion.div>
+          {/* Gradient fades */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Middle Column - Bottom to Top */}
+        <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+          <motion.div
+            className="flex flex-col"
+            animate={
+              hasAnimated
+                ? { y: [-marqueeContentHeight, 0] }
+                : { y: -marqueeContentHeight }
+            }
+            transition={{
+              duration: 35,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <div key={`middle-${index}`} className="px-4 pb-5">
+                <MarqueeTestimonial testimonial={testimonial} index={index} />
+              </div>
+            ))}
+          </motion.div>
+          {/* Gradient fades */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Right Column - Top to Bottom */}
+        <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
+          <motion.div
+            className="flex flex-col"
+            animate={hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }}
+            transition={{
+              duration: 35,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {[...testimonials, ...testimonials].map((testimonial, index) => (
+              <div key={`right-${index}`} className="px-4 pb-5">
+                <MarqueeTestimonial testimonial={testimonial} index={index} />
+              </div>
+            ))}
+          </motion.div>
+          {/* Gradient fades */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+        </div>
+      </div>
+    );
+  };
+
+  // Optimized Marquee Testimonial Component
   const MarqueeTestimonial = ({ testimonial, index }) => {
     return (
       <motion.div
-        className="relative group cursor-default mb-5" // Increased margin bottom
+        className="relative group cursor-default mb-4 lg:mb-5"
         whileHover={{
-          scale: 1.03, // Slightly increased hover scale
+          scale: window.innerWidth >= 1024 ? 1.03 : 1, // Only scale on desktop
           transition: {
             type: "spring",
             stiffness: 400,
@@ -164,32 +267,35 @@ const TestimonialSection = () => {
           ease: [0.25, 0.46, 0.45, 0.94],
         }}
       >
-        {/* Enhanced glow effect on hover */}
+        {/* Enhanced glow effect on hover - only on desktop */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-2xl blur-xl"
           initial={{ opacity: 0 }}
-          whileHover={{ opacity: 1 }}
+          whileHover={{ opacity: window.innerWidth >= 1024 ? 1 : 0 }} // Only on desktop
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
 
-        {/* Main card with increased padding and larger layout */}
+        {/* Main card with responsive sizing */}
         <motion.div
-          className="relative bg-white/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl p-6 group-hover:shadow-2xl group-hover:border-teal-200/50 h-[190px] flex flex-col" // Increased height, padding, and shadow
+          className="relative bg-white/95 backdrop-blur-xl rounded-xl lg:rounded-2xl border border-white/20 shadow-lg lg:shadow-xl p-4 lg:p-6 group-hover:shadow-xl lg:group-hover:shadow-2xl group-hover:border-teal-200/50 h-[170px] lg:h-[190px] flex flex-col"
           whileHover={{
-            borderColor: "rgba(94, 234, 212, 0.5)",
+            borderColor:
+              window.innerWidth >= 1024
+                ? "rgba(94, 234, 212, 0.5)"
+                : "border-white/20",
             transition: { duration: 0.3 },
           }}
         >
           {/* Smoother gradient border */}
           <motion.div
-            className="absolute inset-0 rounded-2xl bg-gradient-to-r from-teal-400/10 via-emerald-400/10 to-teal-400/10"
+            className="absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-r from-teal-400/10 via-emerald-400/10 to-teal-400/10"
             initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
+            whileHover={{ opacity: window.innerWidth >= 1024 ? 1 : 0 }}
             transition={{ duration: 0.4 }}
           />
 
-          {/* Floating elements - slightly larger */}
-          <div className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center">
+          {/* Floating elements */}
+          <div className="absolute -top-1.5 -right-1.5 lg:-top-2 lg:-right-2 w-4 h-4 lg:w-5 lg:h-5 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center">
             <motion.div
               className="w-1.5 h-1.5 bg-white rounded-full"
               animate={{
@@ -204,13 +310,12 @@ const TestimonialSection = () => {
             />
           </div>
 
-          {/* Larger rating stars */}
-          <div className="flex mb-3">
+          {/* Rating stars */}
+          <div className="flex mb-2 lg:mb-3">
             {[...Array(5)].map((_, i) => (
               <motion.svg
                 key={i}
-                className={`w-4 h-4 ${
-                  // Increased from w-3 h-3
+                className={`w-3.5 h-3.5 lg:w-4 lg:h-4 ${
                   i < testimonial.rating ? "text-amber-400" : "text-gray-300"
                 }`}
                 fill="currentColor"
@@ -230,7 +335,7 @@ const TestimonialSection = () => {
                     : {}
                 }
                 whileHover={{
-                  scale: 1.2,
+                  scale: window.innerWidth >= 1024 ? 1.2 : 1,
                   transition: { duration: 0.2 },
                 }}
               >
@@ -239,9 +344,9 @@ const TestimonialSection = () => {
             ))}
           </div>
 
-          {/* Larger quote with bigger text */}
+          {/* Quote with responsive text */}
           <motion.p
-            className="text-gray-700 text-sm leading-relaxed mb-4 font-light relative z-10 line-clamp-3 flex-1" // Increased text size
+            className="text-gray-700 text-xs lg:text-sm leading-relaxed mb-3 lg:mb-4 font-light relative z-10 line-clamp-3 flex-1"
             initial={{ opacity: 0, y: 10 }}
             animate={
               hasAnimated
@@ -258,7 +363,7 @@ const TestimonialSection = () => {
             }
           >
             <motion.span
-              className="text-2xl text-teal-400 font-serif leading-none mr-1"
+              className="text-xl lg:text-2xl text-teal-400 font-serif leading-none mr-1"
               initial={{ scale: 0 }}
               animate={
                 hasAnimated
@@ -277,7 +382,7 @@ const TestimonialSection = () => {
             </motion.span>
             {testimonial.quote}
             <motion.span
-              className="text-2xl text-teal-400 font-serif leading-none ml-1"
+              className="text-xl lg:text-2xl text-teal-400 font-serif leading-none ml-1"
               initial={{ scale: 0 }}
               animate={
                 hasAnimated
@@ -296,12 +401,12 @@ const TestimonialSection = () => {
             </motion.span>
           </motion.p>
 
-          {/* Larger author info */}
-          <div className="relative pt-3 border-t border-gray-100">
+          {/* Author info */}
+          <div className="relative pt-2 lg:pt-3 border-t border-gray-100">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1">
                 <motion.div
-                  className="font-bold text-gray-800 text-sm mb-1 truncate" // Increased text size
+                  className="font-bold text-gray-800 text-xs lg:text-sm mb-0.5 lg:mb-1 truncate"
                   initial={{ opacity: 0, x: -10 }}
                   animate={
                     hasAnimated
@@ -338,9 +443,9 @@ const TestimonialSection = () => {
                 </motion.div>
               </div>
 
-              {/* Larger stats badge */}
+              {/* Stats badge */}
               <motion.div
-                className="px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full shadow-lg flex-shrink-0 ml-2" // Increased padding
+                className="px-2 py-1 lg:px-3 lg:py-1.5 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full shadow-md lg:shadow-lg flex-shrink-0 ml-2"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={
                   hasAnimated
@@ -357,13 +462,11 @@ const TestimonialSection = () => {
                     : {}
                 }
                 whileHover={{
-                  scale: 1.05,
+                  scale: window.innerWidth >= 1024 ? 1.05 : 1,
                   transition: { duration: 0.2 },
                 }}
               >
-                <span className="text-white text-sm font-bold font-mono whitespace-nowrap">
-                  {" "}
-                  {/* Increased text size */}
+                <span className="text-white text-xs lg:text-sm font-bold font-mono whitespace-nowrap">
                   {testimonial.stats}
                 </span>
               </motion.div>
@@ -378,7 +481,7 @@ const TestimonialSection = () => {
     return (
       <section
         ref={sectionRef}
-        className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
+        className="relative py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
       >
         <div className="container relative z-10 px-4 mx-auto text-center">
           <motion.div
@@ -420,19 +523,19 @@ const TestimonialSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
+      className="relative py-16 lg:py-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/50"
     >
       {/* Optimized background effects */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Gradient orbs */}
+        {/* Gradient orbs - reduced for mobile */}
         <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-teal-200/30 to-emerald-200/20 rounded-full blur-2xl"
+          className="absolute top-10 lg:top-20 left-5 lg:left-10 w-48 h-48 lg:w-72 lg:h-72 bg-gradient-to-r from-teal-200/20 to-emerald-200/10 lg:from-teal-200/30 lg:to-emerald-200/20 rounded-full blur-xl lg:blur-2xl"
           animate={
             hasAnimated
               ? {
-                  x: [0, 30, 0],
-                  y: [0, -20, 0],
-                  scale: [1, 1.1, 1],
+                  x: [0, 20, 0],
+                  y: [0, -15, 0],
+                  scale: [1, 1.05, 1],
                 }
               : {}
           }
@@ -445,13 +548,13 @@ const TestimonialSection = () => {
         />
 
         <motion.div
-          className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-r from-emerald-200/20 to-teal-200/30 rounded-full blur-2xl"
+          className="absolute bottom-10 lg:bottom-20 right-5 lg:right-10 w-48 h-48 lg:w-72 lg:h-72 bg-gradient-to-r from-emerald-200/10 to-teal-200/20 lg:from-emerald-200/20 lg:to-teal-200/30 rounded-full blur-xl lg:blur-2xl"
           animate={
             hasAnimated
               ? {
-                  x: [0, -30, 0],
-                  y: [0, 20, 0],
-                  scale: [1.1, 1, 1.1],
+                  x: [0, -20, 0],
+                  y: [0, 15, 0],
+                  scale: [1.05, 1, 1.05],
                 }
               : {}
           }
@@ -472,12 +575,12 @@ const TestimonialSection = () => {
               linear-gradient(rgba(20, 184, 166, 0.2) 1px, transparent 1px),
               linear-gradient(90deg, rgba(20, 184, 166, 0.2) 1px, transparent 1px)
             `,
-            backgroundSize: "60px 60px",
+            backgroundSize: "40px 40px",
           }}
           animate={
             hasAnimated
               ? {
-                  backgroundPosition: ["0px 0px", "60px 60px"],
+                  backgroundPosition: ["0px 0px", "40px 40px"],
                 }
               : {}
           }
@@ -495,112 +598,28 @@ const TestimonialSection = () => {
         highlight="Client Voices"
         description="Discover why industry leaders trust us to transform their content"
         center={true}
-        titleSize="2xl"
+        titleSize="xl"
         titleWeight="normal"
-        descriptionSize="lg"
+        descriptionSize="base"
         lineSpacing="tight"
         highlightColor="teal-500"
         dotColor="teal-500"
         highlightOnNewLine={false}
       />
 
-      {/* Synchronized Three Column Marquee Container with increased height */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4">
-        {" "}
-        {/* Increased max-width */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {" "}
-          {/* Increased gap */}
-          {/* Left Column - Top to Bottom (Starts at top) */}
-          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
-            {" "}
-            {/* Increased height */}
-            <motion.div
-              className="flex flex-col"
-              animate={
-                hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }
-              }
-              transition={{
-                duration: 35, // Slightly increased duration for larger cards
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
-              {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <div key={`left-${index}`} className="px-4 pb-5">
-                  {" "}
-                  {/* Increased padding */}
-                  <MarqueeTestimonial testimonial={testimonial} index={index} />
-                </div>
-              ))}
-            </motion.div>
-            {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-          </div>
-          {/* Middle Column - Bottom to Top (Starts at visible position) */}
-          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
-            {" "}
-            {/* Increased height */}
-            <motion.div
-              className="flex flex-col"
-              animate={
-                hasAnimated
-                  ? { y: [-marqueeContentHeight, 0] }
-                  : { y: -marqueeContentHeight }
-              }
-              transition={{
-                duration: 35, // Slightly increased duration for larger cards
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
-              {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <div key={`middle-${index}`} className="px-4 pb-5">
-                  {" "}
-                  {/* Increased padding */}
-                  <MarqueeTestimonial testimonial={testimonial} index={index} />
-                </div>
-              ))}
-            </motion.div>
-            {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-          </div>
-          {/* Right Column - Top to Bottom (Starts at top) */}
-          <div className="relative h-[550px] overflow-hidden rounded-2xl backdrop-blur-sm">
-            {" "}
-            {/* Increased height */}
-            <motion.div
-              className="flex flex-col"
-              animate={
-                hasAnimated ? { y: [0, -marqueeContentHeight] } : { y: 0 }
-              }
-              transition={{
-                duration: 35, // Slightly increased duration for larger cards
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            >
-              {[...testimonials, ...testimonials].map((testimonial, index) => (
-                <div key={`right-${index}`} className="px-4 pb-5">
-                  {" "}
-                  {/* Increased padding */}
-                  <MarqueeTestimonial testimonial={testimonial} index={index} />
-                </div>
-              ))}
-            </motion.div>
-            {/* Gradient fades */}
-            <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-          </div>
-        </div>
+      {/* Marquee Container */}
+      <div className="relative z-10 max-w-6xl lg:max-w-7xl mx-auto px-3 lg:px-4">
+        {/* Mobile - Single Column with hidden corners */}
+        <MobileMarquee />
+
+        {/* Desktop - Three Columns */}
+        <DesktopMarquee />
       </div>
 
-      {/* Floating Stats */}
+      {/* Floating Stats - Hidden on mobile, visible on desktop */}
       <motion.div
-        className="absolute top-6 left-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
-        initial={{ x: -50, opacity: 0, scale: 0.9 }}
+        className="hidden lg:block absolute top-6 left-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
+        initial={{ x: -30, opacity: 0, scale: 0.9 }}
         animate={
           hasAnimated
             ? {
@@ -627,8 +646,8 @@ const TestimonialSection = () => {
       </motion.div>
 
       <motion.div
-        className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
-        initial={{ x: 50, opacity: 0, scale: 0.9 }}
+        className="hidden lg:block absolute bottom-6 right-6 bg-white/90 backdrop-blur-xl rounded-xl p-4 border border-white/20 shadow-lg"
+        initial={{ x: 30, opacity: 0, scale: 0.9 }}
         animate={
           hasAnimated
             ? {

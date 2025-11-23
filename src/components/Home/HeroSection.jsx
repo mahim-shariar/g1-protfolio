@@ -446,10 +446,9 @@ const HeroSection = () => {
         description="Transform your vision into captivating visual experiences with our AI-powered editing platform."
         center={true}
         titleSize="2xl"
-        titleWeight="normal"
+        titleWeight="medium"
         descriptionSize="lg"
-        highlightWeight="normal"
-        lineSpacing="tight"
+        highlightWeight=""
       />
 
       {/* Video Player Section - Simplified with default controls */}

@@ -21,8 +21,185 @@ import {
   FaMagic,
   FaAward,
 } from "react-icons/fa";
-import bg from "/ICON.png";
+import davinchi from "../assets/davenchi.png";
+import premier from "../assets/premier.png";
+import cap_cut from "../assets/cap-cut.png";
+import after_effect from "../assets/after-effect.png";
+import final_cut from "../assets/final-cut.png";
 import SectionHeader from "../components/Shared/SectionHeader";
+
+// Floating App Logos Component
+const FloatingAppLogos = () => {
+  const videoTools = [
+    { name: "DaVinci Resolve", logo: davinchi },
+    { name: "Premier Pro", logo: premier },
+    { name: "Final Cut Pro", logo: final_cut },
+    { name: "CapCut", logo: cap_cut },
+    { name: "After Effects", logo: after_effect },
+  ];
+
+  // Generate random positions for floating logos
+  const getRandomPosition = (index) => {
+    const positions = [
+      { top: "15%", left: "8%", scale: 0.6 },
+      { top: "22%", right: "12%", scale: 0.8 },
+      { top: "65%", left: "6%", scale: 0.7 },
+      { bottom: "20%", right: "8%", scale: 1.0 },
+      { top: "42%", right: "5%", scale: 0.5 },
+      { bottom: "32%", left: "20%", scale: 0.9 },
+      { top: "12%", right: "25%", scale: 1.1 },
+      { bottom: "16%", right: "32%", scale: 0.4 },
+    ];
+    return positions[index % positions.length];
+  };
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-25">
+      {/* Floating App Logos in Random Positions */}
+      {videoTools.map((tool, index) => {
+        const position = getRandomPosition(index);
+
+        return (
+          <motion.div
+            key={`floating-${tool.name}`}
+            className="absolute z-30"
+            style={position}
+            initial={{ opacity: 0, scale: 0, y: 20 }}
+            animate={{
+              opacity: [0.4, 0.9, 0.4],
+              scale: [
+                position.scale * 0.8,
+                position.scale * 1.2,
+                position.scale * 0.8,
+              ],
+              y: [0, -30, 0, -20, 0],
+              x: [0, 8, -12, 6, 0],
+              rotate: [0, 4, -2, 2, 0],
+            }}
+            transition={{
+              duration: 14 + Math.random() * 8,
+              repeat: Infinity,
+              delay: index * 1.2,
+              ease: [0.25, 0.1, 0.25, 1],
+            }}
+          >
+            <motion.div
+              className="relative bg-gradient-to-br from-white/30 to-white/12 backdrop-blur-xl rounded-xl p-3 border border-white/40 shadow-lg"
+              whileHover={{
+                scale: 1.4,
+                rotateY: 180,
+                transition: {
+                  duration: 0.8,
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                },
+              }}
+            >
+              <motion.img
+                src={tool.logo}
+                alt={tool.name}
+                className="w-14 h-14 object-contain"
+                animate={{
+                  filter: [
+                    "brightness(1.1) drop-shadow(0 0 12px rgba(13, 148, 136, 0.5))",
+                    "brightness(1.4) drop-shadow(0 0 20px rgba(20, 184, 166, 0.8))",
+                    "brightness(1.1) drop-shadow(0 0 12px rgba(13, 148, 136, 0.5))",
+                  ],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  delay: index * 0.8,
+                  ease: "easeInOut",
+                }}
+              />
+
+              {/* Tool Name Tooltip */}
+              <motion.div
+                className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-teal-800/95 text-white text-xs px-3 py-1.5 rounded-md whitespace-nowrap opacity-0 border border-teal-600/30 backdrop-blur-sm shadow-lg"
+                whileHover={{
+                  opacity: 1,
+                  y: -2,
+                  transition: { duration: 0.4, ease: "easeOut" },
+                }}
+              >
+                {tool.name}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-1.5 h-1.5 bg-teal-800/95 rotate-45" />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        );
+      })}
+
+      {/* Subtle Floating Particles */}
+      {Array.from({ length: 6 }).map((_, i) => {
+        const positions = [
+          { top: "30%", left: "16%" },
+          { top: "45%", right: "22%" },
+          { top: "70%", left: "11%" },
+          { bottom: "32%", right: "16%" },
+          { top: "55%", right: "9%" },
+          { bottom: "42%", left: "26%" },
+        ];
+
+        const position = positions[i];
+
+        return (
+          <motion.div
+            key={`floating-particle-${i}`}
+            className="absolute w-1 h-1 bg-gradient-to-r from-teal-400/50 to-teal-300/30 rounded-full opacity-60 z-20"
+            style={position}
+            animate={{
+              y: [0, -20, 0, -12, 0],
+              x: [0, 6, -8, 5, 0],
+              scale: [1, 1.3, 0.9, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3, 0.5, 0.3],
+              rotate: [0, 45, 90, 135, 180],
+            }}
+            transition={{
+              duration: 10 + Math.random() * 6,
+              delay: Math.random() * 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        );
+      })}
+
+      {/* Subtle Glow Spots */}
+      {Array.from({ length: 3 }).map((_, i) => {
+        const positions = [
+          { top: "35%", left: "30%" },
+          { top: "50%", right: "35%" },
+          { bottom: "40%", left: "25%" },
+        ];
+
+        const position = positions[i];
+
+        return (
+          <motion.div
+            key={`floating-glow-${i}`}
+            className="absolute w-32 h-32 rounded-full z-15"
+            style={position}
+            animate={{
+              scale: [1, 1.8, 1],
+              opacity: [0, 0.06, 0],
+            }}
+            transition={{
+              duration: 18,
+              repeat: Infinity,
+              delay: i * 4,
+              ease: [0.4, 0, 0.2, 1],
+            }}
+          >
+            <div className="w-full h-full bg-teal-400/20 rounded-full blur-2xl" />
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
 
 const ContactPage = () => {
   const canvasRef = useRef(null);
@@ -146,66 +323,6 @@ const ContactPage = () => {
       }
     };
   }, []);
-
-  // Floating Logo Component - Reduced size and quantity
-  const FloatingLogos = () => {
-    const logoPositions = [
-      { left: "10%", top: "15%", size: 30, delay: 0 },
-      { left: "85%", top: "20%", size: 25, delay: 1 },
-      { left: "15%", top: "70%", size: 35, delay: 2 },
-      { left: "80%", top: "65%", size: 28, delay: 3 },
-      { left: "5%", top: "40%", size: 22, delay: 4 },
-      { left: "90%", top: "45%", size: 32, delay: 5 },
-    ];
-
-    return (
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {logoPositions.map((position, index) => (
-          <motion.div
-            key={index}
-            className="absolute"
-            style={{
-              left: position.left,
-              top: position.top,
-              width: position.size,
-              height: position.size,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              x: [0, 10, 0],
-              rotate: [0, 8, -6, 0],
-              scale: [0.8, 1, 0.8],
-            }}
-            transition={{
-              duration: 15 + index * 2, // Reduced duration
-              repeat: Infinity,
-              delay: position.delay,
-              ease: "easeInOut",
-            }}
-          >
-            <div
-              className="relative group"
-              style={{
-                width: position.size,
-                height: position.size,
-              }}
-            >
-              <img
-                src={bg}
-                alt="Video Editor"
-                className="w-full h-full object-contain opacity-15 group-hover:opacity-25 transition-opacity duration-500"
-                style={{
-                  filter:
-                    "brightness(0) saturate(100%) invert(44%) sepia(45%) saturate(572%) hue-rotate(135deg) brightness(92%) contrast(90%)",
-                }}
-              />
-              <div className="absolute inset-0 bg-teal-400/10 rounded-full blur-sm group-hover:bg-teal-400/15 transition-all duration-500 opacity-0 group-hover:opacity-100" />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    );
-  };
 
   // Fetch contact data from API
   useEffect(() => {
@@ -373,8 +490,8 @@ const ContactPage = () => {
         className="absolute inset-0 w-full h-full pointer-events-none"
       />
 
-      {/* Floating Logos */}
-      <FloatingLogos />
+      {/* Floating App Logos */}
+      <FloatingAppLogos />
 
       {/* Reduced Gradient Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

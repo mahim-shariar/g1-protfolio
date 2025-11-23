@@ -191,7 +191,12 @@ export const searchVideoReels = async (query) => {
 
 // Reviews API
 export const getReviews = async (params = {}) => {
-  const response = await api.get("/reviews", { params });
+  const response = await api.get("/reviews/text", { params });
+  return response.data;
+};
+
+export const getVideoReviews = async (params = {}) => {
+  const response = await api.get(`/reviews/videos`, { params });
   return response.data;
 };
 
