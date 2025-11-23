@@ -5,6 +5,7 @@ import LoadingSpinner from "./components/Shared/LoadingSpinner";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Login from "./page/Login";
 import PrivateRoute from "./components/auth/PrivateRoute";
+import NotFound from "./components/Shared/NotFundPage";
 
 // Lazy-loaded pages
 const Home = lazy(() => import("./page/Home"));
@@ -68,7 +69,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "login",
+        path: `login/${import.meta.env.VITE_SECRET_RIDDLE_ANSWER}`,
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <Login />
@@ -80,6 +81,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <FaqsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "*",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <NotFound />
           </Suspense>
         ),
       },

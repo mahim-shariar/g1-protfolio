@@ -426,7 +426,7 @@ const HeroSection = () => {
 
   return (
     <motion.div
-      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 flex flex-col items-center justify-start pt-16 pb-8"
+      className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 flex flex-col items-center justify-start pt-20 pb-8"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.0, ease: [0.25, 0.1, 0.25, 1] }}

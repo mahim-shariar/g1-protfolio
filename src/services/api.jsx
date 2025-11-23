@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL =
   import.meta.env.VITE_NODE_ENV === "production"
-    ? "https://jayed-talukder-server.vercel.app/api/v1"
+    ? `${import.meta.env.VITE_SERVER_URL}/api/v1`
     : "http://localhost:5000/api/v1";
 
 const api = axios.create({
@@ -52,17 +52,16 @@ export const login = async (credentials) => {
 
 export const logout = async () => {
   try {
-    // Try to call the server logout endpoint
-    const response = await api.post("/auth/logout");
-
-    // Clear local token regardless of server response
-    localStorage.removeItem("token");
-
-    return response.data;
+    // Call the logout endpoint
+    await api.post("/auth/logout");
   } catch (error) {
-    // Still clear local token even if server request fails
+    console.log("Logout API call failed, but clearing local storage anyway");
     localStorage.removeItem("token");
-    throw error;
+  } finally {
+    // Always clear local storage
+    localStorage.removeItem("token");
+    // Remove authorization header
+    delete api.defaults.headers.common["Authorization"];
   }
 };
 
@@ -117,6 +116,22 @@ export const verifyToken = async (token = null) => {
       status: "error",
       error: error.message,
     };
+  }
+};
+
+export const verifyTokenOnInit = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return { isValid: false, user: null };
+    }
+
+    const response = await api.get("/auth/me");
+    return { isValid: true, user: response.data };
+  } catch (error) {
+    // If token is invalid, clear it
+    localStorage.removeItem("token");
+    return { isValid: false, user: null };
   }
 };
 

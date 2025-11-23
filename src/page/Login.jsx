@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
-import { login, verifyToken, getCurrentUser } from "../services/api";
+import {
+  login,
+  verifyToken,
+  getCurrentUser,
+  forgotPassword,
+  getSecurityQuestionByEmail,
+  verifySecurityQuestion,
+  resetPasswordWithSecurity,
+} from "../services/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,13 +22,20 @@ const Login = () => {
   const [isAlreadyLoggedIn, setIsAlreadyLoggedIn] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // Forgot password states
+  const [forgotPasswordStep, setForgotPasswordStep] = useState(1); // 1: email, 2: security question, 3: new password
+  const [securityQuestion, setSecurityQuestion] = useState("");
+  const [securityAnswer, setSecurityAnswer] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
+
   useEffect(() => {
     checkAuthenticationStatus();
   }, []);
 
   const checkAuthenticationStatus = async () => {
     try {
-      // Check if token exists in localStorage or cookies
       const token = localStorage.getItem("token") || Cookies.get("jwt");
       console.log("Token:", token);
 
@@ -29,33 +44,26 @@ const Login = () => {
         return;
       }
 
-      // Verify the token is still valid
       const tokenResponse = await verifyToken(token);
       console.log("Token response:", tokenResponse);
 
       if (tokenResponse.isValid) {
-        // Get user profile to check role
         const userProfile = await getCurrentUser();
-
         console.log("User profile:", userProfile);
 
-        // Check if user has appropriate role (admin in this case)
         if (userProfile?.data?.user?.role === "admin") {
           setIsAlreadyLoggedIn(true);
           setMessage("You are already logged in. Redirecting to dashboard...");
 
-          // Redirect after a short delay
           setTimeout(() => {
             window.location.href = "/";
           }, 2000);
         } else {
-          // If user doesn't have the right role, clear tokens
           localStorage.removeItem("token");
           Cookies.remove("jwt");
         }
       }
     } catch (error) {
-      // Token is invalid or expired, clear it
       localStorage.removeItem("token");
       Cookies.remove("jwt");
       console.error("Authentication check failed:", error);
@@ -69,12 +77,22 @@ const Login = () => {
     setFieldErrors({});
   };
 
+  const resetForgotPasswordFlow = () => {
+    setShowForgotPassword(false);
+    setForgotPasswordStep(1);
+    setSecurityQuestion("");
+    setSecurityAnswer("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setResetToken("");
+    clearErrors();
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     clearErrors();
 
-    // Client-side validation
     if (!email || !password) {
       setError("Please provide both email and password");
       setLoading(false);
@@ -84,17 +102,13 @@ const Login = () => {
     try {
       const response = await login({ email, password });
 
-      // Handle successful login based on your backend response structure
       if (response.status === "success") {
         setMessage("Login successful! Redirecting...");
 
-        // Store token if it's returned in the response
         if (response.token) {
           localStorage.setItem("token", response.token);
-          // Also store in cookie with 1 day expiration
         }
 
-        // Redirect to dashboard after a delay
         setTimeout(() => {
           window.location.href = "/dashboard";
         }, 2000);
@@ -102,16 +116,13 @@ const Login = () => {
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      // Handle different error response formats from your backend
       if (err.response?.data) {
         const errorData = err.response.data;
 
-        // Handle field-specific errors
         if (errorData.errors) {
           setFieldErrors(errorData.errors);
         }
 
-        // Handle general error message
         if (errorData.message) {
           setError(errorData.message);
         } else if (errorData.status === "fail") {
@@ -129,7 +140,7 @@ const Login = () => {
     }
   };
 
-  const handleForgotPassword = async (e) => {
+  const handleForgotPasswordStep1 = async (e) => {
     e.preventDefault();
     clearErrors();
 
@@ -138,7 +149,6 @@ const Login = () => {
       return;
     }
 
-    // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address");
@@ -148,33 +158,150 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await forgotPassword(email);
+      // Get the security question for this email
+      const securityResponse = await getSecurityQuestionByEmail(email);
+      console.log("Security question response:", securityResponse);
 
-      // Handle response based on your backend structure
-      if (response.status === "success") {
-        setMessage("Password reset instructions have been sent to your email.");
+      if (
+        securityResponse.status === "success" &&
+        securityResponse.data?.securityQuestion
+      ) {
+        setSecurityQuestion(securityResponse.data.securityQuestion);
+        setForgotPasswordStep(2);
+        setMessage("Please answer your security question");
       } else {
-        setError(response.message || "Failed to send reset instructions.");
+        setError(
+          securityResponse.message ||
+            "No security question found for this email"
+        );
       }
     } catch (err) {
-      // Handle different error response formats
+      console.error("Security question error:", err);
       if (err.response?.data) {
         const errorData = err.response.data;
-
-        if (errorData.message) {
-          setError(errorData.message);
-        } else if (errorData.status === "fail") {
-          setError("No user found with that email address");
-        } else {
-          setError("Failed to send reset instructions. Please try again.");
-        }
+        setError(errorData.message || "Failed to retrieve security question");
       } else if (err.message) {
         setError(err.message);
       } else {
-        setError("Failed to send reset instructions. Please try again.");
+        setError("Failed to process your request. Please try again.");
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPasswordStep2 = async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    if (!securityAnswer) {
+      setError("Please provide your security answer");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const verifyResponse = await verifySecurityQuestion({
+        email,
+        answer: securityAnswer,
+      });
+
+      console.log("Verify response:", verifyResponse);
+
+      if (verifyResponse.status === "success") {
+        // Store the reset token from response
+        setResetToken(verifyResponse.resetToken);
+        setForgotPasswordStep(3);
+        setMessage("Security question verified. Please set your new password.");
+      } else {
+        setError(verifyResponse.message || "Incorrect security answer");
+      }
+    } catch (err) {
+      console.error("Verify security error:", err);
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        setError(errorData.message || "Verification failed");
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError("Verification failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPasswordStep3 = async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    if (!newPassword || !confirmPassword) {
+      setError("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const resetResponse = await resetPasswordWithSecurity({
+        token: resetToken,
+        newPassword,
+        answer: securityAnswer, // Include security answer in the reset request
+      });
+
+      console.log("Reset password response:", resetResponse);
+
+      if (resetResponse.status === "success") {
+        setMessage(
+          "Password reset successfully! You can now login with your new password."
+        );
+
+        // Reset the flow and go back to login
+        setTimeout(() => {
+          resetForgotPasswordFlow();
+        }, 3000);
+      } else {
+        setError(resetResponse.message || "Password reset failed");
+      }
+    } catch (err) {
+      console.error("Reset password error:", err);
+      if (err.response?.data) {
+        const errorData = err.response.data;
+        setError(errorData.message || "Password reset failed");
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError("Password reset failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    switch (forgotPasswordStep) {
+      case 1:
+        await handleForgotPasswordStep1(e);
+        break;
+      case 2:
+        await handleForgotPasswordStep2(e);
+        break;
+      case 3:
+        await handleForgotPasswordStep3(e);
+        break;
+      default:
+        break;
     }
   };
 
@@ -265,6 +392,32 @@ const Login = () => {
     );
   }
 
+  const getForgotPasswordTitle = () => {
+    switch (forgotPasswordStep) {
+      case 1:
+        return "Password Recovery";
+      case 2:
+        return "Security Verification";
+      case 3:
+        return "Set New Password";
+      default:
+        return "Password Recovery";
+    }
+  };
+
+  const getForgotPasswordSubtitle = () => {
+    switch (forgotPasswordStep) {
+      case 1:
+        return "Enter your email to start password recovery";
+      case 2:
+        return "Answer your security question to verify your identity";
+      case 3:
+        return "Create a new password for your account";
+      default:
+        return "Enter your email to receive reset instructions";
+    }
+  };
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/80 flex items-center justify-center p-4">
       {/* Background gradient overlays */}
@@ -286,22 +439,46 @@ const Login = () => {
               className="text-teal-600 font-mono uppercase tracking-widest text-sm mb-2"
               variants={itemVariants}
             >
-              {showForgotPassword ? "Password Recovery" : "Access Portal"}
+              {showForgotPassword ? getForgotPasswordTitle() : "Access Portal"}
             </motion.h2>
             <motion.h1
               className="text-2xl font-bold text-gray-800"
               variants={itemVariants}
             >
-              {showForgotPassword ? "Reset Your Password" : "Welcome Back"}
+              {showForgotPassword
+                ? forgotPasswordStep === 1
+                  ? "Reset Your Password"
+                  : forgotPasswordStep === 2
+                  ? "Verify Your Identity"
+                  : "Create New Password"
+                : "Welcome Back"}
             </motion.h1>
             <motion.p
               className="text-gray-600 text-sm mt-2"
               variants={itemVariants}
             >
               {showForgotPassword
-                ? "Enter your email to receive reset instructions"
+                ? getForgotPasswordSubtitle()
                 : "Sign in to your account to continue"}
             </motion.p>
+
+            {/* Progress indicator for forgot password */}
+            {showForgotPassword && (
+              <div className="mt-4 flex justify-center space-x-2">
+                {[1, 2, 3].map((step) => (
+                  <div
+                    key={step}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      step === forgotPasswordStep
+                        ? "bg-teal-600"
+                        : step < forgotPasswordStep
+                        ? "bg-teal-400"
+                        : "bg-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Message and Error Display */}
@@ -328,6 +505,7 @@ const Login = () => {
           <form
             onSubmit={showForgotPassword ? handleForgotPassword : handleLogin}
           >
+            {/* Email Field - Always visible */}
             <motion.div className="mb-5" variants={itemVariants}>
               <label
                 htmlFor="email"
@@ -356,6 +534,7 @@ const Login = () => {
               )}
             </motion.div>
 
+            {/* Password Field - Only for login */}
             {!showForgotPassword && (
               <motion.div className="mb-6" variants={itemVariants}>
                 <div className="flex justify-between items-center mb-2">
@@ -400,9 +579,100 @@ const Login = () => {
               </motion.div>
             )}
 
+            {/* Security Question Field - Step 2 */}
+            {showForgotPassword && forgotPasswordStep === 2 && (
+              <motion.div
+                className="mb-5"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <label
+                  htmlFor="securityQuestion"
+                  className="block text-teal-700 text-sm font-medium mb-2"
+                >
+                  Security Question
+                </label>
+                <div className="w-full px-4 py-3 bg-white/50 border border-teal-500/30 rounded-lg text-gray-700 text-sm mb-4">
+                  {securityQuestion || "Loading security question..."}
+                </div>
+                <label
+                  htmlFor="securityAnswer"
+                  className="block text-teal-700 text-sm font-medium mb-2"
+                >
+                  Your Answer
+                </label>
+                <input
+                  type="text"
+                  id="securityAnswer"
+                  value={securityAnswer}
+                  onChange={(e) => {
+                    setSecurityAnswer(e.target.value);
+                    clearErrors();
+                  }}
+                  className="w-full px-4 py-3 bg-white/80 border border-teal-500/30 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all"
+                  placeholder="Enter your answer"
+                  required
+                />
+              </motion.div>
+            )}
+
+            {/* New Password Fields - Step 3 */}
+            {showForgotPassword && forgotPasswordStep === 3 && (
+              <motion.div
+                className="space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div>
+                  <label
+                    htmlFor="newPassword"
+                    className="block text-teal-700 text-sm font-medium mb-2"
+                  >
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    value={newPassword}
+                    onChange={(e) => {
+                      setNewPassword(e.target.value);
+                      clearErrors();
+                    }}
+                    className="w-full px-4 py-3 bg-white/80 border border-teal-500/30 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all"
+                    placeholder="Enter new password (min. 6 characters)"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-teal-700 text-sm font-medium mb-2"
+                  >
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      clearErrors();
+                    }}
+                    className="w-full px-4 py-3 bg-white/80 border border-teal-500/30 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all"
+                    placeholder="Confirm new password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </motion.div>
+            )}
+
             <motion.button
               type="submit"
-              className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white font-medium rounded-lg relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               variants={glowVariants}
               animate="pulse"
               whileHover={{ scale: loading ? 1 : 1.02 }}
@@ -431,11 +701,23 @@ const Login = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  {showForgotPassword ? "Sending..." : "Signing in..."}
+                  {showForgotPassword
+                    ? forgotPasswordStep === 1
+                      ? "Checking..."
+                      : forgotPasswordStep === 2
+                      ? "Verifying..."
+                      : "Resetting..."
+                    : "Signing in..."}
                 </div>
               ) : (
                 <span className="relative z-10">
-                  {showForgotPassword ? "Send Reset Instructions" : "Sign In"}
+                  {showForgotPassword
+                    ? forgotPasswordStep === 1
+                      ? "Continue"
+                      : forgotPasswordStep === 2
+                      ? "Verify Answer"
+                      : "Reset Password"
+                    : "Sign In"}
                 </span>
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-teal-600 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -451,12 +733,17 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => {
-                  setShowForgotPassword(false);
+                  if (forgotPasswordStep === 1) {
+                    resetForgotPasswordFlow();
+                  } else {
+                    setForgotPasswordStep(forgotPasswordStep - 1);
+                  }
                   clearErrors();
                 }}
                 className="text-teal-600 hover:text-teal-700 text-sm"
               >
-                ← Back to Login
+                ← Back{" "}
+                {forgotPasswordStep === 1 ? "to Login" : "to Previous Step"}
               </button>
             </motion.div>
           )}

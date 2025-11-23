@@ -19,14 +19,14 @@ const SectionHeader = ({
   titleClassName = "", // custom title classes
   highlightClassName = "", // custom highlight classes
   lineSpacing = "normal", // normal, tight, snug, relaxed, loose
-  highlightOnNewLine = true, // NEW: control whether highlight is on new line
+  highlightOnNewLine = true, // control whether highlight is on new line
 }) => {
-  // Size mappings
+  // Size mappings with mobile-first responsive approach
   const titleSizes = {
-    xl: "text-3xl md:text-4xl",
-    "2xl": "text-4xl md:text-5xl",
-    "3xl": "text-4xl md:text-6xl",
-    "4xl": "text-5xl md:text-7xl",
+    xl: "text-2xl sm:text-3xl md:text-4xl",
+    "2xl": "text-3xl sm:text-4xl md:text-5xl",
+    "3xl": "text-3xl sm:text-4xl md:text-6xl",
+    "4xl": "text-4xl sm:text-5xl md:text-7xl",
   };
 
   const titleWeights = {
@@ -39,19 +39,19 @@ const SectionHeader = ({
   };
 
   const descriptionSizes = {
-    sm: "text-sm",
-    base: "text-base",
-    lg: "text-lg",
-    xl: "text-xl",
+    sm: "text-sm sm:text-base",
+    base: "text-base sm:text-lg",
+    lg: "text-base sm:text-lg md:text-xl",
+    xl: "text-lg sm:text-xl md:text-2xl",
   };
 
   // Line spacing mappings
   const lineSpacings = {
-    tight: "leading-tight",
-    snug: "leading-snug",
-    normal: "leading-normal",
-    relaxed: "leading-relaxed",
-    loose: "leading-loose",
+    tight: "leading-tight sm:leading-tight",
+    snug: "leading-snug sm:leading-snug",
+    normal: "leading-normal sm:leading-normal",
+    relaxed: "leading-relaxed sm:leading-relaxed",
+    loose: "leading-loose sm:leading-loose",
   };
 
   return (
@@ -59,17 +59,19 @@ const SectionHeader = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: animationDelay }}
-      className={`${center ? "text-center" : "text-left"} mb-10 ${className}`}
+      className={`${
+        center ? "text-center" : "text-left"
+      } mb-8 sm:mb-10 px-4 sm:px-0 ${className}`}
     >
       {/* Decorative dots - conditionally rendered */}
       {showDots && subtitle && (
         <div
-          className={`inline-flex items-center gap-3 mb-4 ${
+          className={`inline-flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 ${
             center ? "justify-center" : "justify-start"
           }`}
         >
           <div className={`w-1.5 h-1.5 bg-${dotColor} rounded-full`}></div>
-          <div className="text-xs uppercase tracking-widest text-gray-500">
+          <div className="text-xs uppercase tracking-widest text-gray-500 px-1">
             {subtitle}
           </div>
           <div className={`w-1.5 h-1.5 bg-${dotColor} rounded-full`}></div>
@@ -78,17 +80,17 @@ const SectionHeader = ({
 
       {/* Main title with highlight */}
       <h1
-        className={`${titleSizes[titleSize]} ${titleWeights[titleWeight]} ${lineSpacings[lineSpacing]} text-gray-800 mb-3 ${titleClassName}`}
+        className={`${titleSizes[titleSize]} ${titleWeights[titleWeight]} ${lineSpacings[lineSpacing]} text-gray-800 mb-2 sm:mb-3 ${titleClassName}`}
       >
         {title}
         {highlight && (
           <>
-            {/* Conditionally render line break */}
-            {highlightOnNewLine && <br />}
+            {/* Conditionally render line break - hidden on mobile for better flow */}
+            {highlightOnNewLine && <br className="hidden sm:block" />}
             <span
               className={`text-${highlightColor} ${titleWeights[highlightWeight]} ${highlightClassName}`}
             >
-              {highlightOnNewLine ? highlight : ` ${highlight}`}
+              {highlightOnNewLine ? ` ${highlight}` : ` ${highlight}`}
             </span>
           </>
         )}
@@ -99,7 +101,7 @@ const SectionHeader = ({
         <p
           className={`text-gray-600 ${descriptionSizes[descriptionSize]} ${
             center ? "mx-auto" : ""
-          } max-w-lg leading-relaxed`}
+          } max-w-full sm:max-w-lg leading-relaxed px-2 sm:px-0`}
         >
           {description}
         </p>

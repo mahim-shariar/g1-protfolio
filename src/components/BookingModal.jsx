@@ -34,7 +34,7 @@ const BookingModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // Close modal on escape key
+  // Close modal on escape key and prevent background scrolling
   useEffect(() => {
     const handleEscape = (event) => {
       if (event.keyCode === 27) {
@@ -44,7 +44,7 @@ const BookingModal = ({ isOpen, onClose }) => {
 
     if (isOpen) {
       document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden"; // Prevent background scrolling
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
@@ -82,21 +82,6 @@ const BookingModal = ({ isOpen, onClose }) => {
     exit: { opacity: 0 },
   };
 
-  const glowVariants = {
-    pulse: {
-      boxShadow: [
-        "0 0 5px rgba(148, 163, 184, 0.3), 0 0 10px rgba(148, 163, 184, 0.2), 0 0 15px rgba(148, 163, 184, 0.1)",
-        "0 0 10px rgba(148, 163, 184, 0.4), 0 0 20px rgba(148, 163, 184, 0.2), 0 0 30px rgba(148, 163, 184, 0.1)",
-        "0 0 5px rgba(148, 163, 184, 0.3), 0 0 10px rgba(148, 163, 184, 0.2), 0 0 15px rgba(148, 163, 184, 0.1)",
-      ],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut",
-      },
-    },
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -119,10 +104,14 @@ const BookingModal = ({ isOpen, onClose }) => {
           <div className="absolute inset-0 bg-gradient-to-b from-gray-50/60 to-white/80"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-gray-100/40 to-blue-50/40"></div>
 
-          {/* Modal Content */}
+          {/* Modal Content - Centered */}
           <motion.div
-            className="relative bg-white border border-gray-200 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+            className="relative bg-white border border-gray-200 rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden mx-auto"
             variants={modalVariants}
+            style={{
+              // Ensure modal stays centered
+              margin: "auto",
+            }}
           >
             {/* Close Button */}
             <button
@@ -369,7 +358,7 @@ const BookingModal = ({ isOpen, onClose }) => {
 
                         {/* Calendly Iframe */}
                         <iframe
-                          src="https://calendly.com/thezoneonestorage/30min?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=374151&primary_color=6b7280"
+                          src={`${import.meta.env.VITE_TIDYCAL_URL}`}
                           width="100%"
                           height="600"
                           frameBorder="0"

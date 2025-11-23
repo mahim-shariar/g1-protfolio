@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import SectionHeader from "../Shared/SectionHeader";
+import bg from "/ICON.png";
 
 const NextGenServices = () => {
   const containerRef = useRef(null);
@@ -121,149 +122,88 @@ const NextGenServices = () => {
     },
   };
 
-  // Enhanced particle positions - spread throughout the entire container
+  // Enhanced particle positions - with brighter colors
   const particlePositions = [
-    { top: "10%", left: "15%", size: "w-3 h-3", color: "bg-teal-500/70" },
-    { top: "20%", left: "80%", size: "w-2 h-2", color: "bg-emerald-500/60" },
-    { top: "30%", left: "25%", size: "w-3 h-3", color: "bg-teal-400/70" },
-    { top: "40%", left: "70%", size: "w-2 h-2", color: "bg-emerald-400/60" },
-    { top: "50%", left: "10%", size: "w-3 h-3", color: "bg-teal-500/70" },
-    { top: "60%", left: "85%", size: "w-2 h-2", color: "bg-emerald-500/60" },
-    { top: "70%", left: "35%", size: "w-3 h-3", color: "bg-teal-400/70" },
-    { top: "80%", left: "65%", size: "w-2 h-2", color: "bg-emerald-400/60" },
-    { top: "25%", left: "45%", size: "w-2 h-2", color: "bg-teal-500/60" },
-    { top: "45%", left: "55%", size: "w-3 h-3", color: "bg-emerald-500/70" },
-    { top: "65%", left: "20%", size: "w-2 h-2", color: "bg-teal-400/60" },
-    { top: "85%", left: "75%", size: "w-3 h-3", color: "bg-emerald-400/70" },
-    { top: "15%", left: "60%", size: "w-3 h-3", color: "bg-teal-500/70" },
-    { top: "35%", left: "30%", size: "w-2 h-2", color: "bg-emerald-500/60" },
-    { top: "55%", left: "90%", size: "w-3 h-3", color: "bg-teal-400/70" },
-    { top: "75%", left: "40%", size: "w-2 h-2", color: "bg-emerald-400/60" },
+    { top: "10%", left: "15%", size: "w-3 h-3", color: "bg-teal-400/80" },
+    { top: "20%", left: "80%", size: "w-2 h-2", color: "bg-emerald-400/70" },
+    { top: "30%", left: "25%", size: "w-3 h-3", color: "bg-teal-300/80" },
+    { top: "40%", left: "70%", size: "w-2 h-2", color: "bg-emerald-300/70" },
+    { top: "50%", left: "10%", size: "w-3 h-3", color: "bg-teal-400/80" },
+    { top: "60%", left: "85%", size: "w-2 h-2", color: "bg-emerald-400/70" },
+    { top: "70%", left: "35%", size: "w-3 h-3", color: "bg-teal-300/80" },
+    { top: "80%", left: "65%", size: "w-2 h-2", color: "bg-emerald-300/70" },
+    { top: "25%", left: "45%", size: "w-2 h-2", color: "bg-teal-400/70" },
+    { top: "45%", left: "55%", size: "w-3 h-3", color: "bg-emerald-400/80" },
+    { top: "65%", left: "20%", size: "w-2 h-2", color: "bg-teal-300/70" },
+    { top: "85%", left: "75%", size: "w-3 h-3", color: "bg-emerald-300/80" },
+    { top: "15%", left: "60%", size: "w-3 h-3", color: "bg-teal-400/80" },
+    { top: "35%", left: "30%", size: "w-2 h-2", color: "bg-emerald-400/70" },
+    { top: "55%", left: "90%", size: "w-3 h-3", color: "bg-teal-300/80" },
+    { top: "75%", left: "40%", size: "w-2 h-2", color: "bg-emerald-300/70" },
   ];
 
-  return (
-    <div
-      ref={containerRef}
-      className="flex flex-col text-left justify-center items-center w-full mx-auto py-12 gap-16 md:gap-24 relative overflow-hidden"
-    >
-      {/* Enhanced Animated Background Elements */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Large Animated Gradient Orbs */}
+  // Background Logo Animation Component without any blur
+  const BackgroundLogoAnimation = () => {
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Main Background Logo - No blur */}
         <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-teal-200/30 to-emerald-200/40 rounded-full blur-3xl"
+          className="absolute inset-0 flex items-center justify-center z-0"
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.03, 1],
+            opacity: [0.12, 0.18, 0.12],
+            rotate: [0, 1, 0, -1, 0],
           }}
           transition={{
             duration: 12,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: [0.4, 0, 0.2, 1],
           }}
-        />
+        >
+          <img
+            src={bg}
+            alt="Background Logo"
+            className="w-[80%] max-w-[1000px] h-auto opacity-20"
+          />
+        </motion.div>
 
+        {/* Secondary Larger Logo for Depth - No blur */}
         <motion.div
-          className="absolute bottom-20 right-10 w-64 h-64 bg-gradient-to-r from-emerald-200/25 to-teal-200/35 rounded-full blur-3xl"
+          className="absolute inset-0 flex items-center justify-center z-0"
           animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.4, 0.2, 0.4],
+            scale: [1.05, 1.12, 1.05],
+            opacity: [0.08, 0.12, 0.08],
+            rotate: [0, -2, 0, 2, 0],
           }}
           transition={{
-            duration: 10,
+            duration: 16,
             repeat: Infinity,
-            ease: "easeInOut",
+            ease: [0.4, 0, 0.2, 1],
             delay: 2,
           }}
-        />
+        >
+          <img
+            src={bg}
+            alt="Background Logo Glow"
+            className="w-[85%] max-w-[1200px] h-auto opacity-15"
+          />
+        </motion.div>
 
-        {/* Floating Geometric Shapes */}
-        <motion.div
-          className="absolute top-1/4 right-1/4 w-16 h-16 border-2 border-teal-300/40 rounded-lg"
-          animate={{
-            y: [0, -30, 0],
-            rotate: [0, 5, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-
-        <motion.div
-          className="absolute bottom-1/3 left-1/4 w-12 h-12 border-2 border-emerald-300/50 rounded-full"
-          animate={{
-            y: [0, -40, 0],
-            x: [0, 10, 0],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        />
-
-        {/* Rotating Rings */}
-        <motion.div
-          className="absolute top-1/3 right-1/3 w-32 h-32 border border-teal-300/30 rounded-full"
-          animate={{
-            rotate: 360,
-          }}
-          transition={{
-            duration: 40,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-
-        <motion.div
-          className="absolute bottom-1/4 left-1/3 w-20 h-20 border border-emerald-300/40 rounded-full"
-          animate={{
-            rotate: -360,
-          }}
-          transition={{
-            duration: 35,
-            repeat: Infinity,
-            ease: "linear",
-            delay: 3,
-          }}
-        />
-
-        {/* Enhanced Visible Grid Pattern */}
-        <motion.div
-          className="absolute inset-0 opacity-25"
-          animate={{
-            backgroundPosition: ["0% 0%", "100% 100%"],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(20, 184, 166, 0.4) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(20, 184, 166, 0.4) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-          }}
-        />
-
-        {/* ENHANCED VISIBLE FLOATING PARTICLES */}
+        {/* ENHANCED VISIBLE FLOATING PARTICLES - Brighter colors */}
         {particlePositions.map((particle, i) => (
           <motion.div
             key={i}
-            className={`absolute rounded-full ${particle.size} ${particle.color} shadow-lg`}
+            className={`absolute rounded-full ${particle.size} ${particle.color} z-10`}
             style={{
               top: particle.top,
               left: particle.left,
             }}
             animate={{
-              y: [0, -40, 0],
-              x: [0, Math.random() * 30 - 15, 0],
-              scale: [1, 1.2, 1],
-              opacity: [0.7, 1, 0.7],
+              y: [0, -30, 0],
+              x: [0, Math.random() * 20 - 10, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.8, 1, 0.8],
             }}
             transition={{
               duration: 6 + Math.random() * 4,
@@ -274,13 +214,13 @@ const NextGenServices = () => {
           />
         ))}
 
-        {/* Additional Large Floating Elements */}
+        {/* Additional Large Floating Elements - Brighter */}
         <motion.div
-          className="absolute top-1/2 left-1/4 w-8 h-8 bg-teal-500/80 rounded-full shadow-lg"
+          className="absolute top-1/2 left-1/4 w-8 h-8 bg-teal-400/90 rounded-full z-10"
           animate={{
-            y: [0, -60, 0],
-            x: [0, 20, 0],
-            scale: [1, 1.3, 1],
+            y: [0, -40, 0],
+            x: [0, 15, 0],
+            scale: [1, 1.2, 1],
           }}
           transition={{
             duration: 9,
@@ -291,11 +231,11 @@ const NextGenServices = () => {
         />
 
         <motion.div
-          className="absolute top-1/3 right-1/4 w-6 h-6 bg-emerald-500/80 rounded-full shadow-lg"
+          className="absolute top-1/3 right-1/4 w-6 h-6 bg-emerald-400/90 rounded-full z-10"
           animate={{
-            y: [0, -50, 0],
-            x: [0, -15, 0],
-            scale: [1, 1.4, 1],
+            y: [0, -35, 0],
+            x: [0, -12, 0],
+            scale: [1, 1.3, 1],
           }}
           transition={{
             duration: 8,
@@ -307,10 +247,10 @@ const NextGenServices = () => {
 
         {/* Pulse Dots */}
         <motion.div
-          className="absolute top-40 right-40 w-4 h-4 bg-teal-500/80 rounded-full shadow-lg"
+          className="absolute top-40 right-40 w-4 h-4 bg-teal-400/90 rounded-full z-10"
           animate={{
-            scale: [1, 2.5, 1],
-            opacity: [0.8, 0, 0.8],
+            scale: [1, 2, 1],
+            opacity: [0.9, 0.3, 0.9],
           }}
           transition={{
             duration: 5,
@@ -320,10 +260,10 @@ const NextGenServices = () => {
         />
 
         <motion.div
-          className="absolute bottom-40 left-40 w-3 h-3 bg-emerald-500/80 rounded-full shadow-lg"
+          className="absolute bottom-40 left-40 w-3 h-3 bg-emerald-400/90 rounded-full z-10"
           animate={{
-            scale: [1, 3, 1],
-            opacity: [0.7, 0, 0.7],
+            scale: [1, 2.2, 1],
+            opacity: [0.8, 0.2, 0.8],
           }}
           transition={{
             duration: 6,
@@ -335,10 +275,10 @@ const NextGenServices = () => {
 
         {/* Sparkle Effects */}
         <motion.div
-          className="absolute top-20 right-20 w-2 h-2 bg-white rounded-full shadow-lg"
+          className="absolute top-20 right-20 w-2 h-2 bg-white/95 rounded-full z-10"
           animate={{
-            scale: [0, 1.5, 0],
-            opacity: [0, 1, 0],
+            scale: [0, 1.2, 0],
+            opacity: [0, 0.9, 0],
           }}
           transition={{
             duration: 3,
@@ -349,9 +289,9 @@ const NextGenServices = () => {
         />
 
         <motion.div
-          className="absolute bottom-20 left-20 w-1.5 h-1.5 bg-white rounded-full shadow-lg"
+          className="absolute bottom-20 left-20 w-1.5 h-1.5 bg-white/95 rounded-full z-10"
           animate={{
-            scale: [0, 2, 0],
+            scale: [0, 1.5, 0],
             opacity: [0, 0.8, 0],
           }}
           transition={{
@@ -362,12 +302,52 @@ const NextGenServices = () => {
           }}
         />
 
-        {/* Additional subtle background elements */}
+        {/* Subtle Floating Particles - Brighter */}
+        {Array.from({ length: 8 }).map((_, i) => (
+          <motion.div
+            key={`logo-particle-${i}`}
+            className="absolute w-1 h-1 bg-gradient-to-r from-teal-300/70 to-teal-200/60 rounded-full z-5"
+            style={{
+              left: `${10 + i * 10}%`,
+              top: `${15 + i * 10}%`,
+            }}
+            animate={{
+              y: [0, -12, 0, -8, 0],
+              x: [0, 3, -2, 3, 0],
+              scale: [1, 1.1, 0.9, 1.05, 1],
+              opacity: [0.3, 0.5, 0.3, 0.4, 0.3],
+            }}
+            transition={{
+              duration: 8 + i * 1.5,
+              repeat: Infinity,
+              delay: i * 0.4,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+
+        {/* Glow Effect Behind Background Logo - No blur */}
         <motion.div
-          className="absolute top-10 left-10 w-24 h-24 bg-teal-300/20 rounded-full blur-xl"
+          className="absolute inset-0 flex items-center justify-center z-0"
           animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.2, 0.4, 0.2],
+            scale: [1, 1.05, 1],
+            opacity: [0.1, 0.18, 0.1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+        >
+          <div className="w-[500px] h-[500px] bg-teal-300/15 rounded-full" />
+        </motion.div>
+
+        {/* Additional subtle background elements - No blur */}
+        <motion.div
+          className="absolute top-10 left-10 w-20 h-20 bg-teal-200/25 rounded-full z-0"
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.3, 0.5, 0.3],
           }}
           transition={{
             duration: 8,
@@ -377,10 +357,10 @@ const NextGenServices = () => {
         />
 
         <motion.div
-          className="absolute bottom-10 right-10 w-20 h-20 bg-emerald-300/20 rounded-full blur-xl"
+          className="absolute bottom-10 right-10 w-16 h-16 bg-emerald-200/25 rounded-full z-0"
           animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.3, 0.1, 0.3],
+            scale: [1.05, 1, 1.05],
+            opacity: [0.4, 0.2, 0.4],
           }}
           transition={{
             duration: 7,
@@ -389,10 +369,101 @@ const NextGenServices = () => {
             delay: 1,
           }}
         />
+
+        {/* Large Animated Gradient Orbs - No blur */}
+        <motion.div
+          className="absolute top-20 left-10 w-60 h-60 bg-gradient-to-r from-teal-200/40 to-emerald-200/50 rounded-full z-0"
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.4, 0.7, 0.4],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-20 right-10 w-52 h-52 bg-gradient-to-r from-emerald-200/35 to-teal-200/45 rounded-full z-0"
+          animate={{
+            scale: [1.15, 1, 1.15],
+            opacity: [0.5, 0.3, 0.5],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2,
+          }}
+        />
+
+        {/* Floating Geometric Shapes - Brighter */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-14 h-14 border-2 border-teal-200/50 rounded-lg z-5"
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 3, 0],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/3 left-1/4 w-10 h-10 border-2 border-emerald-200/60 rounded-full z-5"
+          animate={{
+            y: [0, -25, 0],
+            x: [0, 8, 0],
+          }}
+          transition={{
+            duration: 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+        />
+
+        {/* Rotating Rings - Thinner and brighter */}
+        <motion.div
+          className="absolute top-1/3 right-1/3 w-28 h-28 border border-teal-200/40 rounded-full z-5"
+          animate={{
+            rotate: 360,
+          }}
+          transition={{
+            duration: 40,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+
+        <motion.div
+          className="absolute bottom-1/4 left-1/3 w-18 h-18 border border-emerald-200/50 rounded-full z-5"
+          animate={{
+            rotate: -360,
+          }}
+          transition={{
+            duration: 35,
+            repeat: Infinity,
+            ease: "linear",
+            delay: 3,
+          }}
+        />
       </div>
+    );
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex flex-col text-left justify-center items-center w-full mx-auto py-12 gap-16 md:gap-24 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-teal-50/90"
+    >
+      {/* Enhanced Background without any blur */}
+      <BackgroundLogoAnimation />
 
       {/* Header Section */}
-
       <SectionHeader
         subtitle="Our Services"
         title="Professional"
@@ -407,7 +478,7 @@ const NextGenServices = () => {
         dotColor="teal-500"
       />
 
-      {/* Services Steps - REDUCED SPACING */}
+      {/* Services Steps */}
       <div className="relative flex flex-col items-center justify-center w-full gap-12 p-4 md:gap-20 z-10">
         {/* Service 1 & 2 */}
         <div className="relative flex flex-col items-center justify-center w-full max-w-4xl gap-12 md:flex-row md:gap-32">
@@ -420,23 +491,18 @@ const NextGenServices = () => {
             variants={cardVariants}
           >
             <div className="relative group">
-              {/* Cozy Card */}
-              <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300 backdrop-blur-sm">
-                {/* Hand-drawn like corner accent */}
+              <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300">
                 <div className="absolute -top-2 -left-2 w-8 h-8 bg-teal-100 rounded-full opacity-60"></div>
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-teal-100 rounded-full opacity-60"></div>
 
-                {/* Icon Container */}
                 <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-teal-500/30 group-hover:rotate-12 transition-transform duration-500">
                   {services[1].icon}
                 </div>
 
-                {/* Number Badge */}
                 <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-teal-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-teal-200 shadow-sm group-hover:bg-teal-50 transition-colors duration-300">
                   {services[1].number}
                 </div>
 
-                {/* Content */}
                 <div className="space-y-5">
                   <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                     {services[1].title}
@@ -447,7 +513,6 @@ const NextGenServices = () => {
                   </p>
                 </div>
 
-                {/* Cozy hover effect */}
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
               </div>
             </div>
@@ -491,23 +556,18 @@ const NextGenServices = () => {
             variants={rightCardVariants}
           >
             <div className="relative group">
-              {/* Cozy Card */}
-              <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300 backdrop-blur-sm">
-                {/* Hand-drawn like corner accent */}
+              <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300">
                 <div className="absolute -top-2 -left-2 w-8 h-8 bg-emerald-100 rounded-full opacity-60"></div>
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-emerald-100 rounded-full opacity-60"></div>
 
-                {/* Icon Container */}
                 <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30 group-hover:-rotate-12 transition-transform duration-500">
                   {services[0].icon}
                 </div>
 
-                {/* Number Badge */}
                 <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-emerald-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-emerald-200 shadow-sm group-hover:bg-emerald-50 transition-colors duration-300">
                   {services[0].number}
                 </div>
 
-                {/* Content */}
                 <div className="space-y-5">
                   <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                     {services[0].title}
@@ -518,14 +578,13 @@ const NextGenServices = () => {
                   </p>
                 </div>
 
-                {/* Cozy hover effect */}
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50/50 to-teal-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Connector between sections - REDUCED SIZE */}
+        {/* Connector between sections */}
         <div className="absolute z-10 md:top-[18rem] top-[45rem] w-80 h-56 transform md:rotate-[45deg] -rotate-[90deg] hidden md:block">
           <svg
             width="100%"
@@ -566,23 +625,18 @@ const NextGenServices = () => {
               variants={cardVariants}
             >
               <div className="relative group">
-                {/* Cozy Card */}
-                <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300 backdrop-blur-sm">
-                  {/* Hand-drawn like corner accent */}
+                <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300">
                   <div className="absolute -top-2 -left-2 w-8 h-8 bg-teal-100 rounded-full opacity-60"></div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-teal-100 rounded-full opacity-60"></div>
 
-                  {/* Icon Container */}
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-teal-500/30 group-hover:rotate-12 transition-transform duration-500">
                     {services[3].icon}
                   </div>
 
-                  {/* Number Badge */}
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-teal-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-teal-200 shadow-sm group-hover:bg-teal-50 transition-colors duration-300">
                     {services[3].number}
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-5">
                     <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                       {services[3].title}
@@ -593,7 +647,6 @@ const NextGenServices = () => {
                     </p>
                   </div>
 
-                  {/* Cozy hover effect */}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
                 </div>
               </div>
@@ -643,23 +696,18 @@ const NextGenServices = () => {
               variants={rightCardVariants}
             >
               <div className="relative group">
-                {/* Cozy Card */}
-                <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300 backdrop-blur-sm">
-                  {/* Hand-drawn like corner accent */}
+                <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300">
                   <div className="absolute -top-2 -left-2 w-8 h-8 bg-emerald-100 rounded-full opacity-60"></div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-emerald-100 rounded-full opacity-60"></div>
 
-                  {/* Icon Container */}
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30 group-hover:-rotate-12 transition-transform duration-500">
                     {services[2].icon}
                   </div>
 
-                  {/* Number Badge */}
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-emerald-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-emerald-200 shadow-sm group-hover:bg-emerald-50 transition-colors duration-300">
                     {services[2].number}
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-5">
                     <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                       {services[2].title}
@@ -670,14 +718,13 @@ const NextGenServices = () => {
                     </p>
                   </div>
 
-                  {/* Cozy hover effect */}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50/50 to-teal-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Connector between sections - REDUCED SIZE */}
+          {/* Connector between sections */}
           <div className="absolute z-10 md:top-[18rem] top-[45rem] w-80 h-56 transform md:rotate-[50deg] -rotate-[90deg] hidden md:block">
             <svg
               width="100%"
@@ -725,23 +772,18 @@ const NextGenServices = () => {
               variants={cardVariants}
             >
               <div className="relative group">
-                {/* Cozy Card */}
-                <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300 backdrop-blur-sm">
-                  {/* Hand-drawn like corner accent */}
+                <div className="relative bg-gradient-to-br from-white to-teal-50 rounded-3xl border-2 border-teal-200 p-8 shadow-lg shadow-teal-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-teal-300/40 group-hover:scale-105 group-hover:border-teal-300">
                   <div className="absolute -top-2 -left-2 w-8 h-8 bg-teal-100 rounded-full opacity-60"></div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-teal-100 rounded-full opacity-60"></div>
 
-                  {/* Icon Container */}
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-teal-500/30 group-hover:rotate-12 transition-transform duration-500">
                     {services[5].icon}
                   </div>
 
-                  {/* Number Badge */}
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-teal-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-teal-200 shadow-sm group-hover:bg-teal-50 transition-colors duration-300">
                     {services[5].number}
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-5">
                     <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                       {services[5].title}
@@ -752,7 +794,6 @@ const NextGenServices = () => {
                     </p>
                   </div>
 
-                  {/* Cozy hover effect */}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-50/50 to-emerald-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
                 </div>
               </div>
@@ -802,23 +843,18 @@ const NextGenServices = () => {
               variants={rightCardVariants}
             >
               <div className="relative group">
-                {/* Cozy Card */}
-                <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300 backdrop-blur-sm">
-                  {/* Hand-drawn like corner accent */}
+                <div className="relative bg-gradient-to-br from-white to-emerald-50 rounded-3xl border-2 border-emerald-200 p-8 shadow-lg shadow-emerald-200/30 md:w-80 w-72 transform transition-all duration-500 group-hover:shadow-emerald-300/40 group-hover:scale-105 group-hover:border-emerald-300">
                   <div className="absolute -top-2 -left-2 w-8 h-8 bg-emerald-100 rounded-full opacity-60"></div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-emerald-100 rounded-full opacity-60"></div>
 
-                  {/* Icon Container */}
                   <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30 group-hover:-rotate-12 transition-transform duration-500">
                     {services[4].icon}
                   </div>
 
-                  {/* Number Badge */}
                   <div className="inline-flex items-center justify-center w-14 h-14 bg-white text-emerald-600 rounded-2xl font-serif text-xl font-bold mb-6 border-2 border-emerald-200 shadow-sm group-hover:bg-emerald-50 transition-colors duration-300">
                     {services[4].number}
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-5">
                     <h2 className="text-2xl font-serif font-bold tracking-tight text-gray-800 leading-tight">
                       {services[4].title}
@@ -829,7 +865,6 @@ const NextGenServices = () => {
                     </p>
                   </div>
 
-                  {/* Cozy hover effect */}
                   <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-50/50 to-teal-50/50 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
                 </div>
               </div>
@@ -846,7 +881,7 @@ const NextGenServices = () => {
         viewport={{ once: true }}
         className="text-center mt-12 relative z-10 p-6"
       >
-        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-teal-200 shadow-sm mb-6">
+        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 border border-teal-200 shadow-sm mb-6">
           <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div>
           <span className="text-teal-700 font-medium text-sm tracking-wide">
             Ready to Start?
@@ -868,30 +903,6 @@ const NextGenServices = () => {
           </button>
         </div>
       </motion.div>
-
-      {/* Enhanced Custom CSS */}
-      <style jsx>{`
-        @keyframes gradient {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 4s ease infinite;
-        }
-
-        .bg-size-200 {
-          background-size: 200% 200%;
-        }
-      `}</style>
     </div>
   );
 };

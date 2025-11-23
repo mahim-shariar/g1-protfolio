@@ -523,7 +523,7 @@ const FaqsPage = () => {
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-white via-teal-50 to-blue-50">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-white via-teal-50 to-blue-50 py-10">
       {/* Background Logo Animation */}
       <BackgroundLogoAnimation />
 
